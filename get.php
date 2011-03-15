@@ -19,13 +19,6 @@
  * 6. Return the file back with a 60-day expiration
  */
 
-// Utility function to test if a string ends with another string
-function endsWith( $haystack, $needle )
-{
-   $length = strlen( $needle );
-   return substr( $haystack, -$length, $length) === $needle;
-}
-
 // Setup admin only files
 $adminOnlyFiles = array();
 
@@ -39,7 +32,7 @@ if( !isset( $_REQUEST[ 't' ] ) || !isset( $_REQUEST[ 'f' ] ) ||
 
 // Make sure there are no special characters so that people don't access files
 // they shouldn't
-preg_replace( '/[[:alnum:]]*/i', '', $_REQUEST[ 'f' ] ) == '' or
+preg_match( '/^[[:alnum:]]*$/i', $_REQUEST[ 'f' ] ) == 1 or
     die( 'GO AWAY' );
 
 /*********************************** STEP 2 ***********************************/
