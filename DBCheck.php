@@ -74,33 +74,34 @@ while( $row = mysql_fetch_row( $allTables ) )
 $intersectingTables = array_intersect_key( $expectedTables, $foundTables );
 
 // Echo out some headers
-echo "<html><head><title>DB Check</title></head><body>";
+// We don't use HTML because this is typically a script and rarely run
+echo "***DB Check***\n\n";
 
 // Echo out each expected table
-echo "<table border=1><tr><td><h1>Expected Tables</h1><br>";
+echo "Expected Tables\n";
 
 foreach( $expectedTables as $expectedTable => $columns )
 {
-   echo "$expectedTable<br>";
+   echo "-$expectedTable\n";
 }
 
 // Then echo out each found table
-echo "</td><td><h1>Found Tables</h1><br>";
+echo "\nFound Tables\n";
 
 foreach( $foundTables as $foundTable => $columns )
 {
-   echo "$foundTable<br>";
+   echo "-$foundTable\n";
 }
 
 // Now start the modifications cell
-echo "</td><td><h1>Modifications</h1><br>";
+echo "\nModifications\n";
 
 // First, check if we can simply skip iterating by comparing the counts of
 // the expected with the intersection and the found with the intersection
 if( count( $expectedTables == count( $intersectingTables ) ) &&
    count( $foundTables == count( $intersectingTables ) ) )
 {
-   echo "Tables match.  No modifications required.";
+   echo "Tables match.  No modifications required!\n";
 }
 else
 {
@@ -115,7 +116,7 @@ else
                die( 'Couldn\'t create table.' . mysql_error() );
 
            // And tell the user we created it
-           echo "Created table $expectedTable.<br>";
+           echo "Created table $expectedTable.\n";
 
            // Since we just created this table, we know it's valid
            unset( $possiblyInvalidTables[ $expectedTable ] );
@@ -133,13 +134,10 @@ else
                die( 'Couldn\'t drop table.' . mysql_error() );
 
            // And tell the user we dropped it
-           echo "Dropped table $foundTable.<br>";
+           echo "Dropped table $foundTable.\n";
        }
    }
 }
-
-// And clean up the table
-echo "</td></tr></table>";
 
 /*********************************** STEP 3 ***********************************/
 
@@ -156,7 +154,7 @@ foreach( $possibleInvalidTables as $possiblyInvalidTable => $insertSQL )
        die( 'Couldn\'t pull table creation command.' . mysql_error() );
    }
 
-   echo "<br>Checking table $possiblyInvalidTable...";
+   echo "\nChecking table $possiblyInvalidTable...";
 
    $row = mysql_fetch_row( $result );
    $createdSQL = $row[ 1 ];
@@ -192,6 +190,6 @@ foreach( $possibleInvalidTables as $possiblyInvalidTable => $insertSQL )
 }
 
 // Finally close the HTML up
-echo "</body></html>";
+echo "\n***DB Check Complete!***\n";
 
 ?>
