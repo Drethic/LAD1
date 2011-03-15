@@ -10,10 +10,8 @@
  * 2c. Create tables that are needed
  * 2d. Drop tables that are not
  * 3. Check each table's validity
- * 3a. Pull each table's columns
- * 3b. Create columns as needed
- * 3c. Delete columns as needed
- * 3d. Update columns as needed
+ * 3a. Pull each table's create definition
+ * 3b. Recreate table if definition is invalid
  */
 
 // Initialize some variables
@@ -25,12 +23,14 @@ $dbUsername = 'lad';
 // table, and the value contains how to create the table. Example:
 // CREATE TABLE key( value );
 // The value is also an array so we can carefully handle each column, tricky eh
-$expectedTables = array( 'USERS' =>
-        array( 'ID' => 'INT PRIMARY KEY AUTO_INCREMENT',
-               'NICK' => 'CHAR(20)',
-               'PASSWORD' => 'CHAR(40)',
-               'EMAIL' => 'CHAR(40)'
-             ));
+$expectedTables = array( 'USERS' => "CREATE TABLE `USERS` (\n" .
+   "`ID` int unsigned NOT NULL AUTO_INCREMENT,\n" .
+   "`NICK` varchar(20) NOT NULL,\n" .
+   "`PASSWORD` varchar(40) NOT NULL,\n" .
+   "`EMAIL` varchar(40) NOT NULL\n," .
+   "PRIMARY KEY (ID)\n" .
+   ") ENGINE = MyISAM DEFAULT CHARSET=latin1" );
+
 $possiblyInvalidTables = $expectedTables;
 
 /*********************************** STEP 2 ***********************************/
@@ -39,7 +39,7 @@ $sqlConnection = mysql_connect('localhost', $dbUsername);
 
 if( !$sqlConnection )
 {
-    die( 'Failed to connect to MySQL.' );
+   die( 'Failed to connect to MySQL.' . mysql_error() );
 }
 
 // Select Database
@@ -47,7 +47,7 @@ $dbSelection = mysql_select_db( $dbName );
 
 if( !$dbSelection )
 {
-    die( 'Failed to select DB in MySQL.' );
+   die( 'Failed to select DB in MySQL.' . mysql_error() );
 }
 
 /*********************************** STEP 2a **********************************/
@@ -56,7 +56,7 @@ $allTables = mysql_query( "SHOW TABLES FROM $dbName" );
 
 if( !$allTables )
 {
-    die( 'Failed to show tables.' );
+   die( 'Failed to show tables.' . mysql_error() );
 }
 
 $foundTables = array('USER' => 'a');
@@ -66,7 +66,7 @@ $foundTables = array('USER' => 'a');
 // See below for the key intersection
 while( $row = mysql_fetch_row( $allTables ) )
 {
-    $foundTables[ $row[0] ] = 1;
+   $foundTables[ $row[0] ] = 1;
 }
 
 /*********************************** STEP 2b **********************************/
@@ -81,7 +81,7 @@ echo "<table border=1><tr><td><h1>Expected Tables</h1><br>";
 
 foreach( $expectedTables as $expectedTable => $columns )
 {
-    echo "$expectedTable<br>";
+   echo "$expectedTable<br>";
 }
 
 // Then echo out each found table
@@ -89,7 +89,7 @@ echo "</td><td><h1>Found Tables</h1><br>";
 
 foreach( $foundTables as $foundTable => $columns )
 {
-    echo "$foundTable<br>";
+   echo "$foundTable<br>";
 }
 
 // Now start the modifications cell
@@ -98,57 +98,100 @@ echo "</td><td><h1>Modifications</h1><br>";
 // First, check if we can simply skip iterating by comparing the counts of
 // the expected with the intersection and the found with the intersection
 if( count( $expectedTables == count( $intersectingTables ) ) &&
-    count( $foundTables == count( $intersectingTables ) ) )
+   count( $foundTables == count( $intersectingTables ) ) )
 {
-    echo "Tables match.  No modifications required.";
+   echo "Tables match.  No modifications required.";
 }
 else
 {
 /*********************************** STEP 2c **********************************/
-    // Check each table we were expecting for missing ones
-    foreach( $expectedTables as $expectedTable => $columns )
-    {
-        if( !key_exists( $expectedTable, $foundTables ) )
-        {
-            // Found a missing one...create it
-            if( !mysql_query( "CREATE TABLE $expectedTable(" .
-                    implode( ', ', $columns ) .
-                    ")" ) )
-            {
-                die( 'Couldn\'t create table.' );
-            }
+   // Check each table we were expecting for missing ones
+   foreach( $expectedTables as $expectedTable => $insertSQL )
+   {
+       if( !key_exists( $expectedTable, $foundTables ) )
+       {
+           // Found a missing one...create it
+           mysql_query( $insertSQL ) or
+               die( 'Couldn\'t create table.' . mysql_error() );
 
-            // And tell the user we created it
-            echo "Created table $expectedTable.<br>";
+           // And tell the user we created it
+           echo "Created table $expectedTable.<br>";
 
-            // Since we just created this table, we know it's valid
-            unset( $possiblyInvalidTables[ $expectedTable ] );
-        }
-    }
+           // Since we just created this table, we know it's valid
+           unset( $possiblyInvalidTables[ $expectedTable ] );
+       }
+   }
 
 /*********************************** STEP 2d **********************************/
-    // Check each table we found for table we weren't expecting
-    foreach( $foundTables as $foundTable )
-    {
-        if( !key_exists( $foundTable, $expectedTables ) )
-        {
-            // Found an extra one...just delete it
-            if( !mysql_query( "DROP TABLE $foundTable" ) )
-            {
-                die( 'Couldn\'t drop table.' );
-            }
+   // Check each table we found for table we weren't expecting
+   foreach( $foundTables as $foundTable )
+   {
+       if( !key_exists( $foundTable, $expectedTables ) )
+       {
+           // Found an extra one...just delete it
+           mysql_query( "DROP TABLE $foundTable" ) or
+               die( 'Couldn\'t drop table.' . mysql_error() );
 
-            // And tell the user we dropped it
-            echo "Dropped table $foundTable.<br>";
-        }
-    }
+           // And tell the user we dropped it
+           echo "Dropped table $foundTable.<br>";
+       }
+   }
 }
-
-// Alright, now we know that we have every table that we want
-// Now we have to check the integrity of each
 
 // And clean up the table
 echo "</td></tr></table>";
+
+/*********************************** STEP 3 ***********************************/
+
+// Alright, now we know that we have every table that we want
+// Now we have to check the integrity of each
+// Iterate over each table, and pull the create table command
+foreach( $possibleInvalidTables as $possiblyInvalidTable => $insertSQL )
+{
+/*********************************** STEP 3a **********************************/
+   $result = mysql_query( "SHOW CREATE TABLE $possiblyInvalidTable" );
+
+   if( !$result )
+   {
+       die( 'Couldn\'t pull table creation command.' . mysql_error() );
+   }
+
+   echo "<br>Checking table $possiblyInvalidTable...";
+
+   $row = mysql_fetch_row( $result );
+   $createdSQL = $row[ 1 ];
+
+   // createdSQL is now the DB create command and insertSQL is ours
+   // Cleanup the whitespace of both then compare line by line
+   $insertSplit = explode( "\n", $insertSQL );
+   $createSplit = explode( "\n", $createdSQL );
+
+   $valid = true;
+   for( $i = 0; $i < count( $insertSplit ); $i++ )
+   {
+       if( trim( $insertSplit[ $i ] ) != trim( $createSplit[ $i ] ) )
+       {
+/*********************************** STEP 3b **********************************/
+           // Discrepancies existed, drop then recreate the table
+           echo "recreating due to discrepancies...";
+
+           mysql_query( "DROP TABLE $possiblyInvalidTable" ) or
+               die( 'Couldn\'t drop table.' . mysql_error() );
+
+           mysql_query( $insertSQL ) or
+               die( 'Couldn\'t recreate table.' . mysql_error() );
+
+           $valid = false;
+           break;
+       }
+   }
+   if( $valid )
+   {
+       echo "OK!";
+   }
+}
+
 // Finally close the HTML up
 echo "</body></html>";
+
 ?>
