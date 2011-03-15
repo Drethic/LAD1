@@ -4,7 +4,7 @@
  * Basic concept: Retrieves a client-side file (JS, CSS, IMG)
  *
  * Parameters:
- *   t: Type – J = JS, C = CSS, I = IMG
+ *   t: Type – J = JS, C = CSS, P = JPG, E = JPEG, N = PNG, S = SVG, G = GIF
  *   f: File name
  *   m: mtime of the file
  *
@@ -39,78 +39,57 @@ if( !isset( $_REQUEST[ 't' ] ) || !isset( $_REQUEST[ 'f' ] ) ||
 
 // Make sure there are no special characters so that people don't access files
 // they shouldn't
-if( preg_replace( '/[[:alnum:]]*/i', '', $_REQUEST[ 'f' ] ) !== '' )
-{
-   die( 'GO AWAY' );
-}
+preg_replace( '/[[:alnum:]]*/i', '', $_REQUEST[ 'f' ] ) == '' or
+    die( 'GO AWAY' );
 
 /*********************************** STEP 2 ***********************************/
-in_array( $_REQUEST[ 't' ], array( 'J', 'C', 'I' ) ) or die( 'GO AWAY' );
+// Make sure the type of file requested is valid
+in_array( $_REQUEST[ 't' ], array( 'J', 'C', 'P', 'E', 'N', 'S', 'G' ) ) or
+    die( 'GO AWAY' );
 
-$possibleFileNames = array();
 $applicationType = "";
 
 switch( $_REQUEST[ 't' ] )
 {
    case 'J':
-       $possibleFileNames[] = "js/{$_REQUEST['f']}.js";
-       $applicationType = "text/javascript";
+       $actualFileName = "js/{$_REQUEST['f']}.js";
+       $applicationType = 'text/javascript';
        break;
    case 'C':
-       $possibleFileNames[] = "css/{$_REQUEST['f']}.css";
-       $applicationType = "text/css";
+       $actualFileName = "css/{$_REQUEST['f']}.css";
+       $applicationType = 'text/css';
        break;
-   case 'I':
-       // Application type can't be determined yet, determine later
-       $possibleFileNames[] = "imgs/${_REQUEST['f']}.jpg";
-       $possibleFileNames[] = "imgs/${_REQUEST['f']}.jpeg";
-       $possibleFileNames[] = "imgs/${_REQUEST['f']}.png";
-       $possibleFileNames[] = "imgs/${_REQUEST['f']}.svg";
-       $possibleFileNames[] = "imgs/${_REQUEST['f']}.gif";
+   case 'P':
+       $actualFileName = "img/${_REQUEST['f']}.jpg";
+       $applicationType = 'image/jpeg';
+       break;
+   case 'E':
+       $actualFileName = "img/${_REQUEST['f']}.jpeg";
+       $applicationType = 'image/jpeg';
+       break;
+   case 'N':
+       $actualFileName = "img/${_REQUEST['f']}.png";
+       $applicationType = 'image/png';
+       break;
+   case 'S':
+       $actualFileName = "img/${_REQUEST['f']}.svg";
+       $applicationType = 'image/svg+xml';
+       break;
+   case 'G':
+       $actualFileName = "img/${_REQUEST['f']}.gif";
+       $applicationType = 'image/gif';
 }
 
 /*********************************** STEP 3 ***********************************/
-if( !isset( $_SESSION[ 'isAdmin' ] ) || !$_SESSION[ 'isAdmin' ] )
+if( ( !isset( $_SESSION[ 'isAdmin' ] ) || !$_SESSION[ 'isAdmin' ] ) &&
+    !in_array( $actualFileName, $adminOnlyFiles ) )
 {
-   foreach( $possibleFileNames as $adminTest )
-   {
-       !in_array( $adminTest, $adminOnlyFiles ) or die( 'GO AWAY' );
-   }
+    die( 'GO AWAY' );
 }
-
-// Dummy value initially
-$actualFileName = 0;
 
 /*********************************** STEP 4 ***********************************/
-// Since images can have +1 possible extension, we'll loop until we find a
-// good one, setting it when we can
-foreach( $possibleFileNames as $fileName )
-{
-   if( is_readable( $fileName ) )
-   {
-       $actualFileName = $fileName;
-       if( endsWith( $fileName, ".jpg" ) || endsWith( $fileName, ".jpeg" ) )
-       {
-           $applicationType = "image/jpeg";
-       }
-       else if( endsWith( $fileName, ".png" ) )
-       {
-           $applicationType = "image/png";
-       }
-       else if( endsWith( $fileName, ".svg" ) )
-       {
-           $applicationType = "image/svg+xml";
-       }
-       else
-       {
-           $applicationType = "image/gif";
-       }
-       break;
-   }
-}
-
 // File does not exist
-if( !$actualFileName )
+if( !is_readable( $actualFileName ) )
 {
    die( 'GO AWAY' );
 }
