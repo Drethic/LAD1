@@ -32,7 +32,7 @@ if( !isset( $_REQUEST[ 't' ] ) || !isset( $_REQUEST[ 'f' ] ) ||
 
 // Make sure there are no special characters so that people don't access files
 // they shouldn't
-preg_match( '/^[[:alnum:]]*$/i', $_REQUEST[ 'f' ] ) == 1 or
+preg_match( '/^[[:alnum:]\.\-]*$/i', $_REQUEST[ 'f' ] ) == 1 or
     die( 'GO AWAY' );
 
 /*********************************** STEP 2 ***********************************/
