@@ -19,6 +19,8 @@
  * 6. Return the file back with a 60-day expiration
  */
 
+require_once( 'private/defs.php' );
+
 // Setup admin only files
 $adminOnlyFiles = array();
 
@@ -27,83 +29,86 @@ $adminOnlyFiles = array();
 if( !isset( $_REQUEST[ 't' ] ) || !isset( $_REQUEST[ 'f' ] ) ||
    !isset( $_REQUEST[ 'm' ] ) )
 {
-   die( 'GO AWAY' );
+   die( 'GO AWAY1' );
 }
 
 // Make sure there are no special characters so that people don't access files
 // they shouldn't
 preg_match( '/^[[:alnum:]\.\-]*$/i', $_REQUEST[ 'f' ] ) == 1 or
-    die( 'GO AWAY' );
+    die( 'GO AWAY2' );
 
 /*********************************** STEP 2 ***********************************/
 // Make sure the type of file requested is valid
 in_array( $_REQUEST[ 't' ], array( 'J', 'C', 'P', 'E', 'N', 'S', 'G' ) ) or
-    die( 'GO AWAY' );
+    die( 'GO AWAY3' );
 
-$applicationType = "";
-
-switch( $_REQUEST[ 't' ] )
-{
-   case 'J':
-       $actualFileName = "js/{$_REQUEST['f']}.js";
-       $applicationType = 'text/javascript';
-       break;
-   case 'C':
-       $actualFileName = "css/{$_REQUEST['f']}.css";
-       $applicationType = 'text/css';
-       break;
-   case 'P':
-       $actualFileName = "img/${_REQUEST['f']}.jpg";
-       $applicationType = 'image/jpeg';
-       break;
-   case 'E':
-       $actualFileName = "img/${_REQUEST['f']}.jpeg";
-       $applicationType = 'image/jpeg';
-       break;
-   case 'N':
-       $actualFileName = "img/${_REQUEST['f']}.png";
-       $applicationType = 'image/png';
-       break;
-   case 'S':
-       $actualFileName = "img/${_REQUEST['f']}.svg";
-       $applicationType = 'image/svg+xml';
-       break;
-   case 'G':
-       $actualFileName = "img/${_REQUEST['f']}.gif";
-       $applicationType = 'image/gif';
-}
+$applicationType = clientfile_getApplicationType( $_REQUEST[ 't' ] );
+$actualFileName = clientfile_getName( $_REQUEST[ 't' ], $_REQUEST[ 'f' ] );
 
 /*********************************** STEP 3 ***********************************/
 if( ( !isset( $_SESSION[ 'isAdmin' ] ) || !$_SESSION[ 'isAdmin' ] ) &&
-    !in_array( $actualFileName, $adminOnlyFiles ) )
+    in_array( $actualFileName, $adminOnlyFiles ) )
 {
-    die( 'GO AWAY' );
+    die( 'GO AWAY4' );
 }
 
 /*********************************** STEP 4 ***********************************/
 // File does not exist
 if( !is_readable( $actualFileName ) )
 {
-   die( 'GO AWAY' );
+   die( 'GO AWAY5' );
 }
 
 /*********************************** STEP 5 ***********************************/
-if( mtime( $actualFileName ) != $_SESSION[ 'm' ] )
+if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] )
 {
    // TODO: Improve this so that it will force a client refresh rather than
    // TODO: simply dying
-   die( 'GO AWAY' );
+   die( 'GO AWAY6' );
 }
 
 /*********************************** STEP 6 ***********************************/
 // Output some headers
 header( "PRAGMA: public" );
 header( "Content-type: $applicationType" );
-header( "Last-Modified: " . date( DateTime::COOKIE, $_SESSION[ 'm' ] ) );
+header( "Last-Modified: " . date( DateTime::COOKIE, $_REQUEST[ 'm' ] ) );
 header( "Expires: " . date( DateTime::COOKIE, time() + (60 * 24 * 60 * 60) ) );
 header( "Content-Length: " . filesize( $actualFileName ) );
 
-// Read file and write it to the user
-readfile( $actualFileName );
+// JQuery UI has special pre processing
+if( $_REQUEST[ 't' ] == 'C' && $_REQUEST[ 'f' ] == JQUERY_UI_CSS )
+{
+    // Read each line one at a time
+    $lineArray = file( $actualFileName );
+    foreach( $lineArray as $line )
+    {
+        // URL's are not correct so...let's fix em
+        // We need to extract the image name out of the url() and then replace
+        // it with a string that we build
+        $urlIndex = strpos( $line, 'url(' );
+        if( $urlIndex == false )
+        {
+            // No URL, just echo out
+            echo $line;
+        }
+        else
+        {
+            // Alright, there is a URL, so figure out exactly where it is
+            $fileIndex = $urlIndex + 11;
+            $dotIndex = strpos( $line, '.png' );
+
+            $fileName = substr( $line, $fileIndex, $dotIndex - $fileIndex );
+            $replacement = clientfile_buildRequest( 'N', $fileName );
+
+            // Now just replace it and echo out
+            echo substr_replace( $line, $replacement, $urlIndex + 4,
+                                 $dotIndex - $urlIndex ) . "\n";
+        }
+    }
+}
+else
+{
+    readfile( $actualFileName );
+}
 
 ?>
