@@ -4,12 +4,13 @@ function doLogin()
     
     $("<form id='loginform'>Login<br></form>")
       .append("Username:<input type='text' name='username' " +
-              "maxlength=20 id='username'>")
+              "maxlength=20 id='username' class='filterkeys' " +
+              "data-filterkeys='[a-zA-Z0-9]'>")
       .append("<span id='usernameerror'></span><br>")
-      .append("Password:<input type='text' name='password' " +
+      .append("Password:<input type='password' name='password' " +
               "maxlength=40 id='password'>")
       .append("<span id='passworderror'></span><br>")
-      .appendTo("body");
+      .appendTo("body").filterKeys();
 
     $("<div>")
       .append("<button id='loginbutton'>Login</button>")
@@ -26,16 +27,43 @@ function doLogin()
    $("#usernameerror, #passworderror").css( "font-weight", "bold" );
 
    var errorStrings = [
-       "Username must be at least 4 characters."
+       "Username must be at least 4 characters.",
+       "Username cannot start with a number.",
+       "Password must be at least 4 characters."
    ];
    $("#username, #password").keyup(function(){
-       if( $("#username").val().length < 4 )
+       var passed = true;
+       if( $("#username").val().substring( 0, 1 ).search( "[0-9]" ) > -1 )
+       {
+           loginError( true, errorStrings[ 1 ] );
+           passed = false;
+       }
+       else if( $("#username").val().length < 4 )
        {
            loginError( true, errorStrings[ 0 ] );
+           passed = false;
        }
        else
        {
            loginError( true, "" );
+       }
+       if( $("#password").val().length < 4 )
+       {
+           loginError( false, errorStrings[ 2 ] );
+           passed = false;
+       }
+       else
+       {
+           loginError( false, "" );
+       }
+
+       if( passed )
+       {
+           $("#loginform button").button( "enable" );
+       }
+       else
+       {
+           $("#loginform button").button( "disable" );
        }
    }).keyup();
 }

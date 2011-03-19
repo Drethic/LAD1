@@ -6,23 +6,23 @@ require_once( 'private/defs.php' );
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title></title><?php
 
-function writeJS($filebase)
+function writeJS( $filebase )
 {
     echo "<script type='text/javascript' src='" .
          clientfile_buildRequest( 'J', $filebase ) .
-         "'></script>\n";
+         "'></script>";
 }
 
 writeJS(JQUERY_JS);
 writeJS(JQUERY_UI_JS);
+writeJS('plugins');
 writeJS('main');
 
 echo "<link rel='stylesheet' type='text/css' href='" .
      clientfile_buildRequest( 'C', JQUERY_UI_CSS ) .
      "'>";
-echo "<script type='text/javascript'>\n";
-echo "$(document).ready(function(){";
-echo "doLogin();});\n";
-echo "</script>";
+echo '<script type="text/javascript">';
+echo '$(document).ready(function(){ doLogin(); });';
+echo '</script>';
 
 ?></head><body></body></html>
