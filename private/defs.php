@@ -2,9 +2,13 @@
 
 session_start();
 
-define('JQUERY_VERSION', 'jquery-1.5.1.min');
-define('JQUERY_UI_VERSION', 'jquery-ui-1.8.10.custom.min');
-define('JQUERY_UI_CSS', 'jquery-ui-1.8.10.custom');
+
+define('JQUERY_VERSION', '1.5.1');
+define('JQUERY_UI_VERSION', '1.8.10');
+
+define('JQUERY_JS', 'jquery-' . JQUERY_VERSION . '.min');
+define('JQUERY_UI_CSS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom');
+define('JQUERY_UI_JS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom.min');
 
 function clientfile_getName( $type, $base )
 {

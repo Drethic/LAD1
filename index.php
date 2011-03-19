@@ -3,11 +3,8 @@
 require_once( 'private/defs.php' );
 
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title></title>
-<?php
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title></title><?php
 
 function writeJS($filebase)
 {
@@ -16,8 +13,8 @@ function writeJS($filebase)
          "'></script>\n";
 }
 
-writeJS(JQUERY_VERSION);
-writeJS(JQUERY_UI_VERSION);
+writeJS(JQUERY_JS);
+writeJS(JQUERY_UI_JS);
 writeJS('main');
 
 echo "<link rel='stylesheet' type='text/css' href='" .
@@ -28,8 +25,4 @@ echo "$(document).ready(function(){";
 echo "doLogin();});\n";
 echo "</script>";
 
-?>
-    </head>
-    <body>
-    </body>
-</html>
+?></head><body></body></html>
