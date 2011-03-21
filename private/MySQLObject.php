@@ -11,9 +11,10 @@
  *  getSingle() : Gets a single entry (1-D array) from DB by index
  *
  * Abstracts:
- *    getColumns() : Return an array with column names in the values
- *      getIndex() : Return an int with the column that is the index
- *  getTableName() : Return the table name
+ *       getColumns() : Return an array with column names in the values
+ *         getIndex() : Return an int with the column that is the index
+ *     getTableName() : Return the table name
+ *  getTableCreator() : Return the statement used to create the table
  *
  * Todo:
  *  Expand get to allow OR in the WHERE
@@ -25,6 +26,7 @@ abstract class MySQLObject
    abstract protected function getColumns();
    abstract protected function getIndex();
    abstract protected function getTableName();
+   abstract protected function getTableCreator();
 
    // Filters = key/value for columnName/columnValue
    // Orders = key for each columnName, value is ASC/DESC
@@ -51,7 +53,7 @@ abstract class MySQLObject
        $sql .= 'FROM `' . getTableName() . '` ';
 
        // Filters
-       if( is_array( $filters ) )
+       if( is_array( $filters ) && count( $filters ) > 0 )
        {
            $sql .= 'WHERE ';
            $filterKeys = array_keys( $filters );
@@ -67,7 +69,7 @@ abstract class MySQLObject
        }
 
        // Ordering
-       if( is_array( $orders ) )
+       if( is_array( $orders ) && count( $orders ) > 0 )
        {
            $sql .= 'ORDER BY ';
            $orderNames = array_keys( $orders );
@@ -110,14 +112,81 @@ abstract class MySQLObject
 
    public function insert( $values )
    {
+      $sql = 'INSERT INTO ' . getTableName() . ' VALUES(' .
+             implode( ', ', $values ) . ')';
+
+      $result = mysql_query( $sql );
+
+      if( !$result )
+      {
+         die( 'MySQL Query Error: ' . mysql_error() );
+      }
+
+      return mysql_insert_id();
    }
 
    public function delete( $filters )
    {
+      $sql = 'DELETE FROM ' . getTableName() . ' WHERE ';
+      $filterKeys = array_keys( $filters );
+      for( $i = 0; $i < count( $filters ); $i++ )
+      {
+         $filterKey = $filterKeys[ $i ];
+         $sql .= $filterKey . '=' . $filters[ $filterKey ];
+         if( $i < count( $filters ) - 1 )
+         {
+            $sql .= ' AND ';
+         }
+      }
+
+      $result = mysql_query( $sql );
+
+      if( !$result )
+      {
+         die( 'MySQL Query Error: ' . mysql_error() );
+      }
+
+      return mysql_affected_rows();
    }
 
-   public function update( $keys, $values )
+   public function update( $values, $conditions = NULL )
    {
+      $sql = 'UPDATE ' . getTableName() . ' SET ';
+      $valueKeys = array_keys( $values );
+      $conditionKeys = array_keys( $conditions );
+
+      for( $i = 0; $i < count( $values ); $i++ )
+      {
+         $valueKey = $valueKeys[ $i ];
+         $sql .= $valueKey . '=' . $values[ $valueKey ];
+         if( $i < count( $values ) - 1 )
+         {
+            $sql .= ', ';
+         }
+      }
+
+      if( is_array( $conditions ) && count( $conditions ) > 0 )
+      {
+         $sql .= ' WHERE ';
+         for( $i = 0; $i < count( $conditions ); $i++ )
+         {
+            $conditionKey = $conditionKeys[ $i ];
+            $sql .= $conditionKey . '=' . $conditions[ $conditionKey ];
+            if( $i < count( $conditions ) - 1 )
+            {
+               $sql .= ' AND ';
+            }
+         }
+      }
+
+      $result = mysql_query( $sql );
+
+      if( !$result )
+      {
+         die( 'MySQL Query Error: ' . mysql_error() );
+      }
+
+      return mysql_affected_rows();
    }
 
    public function getSingle( $value )
