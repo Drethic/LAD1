@@ -69,10 +69,11 @@ if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] )
 
 /*********************************** STEP 6 ***********************************/
 // Output some headers
-header( "Pragma: public" );
+header( 'Pragma: public' );
+header( 'Cache-Control: must-revalidate' );
 header( "Content-Type: $applicationType" );
 header( "Last-Modified: " . date( DateTime::COOKIE, $_REQUEST[ 'm' ] ) );
-header( "Expires: " . date( DateTime::COOKIE, time() + (60 * 24 * 60 * 60) ) );
+header( "Expires: " . date( DateTime::COOKIE, time() + (365 * 24 * 60 * 60) ) );
 
 // JQuery UI has special pre processing
 if( $_REQUEST[ 't' ] == 'C' && $_REQUEST[ 'f' ] == JQUERY_UI_CSS )
