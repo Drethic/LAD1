@@ -6,6 +6,10 @@ require_once( 'private/defs.php' );
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title></title><?php
 
+echo "<link rel='stylesheet' type='text/css' href='" .
+     clientfile_buildRequest( 'C', JQUERY_UI_CSS ) .
+     "'>";
+
 function writeJS( $filebase )
 {
     echo "<script type='text/javascript' src='" .
@@ -18,11 +22,6 @@ writeJS(JQUERY_UI_JS);
 writeJS('plugins');
 writeJS('main');
 
-echo "<link rel='stylesheet' type='text/css' href='" .
-     clientfile_buildRequest( 'C', JQUERY_UI_CSS ) .
-     "'>";
-echo '<script type="text/javascript">';
-echo '$(document).ready(function(){ doLogin(); });';
-echo '</script>';
-
-?></head><body></body></html>
+?></head><body><script type='text/javascript'>$(document).ready(function(){
+    doLogin();
+});</script></body></html>

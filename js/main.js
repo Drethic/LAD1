@@ -149,13 +149,33 @@ function accountCreated( id )
 function validLogin( id )
 {
     //do nothing for now
-    $("body").html( "YAY LOGGED IN WITH " + id + "!" );
+    //$("body").html( "YAY LOGGED IN WITH " + id + "!" );
+    $( "body" ).html( "" );
+    $( "<div id='tabs'></div>" )
+      .append( $("<ul></ul>")
+        .append( "<li><a href='#tabs-1'>Programs</a></li>" )
+        .append( "<li><a href='#tabs-2'>Servers</a></li>" )
+        .append( "<li><a href='#tabs-3'>Users</a></li>" )
+      ).append( $("<div id='tabs-1'></div>" )
+        .append( "Program Stuff<br />More Program Stuff" )
+      ).append( $("<div id='tabs-2'></div>" )
+        .append( "Server Stuff" )
+      ).append( $("<div id='tabs-3'></div>" )
+        .append( "Users Stuff<br /><br />Interesting Stuff" )
+      ).appendTo( "body" ).tabs({
+          select: function( evt, ui )
+          {
+              $( ui.panel ).append( "HI" );
+          },
+          fx: { opacity: 'toggle' }
+      }).css( "font-size", "0.6em" );
 }
 
 function invalidLoginCombo()
 {
-    loginError( true, "Invalid login information." );
-    loginError( false, "Invalid login information." );
+    var str = "Invalid login information.";
+    loginError( true, str );
+    loginError( false, str );
     restoreLoginForm();
 }
 
