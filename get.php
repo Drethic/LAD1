@@ -34,7 +34,7 @@ if( !isset( $_REQUEST[ 't' ] ) || !isset( $_REQUEST[ 'f' ] ) ||
 
 // Make sure there are no special characters so that people don't access files
 // they shouldn't
-preg_match( '/^[[:alnum:]\.\-]*$/i', $_REQUEST[ 'f' ] ) == 1 or
+preg_match( '/^[[:alnum:]\.\-\_]*$/i', $_REQUEST[ 'f' ] ) == 1 or
     die( 'GO AWAY2' );
 
 /*********************************** STEP 2 ***********************************/
@@ -69,17 +69,17 @@ if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] )
 
 /*********************************** STEP 6 ***********************************/
 // Output some headers
-header( "PRAGMA: public" );
-header( "Content-type: $applicationType" );
+header( "Pragma: public" );
+header( "Content-Type: $applicationType" );
 header( "Last-Modified: " . date( DateTime::COOKIE, $_REQUEST[ 'm' ] ) );
 header( "Expires: " . date( DateTime::COOKIE, time() + (60 * 24 * 60 * 60) ) );
-header( "Content-Length: " . filesize( $actualFileName ) );
 
 // JQuery UI has special pre processing
 if( $_REQUEST[ 't' ] == 'C' && $_REQUEST[ 'f' ] == JQUERY_UI_CSS )
 {
     // Read each line one at a time
     $lineArray = file( $actualFileName );
+    $outBuffer = '';
     foreach( $lineArray as $line )
     {
         // URL's are not correct so...let's fix em
@@ -89,7 +89,7 @@ if( $_REQUEST[ 't' ] == 'C' && $_REQUEST[ 'f' ] == JQUERY_UI_CSS )
         if( $urlIndex == false )
         {
             // No URL, just echo out
-            echo $line;
+            $outBuffer .= $line;
         }
         else
         {
@@ -101,13 +101,16 @@ if( $_REQUEST[ 't' ] == 'C' && $_REQUEST[ 'f' ] == JQUERY_UI_CSS )
             $replacement = clientfile_buildRequest( 'N', $fileName );
 
             // Now just replace it and echo out
-            echo substr_replace( $line, $replacement, $urlIndex + 4,
-                                 $dotIndex - $urlIndex ) . "\n";
+            $outBuffer .= substr_replace( $line, $replacement, $urlIndex + 4,
+                                          $dotIndex - $urlIndex ) . "\n";
         }
     }
+    header( "Content-Length: " . strlen( $outBuffer ) );
+    echo $outBuffer;
 }
 else
 {
+    header( "Content-Length: " . filesize( $actualFileName ) );
     readfile( $actualFileName );
 }
 
