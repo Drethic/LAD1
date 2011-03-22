@@ -21,10 +21,9 @@ function doLogin()
 
     $("#emailspan").css( "display", "none" );
     $("#loginbutton, #newuserbutton").button().css( "font-size", "0.6em" )
-      .button( "disable" );
-    $("#loginbutton").click(function( evt ){
+      .button( "disable" ).click(function( evt ){
         $("#loginform input, #loginform button").button( "disable" )
-          .button( "refresh" ).attr( "readonly", true );
+          .button( "refresh" ).attr( "disabled", "disabled" );
         evt.preventDefault();
     });
     $("#newuserbutton").click(function( evt ){
@@ -113,7 +112,7 @@ function loginError( isUser, reason )
     {
         inputObject.css({"background-color" : "#FFAAAA",
                          "border-color" : "#DD4444"});
-        warnObject.css( "display", "");
+        warnObject.css( "display", "" );
         warnObject.html( reason );
     }
 }
@@ -121,34 +120,52 @@ function loginError( isUser, reason )
 function usernameTaken()
 {
     loginError( true, "Username is already taken." );
+    restoreLoginForm();
 }
 
 function usernameAvailable()
 {
     $( "#emailspan" ).css( "display", "" );
-    $( "#username, #password" ).attr( "readonly", true );
+    restoreLoginForm();
+    $( "#username, #password" ).attr( "disabled", "disabled" );
 }
 
 function emailTaken()
 {
     $( "#emailerror" ).html( "Email is already associated with an account." );
+    restoreLoginForm();
+    $( "#username, #password" ).attr( "disabled", "disabled" );
 }
 
 function accountCreated( id )
 {
     validLogin( id );
+    restoreLoginForm();
 }
 
 function validLogin( id )
 {
     //do nothing for now
     $("body").html( "YAY LOGGED IN WITH " + id + "!" );
+    restoreLoginForm();
 }
 
 function invalidLoginCombo()
 {
     loginError( true, "Invalid login information." );
     loginError( false, "Invalid login information." );
+    restoreLoginForm();
+}
+
+function restoreLoginForm( )
+{
+    restoreForm( "loginform" );
+}
+
+function restoreForm(frm)
+{
+    $("#" + frm + " input,#" + frm + " button").button( "enable" )
+          .button( "refresh" ).attr( "disabled", false );
 }
 
 function doAjax( outData )
