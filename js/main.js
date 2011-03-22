@@ -23,7 +23,8 @@ function doLogin()
     $("#loginbutton, #newuserbutton").button().css( "font-size", "0.6em" )
       .button( "disable" ).click(function( evt ){
         $("#loginform input, #loginform button").button( "disable" )
-          .button( "refresh" ).attr( "disabled", "disabled" );
+          .button( "refresh" ).attr( "disabled", "disabled" )
+          .attr( "readonly", true );
         evt.preventDefault();
     });
     $("#newuserbutton").click(function( evt ){
@@ -127,14 +128,16 @@ function usernameAvailable()
 {
     $( "#emailspan" ).css( "display", "" );
     restoreLoginForm();
-    $( "#username, #password" ).attr( "disabled", "disabled" );
+    $( "#username, #password" ).attr( "disabled", "disabled" )
+      .attr( "readonly", true );
 }
 
 function emailTaken()
 {
     $( "#emailerror" ).html( "Email is already associated with an account." );
     restoreLoginForm();
-    $( "#username, #password" ).attr( "disabled", "disabled" );
+    $( "#username, #password" ).attr( "disabled", "disabled" )
+      .attr( "readonly", true );
 }
 
 function accountCreated( id )
@@ -147,7 +150,6 @@ function validLogin( id )
 {
     //do nothing for now
     $("body").html( "YAY LOGGED IN WITH " + id + "!" );
-    restoreLoginForm();
 }
 
 function invalidLoginCombo()
@@ -165,7 +167,8 @@ function restoreLoginForm( )
 function restoreForm(frm)
 {
     $("#" + frm + " input,#" + frm + " button").button( "enable" )
-          .button( "refresh" ).attr( "disabled", false );
+      .button( "refresh" ).attr( "disabled", false )
+      .attr( "readonly", false );
 }
 
 function doAjax( outData )
