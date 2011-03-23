@@ -3,6 +3,12 @@
 /**
  * Basic concept: Interface to the User MySQL table
  *
+ * Uses:
+ *              addUser: Adds a user to the DB
+ *           checkCombo: Checks if specified combo exists, return ID on success
+ *                       or False on failure
+ *     checkEmailExists: Checks if email exists, return true/false
+ *  checkUsernameExists: Checks if username exists, return true/false
  */
 
 require_once( 'MySqlObject.php' );
@@ -45,7 +51,11 @@ class Users extends MySQLObject
     {
         $val = get( array( 'NICK' => $nick, 'PASSWORD' => $pass ), NULL, NULL,
                     array( 'NICK', 'PASSWORD', 'EMAIL' ) );
-        return count( $val ) == 1;
+        if( count( $val ) == 0 )
+        {
+            return false;
+        }
+        return $val[ 0 ][ 0 ];
     }
 
     function checkUsernameExists( $nick )
