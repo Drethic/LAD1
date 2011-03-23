@@ -37,6 +37,25 @@ class Users extends MySQLObject
    {
       return insert( array( "NULL", $nick, $pass, $email ) );
    }
+
+   function checkCombo( $nick, $pass )
+   {
+       $val = get( array( 'NICK' => $nick, 'PASSWORD' => $pass ), NULL, NULL,
+                   array( 'NICK', 'PASSWORD', 'EMAIL' ) );
+       return count( $val ) == 1;
+   }
+
+   function checkUsernameExists( $nick )
+   {
+       $val = get( array( 'LOWER(NICK)' => "LOWER($nick)" ) );
+       return count( $val ) != 0;
+   }
+
+   function checkEmailExists( $email )
+   {
+       $val = get( array( 'LOWER(EMAIL)' => "LOWER($email)" ) );
+       return count( $val ) != 0;
+   }
 }
 
 ?>
