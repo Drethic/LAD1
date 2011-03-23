@@ -5,6 +5,8 @@
  *
  */
 
+require_once( 'MySqlObject.php' );
+
 class Users extends MySQLObject
 {
    function getColumns( )
