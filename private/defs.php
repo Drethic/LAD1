@@ -2,13 +2,16 @@
 
 session_start();
 
-
 define('JQUERY_VERSION', '1.5.1');
 define('JQUERY_UI_VERSION', '1.8.10');
 
 define('JQUERY_JS', 'jquery-' . JQUERY_VERSION . '.min');
 define('JQUERY_UI_CSS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom');
 define('JQUERY_UI_JS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom.min');
+
+define('DB_NAME', 'lad');
+define('DB_USERNAME', 'lad');
+
 
 function clientfile_getName( $type, $base )
 {
@@ -55,6 +58,23 @@ function clientfile_buildRequest( $type, $base )
 {
     return "get.php?t=$type&f=$base&m=" .
            filemtime( clientfile_getName( $type, $base ) );
+}
+
+/*************** END OF FUNCTIONS - BEGIN INIT ********************************/
+// Connect to MySQL
+$sqlConnection = mysql_pconnect( 'localhost', DB_NAME );
+
+if( !$sqlConnection )
+{
+   die( 'Failed to connect to MySQL.' . mysql_error() );
+}
+
+// Select Database
+$dbSelection = mysql_select_db( DB_USERNAME );
+
+if( !$dbSelection )
+{
+   die( 'Failed to select DB in MySQL.' . mysql_error() );
 }
 
 ?>

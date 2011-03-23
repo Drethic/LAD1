@@ -23,19 +23,19 @@ $dbUsername = 'lad';
 // table, and the value contains how to create the table. Example:
 // CREATE TABLE key( value );
 // The value is also an array so we can carefully handle each column, tricky eh
-$expectedTables = array( 'USERS' => "CREATE TABLE `USERS` (\n" .
-   "`ID` int unsigned NOT NULL AUTO_INCREMENT,\n" .
-   "`NICK` varchar(20) NOT NULL,\n" .
-   "`PASSWORD` varchar(40) NOT NULL,\n" .
-   "`EMAIL` varchar(40) NOT NULL\n," .
-   "PRIMARY KEY (ID)\n" .
-   ") ENGINE = MyISAM DEFAULT CHARSET=latin1" );
+require_once 'users.php';
+
+$expectedTables = array();
+
+// Add users to the list
+$users = new Users();
+$expectedTables[ $users->getTableName() ] = $users->getTableCreator();
 
 $possiblyInvalidTables = $expectedTables;
 
 /*********************************** STEP 2 ***********************************/
 // Connect to MySQL
-$sqlConnection = mysql_connect('localhost', $dbUsername);
+$sqlConnection = mysql_pconnect('localhost', $dbUsername);
 
 if( !$sqlConnection )
 {
@@ -58,8 +58,6 @@ if( !$allTables )
 {
    die( 'Failed to show tables.' . mysql_error() );
 }
-
-$foundTables = array('USER' => 'a');
 
 // Actually pull out each row which only has the name of the table
 // We set the value to 1 for fun, and the index to the name of the table
