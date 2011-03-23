@@ -9,6 +9,7 @@
  *                       or False on failure
  *     checkEmailExists: Checks if email exists, return true/false
  *  checkUsernameExists: Checks if username exists, return true/false
+ *    lookupUserDetails: Looks up a single user, return false/array of user
  */
 
 require_once( 'MySqlObject.php' );
@@ -68,6 +69,11 @@ class Users extends MySQLObject
     {
         $val = get( array( 'LOWER(EMAIL)' => "LOWER($email)" ) );
         return count( $val ) != 0;
+    }
+
+    function lookupUserDetails( $id )
+    {
+        return getSingle( $id );
     }
 }
 
