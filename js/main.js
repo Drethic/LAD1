@@ -191,8 +191,9 @@ function restoreForm(frm)
       .attr( "readonly", false );
 }
 
-function doAjax( outData )
+function doAjax( action, outData )
 {
+    outData[ "action" ] = action;
     $.ajax({
        url: "ajaxhandler.php",
        success: function( data ) {
