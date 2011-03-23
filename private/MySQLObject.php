@@ -192,6 +192,10 @@ abstract class MySQLObject
    public function getSingle( $value )
    {
        $ret = get( array( getIndex() => $value ), NULL, 1 );
+       if( count( $ret ) == 0 )
+       {
+           return false;
+       }
        return $ret[ 0 ];
    }
 }
