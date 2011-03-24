@@ -45,12 +45,12 @@ abstract class MySQLObject
        }
        else
        {
-            $columns = array_diff( getColumns(), $excludeColumns );
+            $columns = array_diff( $this->getColumns(), $excludeColumns );
             $sql .= implode( ', ', $columns ) . ' ';
        }
 
        // Table name
-       $sql .= 'FROM `' . getTableName() . '` ';
+       $sql .= 'FROM `' . $this->getTableName() . '` ';
 
        // Filters
        if( is_array( $filters ) && count( $filters ) > 0 )
@@ -112,7 +112,7 @@ abstract class MySQLObject
 
    public function insert( $values )
    {
-      $sql = 'INSERT INTO ' . getTableName() . ' VALUES(' .
+      $sql = 'INSERT INTO ' . $this->getTableName() . ' VALUES(' .
              implode( ', ', $values ) . ')';
 
       $result = mysql_query( $sql );
@@ -127,7 +127,7 @@ abstract class MySQLObject
 
    public function delete( $filters )
    {
-      $sql = 'DELETE FROM ' . getTableName() . ' WHERE ';
+      $sql = 'DELETE FROM ' . $this->getTableName() . ' WHERE ';
       $filterKeys = array_keys( $filters );
       for( $i = 0; $i < count( $filters ); $i++ )
       {
@@ -151,7 +151,7 @@ abstract class MySQLObject
 
    public function update( $values, $conditions = NULL )
    {
-      $sql = 'UPDATE ' . getTableName() . ' SET ';
+      $sql = 'UPDATE ' . $this->getTableName() . ' SET ';
       $valueKeys = array_keys( $values );
       $conditionKeys = array_keys( $conditions );
 
@@ -191,7 +191,7 @@ abstract class MySQLObject
 
    public function getSingle( $value )
    {
-       $ret = get( array( getIndex() => $value ), NULL, 1 );
+       $ret = get( array( $this->getIndex() => $value ), NULL, 1 );
        if( count( $ret ) == 0 )
        {
            return false;
