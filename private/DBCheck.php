@@ -62,6 +62,7 @@ if( !$allTables )
 // Actually pull out each row which only has the name of the table
 // We set the value to 1 for fun, and the index to the name of the table
 // See below for the key intersection
+$foundTables = array();
 while( $row = mysql_fetch_row( $allTables ) )
 {
    $foundTables[ $row[0] ] = 1;
@@ -96,8 +97,10 @@ echo "\nModifications\n";
 
 // First, check if we can simply skip iterating by comparing the counts of
 // the expected with the intersection and the found with the intersection
-if( count( $expectedTables == count( $intersectingTables ) ) &&
-   count( $foundTables == count( $intersectingTables ) ) )
+if( count( $expectedTables ) &&
+   count( $foundTables ) )
+//if( count( $expectedTables == count( $intersectingTables ) ) &&
+   //count( $foundTables == count( $intersectingTables ) ) )
 {
    echo "Tables match.  No modifications required!\n";
 }
@@ -142,7 +145,7 @@ else
 // Alright, now we know that we have every table that we want
 // Now we have to check the integrity of each
 // Iterate over each table, and pull the create table command
-foreach( $possibleInvalidTables as $possiblyInvalidTable => $insertSQL )
+foreach( $possiblyInvalidTables as $possiblyInvalidTable => $insertSQL )
 {
 /*********************************** STEP 3a **********************************/
    $result = mysql_query( "SHOW CREATE TABLE $possiblyInvalidTable" );
