@@ -196,9 +196,7 @@ function doAjax( action, outData )
     outData[ "action" ] = action;
     $.ajax({
        url: "ajaxhandler.php",
-       success: function( data ) {
-           eval( data );
-       },
-       data: outData
+       data: outData,
+       dataType: "script"
     });
 }

@@ -6,7 +6,6 @@
  * Uses: It handles stuff...
  */
 
-header('Content-Type: text/javascript; charset=UTF-8');
 require_once( 'private/defs.php' );
 require_once( 'private/users.php' );
 
@@ -15,8 +14,13 @@ if ($action == 'login') {
     $nick = $_REQUEST['username'];
     $pass = $_REQUEST['password'];
     $user = new Users();
-    if ($user->checkCombo( $nick, $pass ) == 'false'){
-        echo "alert('Not in db')";
+    if( $user->checkCombo( $nick, $pass ) == false )
+    {
+        echo "alert('Not in db');";
+    }
+    else
+    {
+        echo "alert('In DB?');";
     }
 } elseif ($action == 'newuser1') {
     echo "alert('newuser1')";
