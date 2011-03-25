@@ -62,7 +62,8 @@ abstract class MySQLObject
            for( $i = 0; $i < count( $filters ); $i++ )
            {
                $filterKey = $filterKeys[ $i ];
-               $sql .= "$filterKey={$filters[ $filterKey ]} ";
+               $filter = mysql_real_escape_string( $filters[ $filterKey ] );
+               $sql .= "`$filterKey`='$filter' ";
                if( $i < count( $filters ) - 1 )
                {
                    $sql .= 'AND ';
@@ -101,7 +102,7 @@ abstract class MySQLObject
 
        if( !$result )
        {
-           die( 'MySQL Query Error: ' . mysql_error() );
+           die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
        }
 
        $ret = array();
@@ -121,7 +122,7 @@ abstract class MySQLObject
 
       if( !$result )
       {
-         die( 'MySQL Query Error: ' . mysql_error() );
+         die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
       }
 
       return mysql_insert_id();
@@ -145,7 +146,7 @@ abstract class MySQLObject
 
       if( !$result )
       {
-         die( 'MySQL Query Error: ' . mysql_error() );
+         die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
       }
 
       return mysql_affected_rows();
@@ -160,7 +161,8 @@ abstract class MySQLObject
       for( $i = 0; $i < count( $values ); $i++ )
       {
          $valueKey = $valueKeys[ $i ];
-         $sql .= $valueKey . '=' . $values[ $valueKey ];
+         $value = mysql_real_escape_string( $values[ $valueKey ] );
+         $sql .= "`$valueKey`='$value' ";
          if( $i < count( $values ) - 1 )
          {
             $sql .= ', ';
@@ -185,7 +187,7 @@ abstract class MySQLObject
 
       if( !$result )
       {
-         die( 'MySQL Query Error: ' . mysql_error() );
+         die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
       }
 
       return mysql_affected_rows();
