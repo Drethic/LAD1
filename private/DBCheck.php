@@ -26,10 +26,12 @@ $dbUsername = 'lad';
 require_once 'users.php';
 
 $expectedTables = array();
+$mysqlObjects = array();
 
 // Add users to the list
 $users = new Users();
 $expectedTables[ $users->getTableName() ] = $users->getTableCreator();
+$mysqlObjects[ $users->getTableName() ] = $users;
 
 $possiblyInvalidTables = $expectedTables;
 
@@ -161,30 +163,28 @@ foreach( $possiblyInvalidTables as $possiblyInvalidTable => $insertSQL )
    $createdSQL = $row[ 1 ];
 
    // createdSQL is now the DB create command and insertSQL is ours
-   // Cleanup the whitespace of both then compare line by line
-   $insertSplit = explode( "\n", $insertSQL );
-   $createSplit = explode( "\n", $createdSQL );
+   // Cleanup the whitespace of both then compare them
+   $cleanInsert = $mysqlObjects[ $possiblyInvalidTable ]->getMinimizedCreator();
+   $cleanCreate = MySQLObject::minimizeCreator( $createdSQL );
 
-   $valid = true;
-   for( $i = 0; $i < count( $insertSplit ); $i++ )
+   if( strcasecmp( $cleanInsert, $cleanCreate ) != 0 )
    {
-       if( trim( $insertSplit[ $i ] ) != trim( $createSplit[ $i ] ) )
-       {
 /*********************************** STEP 3b **********************************/
-           // Discrepancies existed, drop then recreate the table
-           echo "recreating due to discrepancies...";
+       // Discrepancies existed, drop then recreate the table
+       echo "recreating due to discrepancies...\n";
+       echo "Desired SQL statement: $cleanInsert\n";
+       echo "Actual SQL statement: $cleanCreate\n";
 
-           mysql_query( "DROP TABLE $possiblyInvalidTable" ) or
-               die( 'Couldn\'t drop table.' . mysql_error() );
+       mysql_query( "DROP TABLE $possiblyInvalidTable" ) or
+           die( 'Couldn\'t drop table.' . mysql_error() );
 
-           mysql_query( $insertSQL ) or
-               die( 'Couldn\'t recreate table.' . mysql_error() );
+       mysql_query( $insertSQL ) or
+           die( 'Couldn\'t recreate table.' . mysql_error() );
 
-           $valid = false;
-           break;
-       }
+       $valid = false;
+       break;
    }
-   if( $valid )
+   else
    {
        echo "OK!";
    }

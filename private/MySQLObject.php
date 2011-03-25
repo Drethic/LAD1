@@ -4,11 +4,13 @@
  * Basic concept: Provides a low-level class for all MySQL objects
  *
  * Uses:
- *        get() : Gets values(2-D array) from DB based on parameters
- *     insert() : Adds values to DB
- *     delete() : Delete values in DB
- *     update() : Update values in DB
- *  getSingle() : Gets a single entry (1-D array) from DB by index
+ *                  get() : Gets values(2-D array) from DB based on parameters
+ *               insert() : Adds values to DB
+ *               delete() : Delete values in DB
+ *               update() : Update values in DB
+ *            getSingle() : Gets a single entry (1-D array) from DB by index
+ *  getMinimizedCreator() : Gets the creator in a minimized format
+ *      minimizeCreator() : Minimizes the input parameter to compress it
  *
  * Abstracts:
  *       getColumns() : Return an array with column names in the values
@@ -197,6 +199,16 @@ abstract class MySQLObject
            return false;
        }
        return $ret[ 0 ];
+   }
+
+   public function getMinimizedCreator( )
+   {
+       return $this->minimizeCreator( $this->getTableCreator() );
+   }
+
+   public static function minimizeCreator( $creator )
+   {
+       return str_replace( array( ' ', '\n', '\r', '\t' ), '', $creator );
    }
 }
 
