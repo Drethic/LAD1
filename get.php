@@ -62,8 +62,6 @@ if( !is_readable( $actualFileName ) )
 /*********************************** STEP 5 ***********************************/
 if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] )
 {
-   // TODO: Improve this so that it will force a client refresh rather than
-   // TODO: simply dying
    die( 'GO AWAY6' );
 }
 
