@@ -14,13 +14,14 @@ if ($action == 'login') {
     $nick = $_REQUEST['username'];
     $pass = $_REQUEST['password'];
     $user = new Users();
-    if( $user->checkCombo( $nick, $pass ) == false )
+    $result = $user->checkCombo( $nick, $pass );
+    if( $result == false )
     {
-        echo "alert('Not in db');";
+        echo "invalidLoginCombo();";
     }
     else
     {
-        echo "alert('In DB?');";
+        echo "validLogin($result);";
     }
 } elseif ($action == 'newuser1') {
     echo "alert('newuser1')";

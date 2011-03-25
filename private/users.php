@@ -45,11 +45,16 @@ class Users extends MySQLObject
 
     function addUser( $nick, $pass, $email )
     {
+        $nick = $this->escapifyString( $nick );
+        $pass = $this->escapifyString( $pass );
+        $email = $this->escapifyString( $email );
         return $this->insert( array( "NULL", $nick, $pass, $email ) );
     }
 
     function checkCombo( $nick, $pass )
     {
+        $nick = $this->escapifyString( $nick );
+        $pass = $this->escapifyString( $nick );
         $val = $this->get( array( 'NICK' => $nick, 'PASSWORD' => $pass ) );
         if( count( $val ) == 0 )
         {
@@ -60,12 +65,14 @@ class Users extends MySQLObject
 
     function checkUsernameExists( $nick )
     {
+        $nick = $this->escapifyString( $nick );
         $val = $this->get( array( 'LOWER(NICK)' => "LOWER($nick)" ) );
         return count( $val ) != 0;
     }
 
     function checkEmailExists( $email )
     {
+        $email = $this->escapifyString( $email );
         $val = $this->get( array( 'LOWER(EMAIL)' => "LOWER($email)" ) );
         return count( $val ) != 0;
     }

@@ -11,6 +11,7 @@
  *            getSingle() : Gets a single entry (1-D array) from DB by index
  *  getMinimizedCreator() : Gets the creator in a minimized format
  *      minimizeCreator() : Minimizes the input parameter to compress it
+ *       escapifyString() : Escapes a string for use in the DB
  *
  * Abstracts:
  *       getColumns() : Return an array with column names in the values
@@ -62,8 +63,8 @@ abstract class MySQLObject
            for( $i = 0; $i < count( $filters ); $i++ )
            {
                $filterKey = $filterKeys[ $i ];
-               $filter = mysql_real_escape_string( $filters[ $filterKey ] );
-               $sql .= "`$filterKey`='$filter' ";
+               $filter = $filters[ $filterKey ];
+               $sql .= "`$filterKey`=$filter ";
                if( $i < count( $filters ) - 1 )
                {
                    $sql .= 'AND ';
@@ -161,8 +162,8 @@ abstract class MySQLObject
       for( $i = 0; $i < count( $values ); $i++ )
       {
          $valueKey = $valueKeys[ $i ];
-         $value = mysql_real_escape_string( $values[ $valueKey ] );
-         $sql .= "`$valueKey`='$value' ";
+         $value = $values[ $valueKey ];
+         $sql .= "`$valueKey`=$value ";
          if( $i < count( $values ) - 1 )
          {
             $sql .= ', ';
@@ -211,6 +212,11 @@ abstract class MySQLObject
    public static function minimizeCreator( $creator )
    {
        return str_replace( array( ' ', '\n', '\r', '\t' ), '', $creator );
+   }
+
+   protected function escapifyString( $input )
+   {
+       return "'" . mysql_real_escape_string( $input ) . "'";
    }
 }
 
