@@ -50,8 +50,7 @@ class Users extends MySQLObject
 
     function checkCombo( $nick, $pass )
     {
-        $val = $this->get( array( 'NICK' => $nick, 'PASSWORD' => $pass ), NULL, NULL,
-                    array( 'NICK', 'PASSWORD', 'EMAIL' ) );
+        $val = $this->get( array( 'NICK' => $nick, 'PASSWORD' => $pass ) );
         if( count( $val ) == 0 )
         {
             return false;
