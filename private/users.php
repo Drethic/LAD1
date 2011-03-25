@@ -35,11 +35,11 @@ class Users extends MySQLObject
     function getTableCreator( )
     {
         return "CREATE TABLE `USERS` (\n" .
-               "`id` int unsigned NOT NULL AUTO_INCREMENT,\n" .
+               "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
                "`NICK` varchar(20) NOT NULL,\n" .
                "`PASSWORD` varchar(40) NOT NULL,\n" .
                "`EMAIL` varchar(40) NOT NULL,\n" .
-               "PRIMARY KEY (ID)\n" .
+               "PRIMARY KEY (`ID`)\n" .
                ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
     }
 
