@@ -66,14 +66,14 @@ class Users extends MySQLObject
     function checkUsernameExists( $nick )
     {
         $nick = $this->escapifyString( $nick );
-        $val = $this->get( array( 'LOWER(NICK)' => "LOWER($nick)" ) );
+        $val = $this->get( array( "LOWER(NICK)" =>  "LOWER(" . $nick . ")" ) );
         return count( $val ) != 0;
     }
 
     function checkEmailExists( $email )
     {
         $email = $this->escapifyString( $email );
-        $val = $this->get( array( 'LOWER(EMAIL)' => "LOWER($email)" ) );
+        $val = $this->get( array( "LOWER(EMAIL)" => "LOWER(" . $email . ")" ) );
         return count( $val ) != 0;
     }
 
