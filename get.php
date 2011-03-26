@@ -68,7 +68,7 @@ if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] )
 /*********************************** STEP 6 ***********************************/
 // Output some headers
 header( 'Pragma: public' );
-header( 'Cache-Control: must-revalidate' );
+header( 'Cache-Control: max-age=31536000' );
 header( "Content-Type: $applicationType" );
 header( "Last-Modified: " . date( DateTime::COOKIE, $_REQUEST[ 'm' ] ) );
 header( "Expires: " . date( DateTime::COOKIE, time() + (365 * 24 * 60 * 60) ) );
