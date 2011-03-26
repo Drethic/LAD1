@@ -23,9 +23,28 @@ if ($action == 'login') {
     {
         echo "validLogin($result);";
     }
-} elseif ($action == 'newuser1') {
-    echo "alert('newuser1')";
-} else {
+}
+elseif ($action == 'newuser1')
+{
+    $nick = $_REQUEST['username'];
+    $pass = $_REQUEST['password'];
+    $user = new Users();
+    $result = $user->checkUsernameExists( $nick );
+    If ($result != 0)
+    {
+        echo "usernameTaken()";
+    }
+    else
+    {
+        echo "usernameAvailable()";
+    }
+}
+elseif ($action == 'newuser2')
+{
+    echo "alert('newuser2')";
+}
+else
+{
     echo "alert('Nothing')";
 }
 
