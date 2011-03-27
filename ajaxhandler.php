@@ -31,8 +31,9 @@
  *      main.js usernameTaken().
  * 1b2. If Username is available puts username/password into session vars and
  *      echo back to main.js usernameAvailable().
- * 1c. Once user inputs the email newuser2 checks if it is already in use.
- *     It pulls in the session vars from step 1b2.
+ * 1c. Once user inputs the retyped password and email newuser2 checks if the
+ *     password matches and if the email is already in use.  It pulls in the
+ *     session vars from step 1b2.
  * 1c1. If the Email is already in the database echo back to main.js
  *      emailTaken()
  * 1c2. If the Email isn't used places username, password, and email into the
@@ -90,21 +91,29 @@ elseif ($action == 'newuser2')
     $nick = $_SESSION['username'];
     $pass = $_SESSION['password'];
     $email = $_REQUEST['email'];
-    $user = new Users();
-    $result = $user->checkEmailExists( $email );
-/*********************************** STEP 1c1 *********************************/
-    if ($result != 0)
+    $cpass = $_REQUEST['cpassword'];
+    if ($pass != $cpass)
     {
-        echo "emailTaken()";
+        echo "cpasswordInvalid()";
     }
-/*********************************** STEP 1c2 *********************************/
     else
     {
-        $user->addUser($nick, $pass, $email);
-        $val = $user->get( array( 'NICK' => "'" . $nick . "'" ) );
-        $id = $val[0][0];
-        $_SESSION['id'] = $id;
-        echo "accountCreated(" . $id .  ")";
+        $user = new Users();
+        $result = $user->checkEmailExists( $email );
+/*********************************** STEP 1c1 *********************************/
+        if ($result != 0)
+        {
+            echo "emailTaken()";
+        }
+/*********************************** STEP 1c2 *********************************/
+        else
+        {
+            $user->addUser($nick, $pass, $email);
+            $val = $user->get( array( 'NICK' => "'" . $nick . "'" ) );
+            $id = $val[0][0];
+            $_SESSION['id'] = $id;
+            echo "accountCreated(" . $id .  ")";
+        }
     }
 }
 /*********************************** STEP 1d **********************************/
