@@ -64,7 +64,7 @@ abstract class MySQLObject
            {
                $filterKey = $filterKeys[ $i ];
                $filter = $filters[ $filterKey ];
-               $sql .= "`$filterKey`=$filter ";
+               $sql .= "$filterKey=$filter ";
                if( $i < count( $filters ) - 1 )
                {
                    $sql .= 'AND ';

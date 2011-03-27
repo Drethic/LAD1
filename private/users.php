@@ -54,27 +54,27 @@ class Users extends MySQLObject
     function checkCombo( $nick, $pass )
     {
         $nick = $this->escapifyString( $nick );
-        $pass = $this->escapifyString( $nick );
+        $pass = $this->escapifyString( $pass );
         $val = $this->get( array( 'NICK' => $nick, 'PASSWORD' => $pass ) );
         if( count( $val ) == 0 )
         {
             return false;
         }
-        return $val[ 0 ][ 0 ];
+        return $val;
     }
 
     function checkUsernameExists( $nick )
     {
         $nick = $this->escapifyString( $nick );
-        $val = $this->get( array( 'LOWER(NICK)' => "LOWER($nick)" ) );
-        return count( $val ) != 0;
+        $val = $this->get( array( "LOWER(NICK)" =>  "LOWER(" . $nick . ")" ) );
+        return count( $val );
     }
 
     function checkEmailExists( $email )
     {
         $email = $this->escapifyString( $email );
-        $val = $this->get( array( 'LOWER(EMAIL)' => "LOWER($email)" ) );
-        return count( $val ) != 0;
+        $val = $this->get( array( "LOWER(EMAIL)" => "LOWER(" . $email . ")" ) );
+        return count( $val );
     }
 
     function lookupUserDetails( $id )
