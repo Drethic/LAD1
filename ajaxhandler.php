@@ -91,22 +91,22 @@ elseif ($action == 'newuser1')
 /*********************************** STEP 1c **********************************/
 elseif ($action == 'newuser2')
 {
-    if (!isset($_SESSON['username']))
-    {
-        die('Stupid Muppet! Invalid Username!');
-    }
-    else
-    {
+    //if (!isset($_SESSON['username']))
+    //{
+        //die('Stupid Muppet! Invalid Username!');
+    //}
+    //else
+    //{
         $nick = $_SESSION['username'];
-    }
-    if (!isset($_SESSON['password']))
-    {
-        die('Stupid Muppet! Invalid Password!');
-    }
-    else
-    {
-        $nick = $_SESSION['password'];
-    }
+    //}
+    //if (!isset($_SESSON['password']))
+    //{
+        //die('Stupid Muppet! Invalid Password!');
+    //}
+    //else
+    //{
+        $pass = $_SESSION['password'];
+    //}
     $email = $_REQUEST['email'];
     $cpass = $_REQUEST['cpassword'];
     if ($pass != $cpass)
