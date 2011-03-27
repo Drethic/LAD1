@@ -5,16 +5,17 @@ function doLogin()
     $("<form id='loginform'>Login<br></form>")
       .append("Username:<input type='text' name='username' " +
               "maxlength=20 id='username' class='filterkeys' " +
-              "data-filterkeys='[a-zA-Z0-9]'>")
+              "data-filterkeys='[a-zA-Z0-9]' autocomplete='off'>")
       .append("<span id='usernameerror'></span><br>")
       .append("Password:<input type='password' name='password' " +
               "maxlength=40 id='password'>")
       .append("<span id='passworderror'></span><br>")
-      .append("<span id='cpasswordspan'>Retype Password:<input type='password' name='cpassword' " +
-              "maxlength=40 id='cpassword'>")
+      .append("<span id='cpasswordspan'>Retype Password:<input type='password'"+
+              " name='cpassword' maxlength=40 id='cpassword'>")
       .append("<span id='cpassworderror'></span></span><br>")
       .append("<span id='emailspan'>E-mail:<input type='text' name='email' " +
-              "maxlength=40 id='email'><span id='emailerror'></span></span>")
+              "maxlength=40 id='email' autocomplete='off'>" +
+              "<span id='emailerror'></span></span>")
       .appendTo("body").filterKeys();
 
     $("<div>")
@@ -39,8 +40,7 @@ function doLogin()
                 email: $("#email").val()
             });
         }
-        else if( $( "#usernameerror" ).val().length == 0 &&
-            $( "#passworderror" ).val().length == 0 )
+        else
         {
             doAjax( "newuser1", {
                 username: $("#username").val(),
@@ -50,10 +50,17 @@ function doLogin()
         evt.preventDefault();
     });
     $("#loginbutton").click(function( evt ){
-        doAjax( "login", {
-            username: $("#username").val(),
-            password: $("#password").val()
-        });
+        if( $( "#emailspan").css( "display" ) != "none" )
+        {
+            doLogin();
+        }
+        else
+        {
+            doAjax( "login", {
+                username: $("#username").val(),
+                password: $("#password").val()
+            });
+        }
         evt.preventDefault();
     });
 
@@ -67,11 +74,7 @@ function doLogin()
         "Type in a Username to Login or Register",
         "Type in a Password to Login or Register"
     ];
-    //delete maybe?
-    //$("#email").keyup(function(){
-        //$("#emailerror").html( "" );
-    //})
-    $("#username, #password").keyup(function(){
+    $("#username, #password").bind('keyup', function(){
         var passed = true;
         if( $("#username").val().substring( 0, 1 ).search( "[0-9]" ) > -1 )
         {
@@ -115,7 +118,7 @@ function doLogin()
         {
             $("#loginform button").button( "disable" );
         }
-    }).keyup();
+    });
 }
 
 function loginError( field, reason )
@@ -140,8 +143,6 @@ function loginError( field, reason )
         inputObject = $("#email");
         warnObject = $("#emailerror");
     }
-    //var inputObject = $(field ? "#username" : "#password");
-    //var warnObject = $(field ? "#usernameerror" : "#passworderror");
     if( reason.length == 0 )
     {
         inputObject.css({"background-color" : "",
@@ -171,7 +172,7 @@ function usernameAvailable()
     restoreLoginForm();
         $( "#username, #password" ).attr( "disabled", "disabled" )
         .attr( "readonly", true );
-    $( "#loginbutton" ).button( "disable" );
+    $( "#loginbutton" ).button( "option", "label", "Reset Form", "enable" );
     $( "#newuserbutton" ).button( "option", "label", "Create Account" );
 
     var errorStrings = [
@@ -180,7 +181,7 @@ function usernameAvailable()
         "Email must be in the following format user@host.domain"
     ];
 
-    $("#cpassword, #email").keyup(function(){
+    $("#cpassword, #email").bind('keyup', function(){
         var passed = true;
         var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
         var emailval = $("#email").val();
@@ -211,19 +212,18 @@ function usernameAvailable()
         if( passed )
         {
             $("#loginform button").button( "enable" );
-            $( "#loginbutton" ).button( "disable" );
         }
         else
         {
             $("#loginform button").button( "disable" );
+            $( "#loginbutton" ).button( "enable" );
         }
-    }).keyup();
+    });
 }
 
 function cpasswordInvalid()
 {
     loginError( "#cpass", "Passwords did not match." );
-    //$( "#cpassworderror" ).html( "Passwords did not match." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
@@ -232,7 +232,6 @@ function cpasswordInvalid()
 function emailTaken()
 {
     loginError( "#email", "Email is already associated with an account." );
-    //$( "#emailerror" ).html( "Email is already associated with an account." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
