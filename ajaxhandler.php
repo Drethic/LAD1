@@ -71,7 +71,7 @@ if ($action == 'login')
 {
     $rnick = $_REQUEST['username'];
     $rpass = $_REQUEST['password'];
-    if (!strlen($rnick) > 3 && strlen($rnick) < 21)
+    if( !( strlen($rnick) > 3 && strlen($rnick) < 21 ) )
     {
         die('Stupid Muppet!  Username is the wrong length!');
     }
@@ -79,7 +79,7 @@ if ($action == 'login')
     {
         $nick = $rnick;
     }
-    if (!strlen($rpass) > 3 && strlen($rpass) < 41)
+    if( !(strlen($rpass) > 3 && strlen($rpass) < 41 ) )
     {
         die('Stupid Muppet!  Password is the wrong length!');
     }
@@ -88,7 +88,7 @@ if ($action == 'login')
         $pass = $rpass;
     }
     $user = new Users();
-    $result = $user->checkCombo( $nick, $pass );
+    $result = $user->checkCombo( $rnick, $rpass );
 /*********************************** STEP 1a1 *********************************/
     if( $result == false )
     {
@@ -98,10 +98,9 @@ if ($action == 'login')
     else
     {
         $id = $result[0][0];
-        $nick = $result[0][1];
         $_SESSION['id'] = $id;
-        $_SESSION['username'] = $nick;
-        echo "validLogin($result);";
+        $_SESSION['username'] = $rnick;
+        echo "validLogin($id);";
     }
 }
 /*********************************** STEP 1b **********************************/
@@ -109,7 +108,7 @@ elseif ($action == 'newuser1')
 {
     $rnick = $_REQUEST['username'];
     $rpass = $_REQUEST['password'];
-    if (!strlen($rnick) > 3 && strlen($rnick) < 21)
+    if( !( strlen($rnick) > 3 && strlen($rnick) < 21 ) )
     {
         die('Stupid Muppet!  Username is the wrong length!');
     }
@@ -117,7 +116,7 @@ elseif ($action == 'newuser1')
     {
         $nick = $rnick;
     }
-    if (!strlen($rpass) > 3 && strlen($rpass) < 41)
+    if( !( strlen($rpass) > 3 && strlen($rpass) < 41 ) )
     {
         die('Stupid Muppet!  Password is the wrong length!');
     }
