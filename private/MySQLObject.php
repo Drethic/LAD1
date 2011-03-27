@@ -163,7 +163,7 @@ abstract class MySQLObject
       {
          $valueKey = $valueKeys[ $i ];
          $value = $values[ $valueKey ];
-         $sql .= "`$valueKey`=$value ";
+         $sql .= "$valueKey=$value ";
          if( $i < count( $values ) - 1 )
          {
             $sql .= ', ';
