@@ -23,8 +23,8 @@
  * 1.  Requests the action from main.js
  * 1a. If Login was selected checks if user/pass combo is valid.
  * 1a1. If Login was invalid echo back to main.js invalidLoginCombo().
- * 1a2. If Login was valid sets session for ID and echo back to main.js
- *      validLogin() with ID of the user.
+ * 1a2. If Login was valid sets session for ID and NICK. Then echo back to
+ *      main.js validLogin() with ID of the user.
  * 1b. If New User was selected it requests username/password from main.js login
  *     form.
  * 1b1. Checks to see if Username is already taken.  If unavailable echo back to
@@ -61,7 +61,10 @@ if ($action == 'login') {
 /*********************************** STEP 1a2 *********************************/
     else
     {
-        $_SESSION['id'] = $result;
+        $id = $result[0][0];
+        $nick = $result[0][1];
+        $_SESSION['id'] = $id;
+        $_SESSION['username'] = $nick;
         echo "validLogin($result);";
     }
 }
@@ -88,8 +91,22 @@ elseif ($action == 'newuser1')
 /*********************************** STEP 1c **********************************/
 elseif ($action == 'newuser2')
 {
-    $nick = $_SESSION['username'];
-    $pass = $_SESSION['password'];
+    if (!isset($_SESSON['username']))
+    {
+        die('Stupid Muppet! Invalid Username!');
+    }
+    else
+    {
+        $nick = $_SESSION['username'];
+    }
+    if (!isset($_SESSON['password']))
+    {
+        die('Stupid Muppet! Invalid Password!');
+    }
+    else
+    {
+        $nick = $_SESSION['password'];
+    }
     $email = $_REQUEST['email'];
     $cpass = $_REQUEST['cpassword'];
     if ($pass != $cpass)
