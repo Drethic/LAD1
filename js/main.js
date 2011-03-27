@@ -10,6 +10,9 @@ function doLogin()
       .append("Password:<input type='password' name='password' " +
               "maxlength=40 id='password'>")
       .append("<span id='passworderror'></span><br>")
+      .append("<span id='cpasswordspan'>Retype Password:<input type='password' name='cpassword' " +
+              "maxlength=40 id='cpassword'>")
+      .append("<span id='cpassworderror'></span></span><br>")
       .append("<span id='emailspan'>E-mail:<input type='text' name='email' " +
               "maxlength=40 id='email'><span id='emailerror'></span></span>")
       .appendTo("body").filterKeys();
@@ -19,6 +22,7 @@ function doLogin()
       .append("<button id='newuserbutton'>New User</button>")
       .appendTo("#loginform");
 
+    $("#cpasswordspan").css( "display", "none" );
     $("#emailspan").css( "display", "none" );
     $("#loginbutton, #newuserbutton").button().css( "font-size", "0.6em" )
       .button( "disable" ).click(function( evt ){
@@ -31,6 +35,7 @@ function doLogin()
         if( $( "#emailspan").css( "display" ) != "none" )
         {
             doAjax( "newuser2", {
+                cpassword: $("#cpassword").val(),
                 email: $("#email").val()
             });
         }
@@ -126,18 +131,30 @@ function usernameTaken()
 
 function usernameAvailable()
 {
+    $( "#cpasswordspan" ).css( "display", "" );
     $( "#emailspan" ).css( "display", "" );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
+      $( "#loginbutton" ).button( "disable" );
+    $( "#newuserbutton" ).button( "option", "label", "Create Account" );
 }
 
+function cpasswordInvalid()
+{
+    $( "#cpassworderror" ).html( "Passwords did not match." );
+    restoreLoginForm();
+    $( "#username, #password" ).attr( "disabled", "disabled" )
+      .attr( "readonly", true );
+    $( "#loginbutton" ).button( "disable" );
+}
 function emailTaken()
 {
     $( "#emailerror" ).html( "Email is already associated with an account." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
+    $( "#loginbutton" ).button( "disable" );
 }
 
 function accountCreated( id )
