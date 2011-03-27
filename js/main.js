@@ -160,6 +160,7 @@ function loginError( field, reason )
 function usernameTaken()
 {
     loginError( "#user", "Username is already taken." );
+    loginError( "#pass", "" );
     restoreLoginForm();
 }
 
