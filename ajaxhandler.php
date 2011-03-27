@@ -48,7 +48,9 @@ require_once( 'private/defs.php' );
 require_once( 'private/users.php' );
 
 function isValidEmail($email){
-    $pattern = "/^[-_a-z0-9\'+*$^&%=~!?{}]++(?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*+@(?:(?![-.])[-a-z0-9.]+(?<![-.])\.[a-z]{2,6}|\d{1,3}(?:\.\d{1,3}){3})(?::\d++)?$/iD";
+    $pattern = "/^[-_a-z0-9\'+*$^&%=~!?{}]++(?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*"
+    . "+@(?:(?![-.])[-a-z0-9.]+(?<![-.])\.[a-z]{2,6}|\d{1,3}(?:\.\d{1,3}){3})"
+    . "(?::\d++)?$/iD";
     if(!preg_match($pattern, $email)){
       return false;
     }
@@ -185,9 +187,7 @@ elseif ($action == 'newuser2')
 /*********************************** STEP 1c2 *********************************/
         else
         {
-            $user->addUser($nick, $pass, $email);
-            $val = $user->get( array( 'NICK' => "'" . $nick . "'" ) );
-            $id = $val[0][0];
+            $id = $user->addUser($nick, $pass, $email);
             $_SESSION['id'] = $id;
             echo "accountCreated(" . $id .  ")";
         }
