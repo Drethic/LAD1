@@ -57,40 +57,54 @@ function doLogin()
         evt.preventDefault();
     });
 
-    $("#usernameerror, #passworderror").css( "font-weight", "bold" );
+    $("#usernameerror, #passworderror", "#cpassworderror", "#emailerror")
+        .css( "font-weight", "bold" );
 
     var errorStrings = [
         "Username must be at least 4 characters.",
         "Username cannot start with a number.",
-        "Password must be at least 4 characters."
+        "Password must be at least 4 characters.",
+        "Type in a Username to Login or Register",
+        "Type in a Password to Login or Register"
     ];
-    $("#email").keyup(function(){
-        $("#emailerror").html( "" );
-    })
+    //delete maybe?
+    //$("#email").keyup(function(){
+        //$("#emailerror").html( "" );
+    //})
     $("#username, #password").keyup(function(){
         var passed = true;
         if( $("#username").val().substring( 0, 1 ).search( "[0-9]" ) > -1 )
         {
-            loginError( true, errorStrings[ 1 ] );
+            loginError( "#user", errorStrings[ 1 ] );
+            passed = false;
+        }
+        else if( $("#username").val().length == 0 )
+        {
+            loginError( "#user", errorStrings[ 3 ] );
             passed = false;
         }
         else if( $("#username").val().length < 4 )
         {
-            loginError( true, errorStrings[ 0 ] );
+            loginError( "#user", errorStrings[ 0 ] );
             passed = false;
         }
         else
         {
-            loginError( true, "" );
+            loginError( "#user", "" );
         }
-        if( $("#password").val().length < 4 )
+        if( $("#password").val().length == 0 )
         {
-            loginError( false, errorStrings[ 2 ] );
+            loginError( "#pass", errorStrings[ 4 ] );
+            passed = false;
+        }
+        else if( $("#password").val().length < 4 )
+        {
+            loginError( "#pass", errorStrings[ 2 ] );
             passed = false;
         }
         else
         {
-            loginError( false, "" );
+            loginError( "#pass", "" );
         }
 
         if( passed )
@@ -104,10 +118,30 @@ function doLogin()
     }).keyup();
 }
 
-function loginError( isUser, reason )
+function loginError( field, reason )
 {
-    var inputObject = $(isUser ? "#username" : "#password");
-    var warnObject = $(isUser ? "#usernameerror" : "#passworderror");
+    if (field == "#user")
+    {
+        var inputObject = $("#username");
+        var warnObject = $("#usernameerror");
+    }
+    else if (field == "#pass")
+    {
+        inputObject = $("#password");
+        warnObject = $("#passworderror");
+    }
+    else if (field == "#cpass")
+    {
+        inputObject = $("#cpassword");
+        warnObject = $("#cpassworderror");
+    }
+    else if (field == "#email")
+    {
+        inputObject = $("#email");
+        warnObject = $("#emailerror");
+    }
+    //var inputObject = $(field ? "#username" : "#password");
+    //var warnObject = $(field ? "#usernameerror" : "#passworderror");
     if( reason.length == 0 )
     {
         inputObject.css({"background-color" : "",
@@ -125,7 +159,7 @@ function loginError( isUser, reason )
 
 function usernameTaken()
 {
-    loginError( true, "Username is already taken." );
+    loginError( "#user", "Username is already taken." );
     restoreLoginForm();
 }
 
@@ -134,15 +168,61 @@ function usernameAvailable()
     $( "#cpasswordspan" ).css( "display", "" );
     $( "#emailspan" ).css( "display", "" );
     restoreLoginForm();
-    $( "#username, #password" ).attr( "disabled", "disabled" )
-      .attr( "readonly", true );
-      $( "#loginbutton" ).button( "disable" );
+        $( "#username, #password" ).attr( "disabled", "disabled" )
+        .attr( "readonly", true );
+    $( "#loginbutton" ).button( "disable" );
     $( "#newuserbutton" ).button( "option", "label", "Create Account" );
+
+    var errorStrings = [
+        "Password must be at least 4 characters.",
+        "Email address required",
+        "Email must be in the following format user@host.domain"
+    ];
+
+    $("#cpassword, #email").keyup(function(){
+        var passed = true;
+        var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+        var emailval = $("#email").val();
+        if( $("#cpassword").val().length < 4 )
+        {
+            loginError( "#cpass", errorStrings[ 0 ] );
+            passed = false;
+        }
+        else
+        {
+            loginError( "#cpass", "" );
+        }
+        if( $("#email").val().length < 1 )
+        {
+            loginError( "#email", errorStrings[ 1 ] );
+            passed = false;
+        }
+        else if (!emailReg.test(emailval))
+        {
+            loginError( "#email", errorStrings[ 2 ] );
+            passed = false;
+        }
+        else
+        {
+            loginError( "#email", "" );
+        }
+
+        if( passed )
+        {
+            $("#loginform button").button( "enable" );
+            $( "#loginbutton" ).button( "disable" );
+        }
+        else
+        {
+            $("#loginform button").button( "disable" );
+        }
+    }).keyup();
 }
 
 function cpasswordInvalid()
 {
-    $( "#cpassworderror" ).html( "Passwords did not match." );
+    loginError( "#cpass", "Passwords did not match." );
+    //$( "#cpassworderror" ).html( "Passwords did not match." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
@@ -150,7 +230,8 @@ function cpasswordInvalid()
 }
 function emailTaken()
 {
-    $( "#emailerror" ).html( "Email is already associated with an account." );
+    loginError( "#email", "Email is already associated with an account." );
+    //$( "#emailerror" ).html( "Email is already associated with an account." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
@@ -184,15 +265,15 @@ function validLogin( id )
           {
               $( ui.panel ).append( "HI" );
           },
-          fx: { opacity: 'toggle' }
+          fx: {opacity: 'toggle'}
       }).css( "font-size", "0.6em" );
 }
 
 function invalidLoginCombo()
 {
     var str = "Invalid login information.";
-    loginError( true, str );
-    loginError( false, str );
+    loginError( "#user", str );
+    loginError( "#pass", str );
     restoreLoginForm();
 }
 
