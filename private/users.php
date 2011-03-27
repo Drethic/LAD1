@@ -60,7 +60,7 @@ class Users extends MySQLObject
         {
             return false;
         }
-        return $val[ 0 ][ 0 ];
+        return $val;
     }
 
     function checkUsernameExists( $nick )
