@@ -23,8 +23,7 @@ function doLogin()
       .append("<button id='newuserbutton'>New User</button>")
       .appendTo("#loginform");
 
-    $("#cpasswordspan").css( "display", "none" );
-    $("#emailspan").css( "display", "none" );
+    $("#cpasswordspan, #emailspan").css( "display", "none" );
     $("#loginbutton, #newuserbutton").button().css( "font-size", "0.6em" )
       .button( "disable" ).click(function( evt ){
         $("#loginform input, #loginform button").button( "disable" )
@@ -167,8 +166,7 @@ function usernameTaken()
 
 function usernameAvailable()
 {
-    $( "#cpasswordspan" ).css( "display", "" );
-    $( "#emailspan" ).css( "display", "" );
+    $( "#cpasswordspan, #emailspan" ).css( "display", "" );
     restoreLoginForm();
         $( "#username, #password" ).attr( "disabled", "disabled" )
         .attr( "readonly", true );
@@ -194,7 +192,7 @@ function usernameAvailable()
         {
             loginError( "#cpass", "" );
         }
-        if( $("#email").val().length < 1 )
+        if( emailval.length < 1 )
         {
             loginError( "#email", errorStrings[ 1 ] );
             passed = false;
