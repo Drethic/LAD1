@@ -28,7 +28,7 @@ function doLogin()
         evt.preventDefault();
     });
     $("#newuserbutton").click(function( evt ){
-        if( $( "#emailspan").css( "display" ) == "" )
+        if( $( "#emailspan").css( "display" ) != "none" )
         {
             doAjax( "newuser2", {
                 email: $("#email").val()
