@@ -20,20 +20,22 @@
  *  password    = Sets the Password into session to send to newuser2 during
  *                creation of account.
  *
- * 1.  Requests the action from main.js
- * 1a. If Login was selected checks if user/pass combo is valid.
+ * 1.  Requests the action from main.js. Also forces a redirect back to
+ *     index.php if not called via main.js.
+ * 1a. If Login was selected checks if user/pass combo is valid. Does a sanity
+ *     check on the user/pass for length else die.
  * 1a1. If Login was invalid echo back to main.js invalidLoginCombo().
  * 1a2. If Login was valid sets session for ID and NICK. Then echo back to
  *      main.js validLogin() with ID of the user.
  * 1b. If New User was selected it requests username/password from main.js login
- *     form.
+ *     form. Does a sanity check on the user/pass for length else die.
  * 1b1. Checks to see if Username is already taken.  If unavailable echo back to
  *      main.js usernameTaken().
  * 1b2. If Username is available puts username/password into session vars and
  *      echo back to main.js usernameAvailable().
  * 1c. Once user inputs the retyped password and email newuser2 checks if the
  *     password matches and if the email is already in use.  It pulls in the
- *     session vars from step 1b2.
+ *     session vars from step 1b2 and checks if they are valid else die.
  * 1c1. If the Email is already in the database echo back to main.js
  *      emailTaken()
  * 1c2. If the Email isn't used places username, password, and email into the
@@ -45,12 +47,44 @@
 require_once( 'private/defs.php' );
 require_once( 'private/users.php' );
 
+function isValidEmail($email){
+    $pattern = "/^[-_a-z0-9\'+*$^&%=~!?{}]++(?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*+@(?:(?![-.])[-a-z0-9.]+(?<![-.])\.[a-z]{2,6}|\d{1,3}(?:\.\d{1,3}){3})(?::\d++)?$/iD";
+    if(!preg_match($pattern, $email)){
+      return false;
+    }
+    return true;
+}
+
 /*********************************** STEP 1 ***********************************/
-$action = $_REQUEST['action'];
+if (isset($_REQUEST['action']))
+{
+    $action = $_REQUEST['action'];
+}
+else
+{
+    $action = 'nothing';
+}
 /*********************************** STEP 1a **********************************/
-if ($action == 'login') {
-    $nick = $_REQUEST['username'];
-    $pass = $_REQUEST['password'];
+if ($action == 'login')
+{
+    $rnick = $_REQUEST['username'];
+    $rpass = $_REQUEST['password'];
+    if (!strlen($rnick) > 3 && strlen($rnick) < 21)
+    {
+        die('Stupid Muppet!  Username is the wrong length!');
+    }
+    else
+    {
+        $nick = $rnick;
+    }
+    if (!strlen($rpass) > 3 && strlen($rpass) < 41)
+    {
+        die('Stupid Muppet!  Password is the wrong length!');
+    }
+    else
+    {
+        $pass = $rpass;
+    }
     $user = new Users();
     $result = $user->checkCombo( $nick, $pass );
 /*********************************** STEP 1a1 *********************************/
@@ -71,8 +105,24 @@ if ($action == 'login') {
 /*********************************** STEP 1b **********************************/
 elseif ($action == 'newuser1')
 {
-    $nick = $_REQUEST['username'];
-    $pass = $_REQUEST['password'];
+    $rnick = $_REQUEST['username'];
+    $rpass = $_REQUEST['password'];
+    if (!strlen($rnick) > 3 && strlen($rnick) < 21)
+    {
+        die('Stupid Muppet!  Username is the wrong length!');
+    }
+    else
+    {
+        $nick = $rnick;
+    }
+    if (!strlen($rpass) > 3 && strlen($rpass) < 41)
+    {
+        die('Stupid Muppet!  Password is the wrong length!');
+    }
+    else
+    {
+        $pass = $rpass;
+    }
     $user = new Users();
     $result = $user->checkUsernameExists( $nick );
 /*********************************** STEP 1b1 *********************************/
@@ -109,7 +159,15 @@ elseif ($action == 'newuser2')
     {
         $pass = $spass;
     }
-    $email = $_REQUEST['email'];
+    $remail = $_REQUEST['email'];
+    if (!isValidEmail($remail))
+    {
+        die('Stupid muppet!  Your email isn\'t formatted right!');
+    }
+    else
+    {
+        $email = $remail;
+    }
     $cpass = $_REQUEST['cpassword'];
     if ($pass != $cpass)
     {
@@ -136,9 +194,10 @@ elseif ($action == 'newuser2')
     }
 }
 /*********************************** STEP 1d **********************************/
-else
+elseif ($action == 'nothing')
 {
-    echo "alert('Nothing to handle.')";
+    echo 'Nothing to handle.  Now go back to the index ya muppet!';
+    header("refresh: 2; index.php");
 }
 
 ?>
