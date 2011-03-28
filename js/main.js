@@ -10,9 +10,9 @@ function doLogin()
       .append("Password:<input type='password' name='password' " +
               "maxlength=40 id='password'>")
       .append("<span id='passworderror'></span><br>")
-      .append("<span id='cpasswordspan'>Retype Password:<input type='password'"+
-              " name='cpassword' maxlength=40 id='cpassword'>")
-      .append("<span id='cpassworderror'></span></span><br>")
+      .append("<span id='cpasswordspan'>Retype Password:<input "+
+              "type='password' name='cpassword' maxlength=40 id='cpassword'>" +
+              "<span id='cpassworderror'></span><br></span>")
       .append("<span id='emailspan'>E-mail:<input type='text' name='email' " +
               "maxlength=40 id='email' autocomplete='off'>" +
               "<span id='emailerror'></span></span>")
