@@ -35,12 +35,17 @@ class Users extends MySQLObject
     function getTableCreator( )
     {
         return "CREATE TABLE `USERS` (\n" .
-               "`id` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
+               "`ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
                "`NICK` varchar(20) NOT NULL,\n" .
                "`PASSWORD` varchar(40) NOT NULL,\n" .
                "`EMAIL` varchar(40) NOT NULL,\n" .
                "PRIMARY KEY (`ID`)\n" .
                ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
+    }
+
+    function getDependents()
+    {
+        return array();
     }
 
     function addUser( $nick, $pass, $email )
