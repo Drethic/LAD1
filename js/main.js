@@ -77,36 +77,36 @@ function doLogin()
         var passed = true;
         if( $("#username").val().substring( 0, 1 ).search( "[0-9]" ) > -1 )
         {
-            loginError( "#user", errorStrings[ 1 ] );
+            loginErrort( "#username", errorStrings[ 1 ] );
             passed = false;
         }
         else if( $("#username").val().length == 0 )
         {
-            loginError( "#user", errorStrings[ 3 ] );
+            loginErrort( "#username", errorStrings[ 3 ] );
             passed = false;
         }
         else if( $("#username").val().length < 4 )
         {
-            loginError( "#user", errorStrings[ 0 ] );
+            loginErrort( "#username", errorStrings[ 0 ] );
             passed = false;
         }
         else
         {
-            loginError( "#user", "" );
+            loginErrort( "#username", "" );
         }
         if( $("#password").val().length == 0 )
         {
-            loginError( "#pass", errorStrings[ 4 ] );
+            loginErrort( "#password", errorStrings[ 4 ] );
             passed = false;
         }
         else if( $("#password").val().length < 4 )
         {
-            loginError( "#pass", errorStrings[ 2 ] );
+            loginErrort( "#password", errorStrings[ 2 ] );
             passed = false;
         }
         else
         {
-            loginError( "#pass", "" );
+            loginErrort( "#password", "" );
         }
 
         if( passed )
@@ -120,28 +120,37 @@ function doLogin()
     }).keyup();
 }
 
+function loginErrort ( field, reason )
+{
+    var inputObject = $(field);
+    var warnObject = $(field + 'error');
+
+    if( reason.length == 0 )
+    {
+        inputObject.css({"background-color" : "",
+                         "border-color" : ""});
+        warnObject.css( "display", "none" );
+        warnObject.removeClass('ui-icon ui-icon-notice ui-state-error');
+        warnObject.removeAttr('style', 'display:inline-block;' +
+            'background-image:url(img/ui-icons_cd0a0a_256x240.png);');
+        warnObject.removeAttr('title', reason );
+    }
+    else
+    {
+        inputObject.css({"background-color" : "#FFAAAA",
+                         "border-color" : "#DD4444"});
+        warnObject.addClass('ui-icon ui-icon-notice ui-state-error');
+        warnObject.attr('style', 'display:inline-block;' +
+            'background-image:url(img/ui-icons_cd0a0a_256x240.png);');
+        warnObject.attr('title', reason );
+    }
+}
+
 function loginError( field, reason )
 {
-    if (field == "#user")
-    {
-        var inputObject = $("#username");
-        var warnObject = $("#usernameerror");
-    }
-    else if (field == "#pass")
-    {
-        inputObject = $("#password");
-        warnObject = $("#passworderror");
-    }
-    else if (field == "#cpass")
-    {
-        inputObject = $("#cpassword");
-        warnObject = $("#cpassworderror");
-    }
-    else if (field == "#email")
-    {
-        inputObject = $("#email");
-        warnObject = $("#emailerror");
-    }
+    var inputObject = $(field);
+    var warnObject = $(field + 'error');
+
     if( reason.length == 0 )
     {
         inputObject.css({"background-color" : "",
@@ -159,8 +168,8 @@ function loginError( field, reason )
 
 function usernameTaken()
 {
-    loginError( "#user", "Username is already taken." );
-    loginError( "#pass", "" );
+    loginErrort( "#username", "Username is already taken." );
+    loginErrort( "#password", "" );
     restoreLoginForm();
 }
 
@@ -186,32 +195,32 @@ function usernameAvailable()
         var emailval = $("#email").val();
         if( $("#cpassword").val().length < 4 )
         {
-            loginError( "#cpass", errorStrings[ 0 ] );
+            loginErrort( "#cpassword", errorStrings[ 0 ] );
             passed = false;
         }
         else if( $("#password").val() != $("#cpassword").val() )
         {
-            loginError( "#pass", errorStrings[ 1 ] );
-            loginError( "#cpass", errorStrings[ 1 ] );
+            loginErrort( "#password", errorStrings[ 1 ] );
+            loginErrort( "#cpassword", errorStrings[ 1 ] );
             passed = false;
         }
         else
         {
-            loginError( "#cpass", "" );
+            loginErrort( "#cpassword", "" );
         }
         if( emailval.length < 1 )
         {
-            loginError( "#email", errorStrings[ 2 ] );
+            loginErrort( "#email", errorStrings[ 2 ] );
             passed = false;
         }
         else if (!emailReg.test(emailval))
         {
-            loginError( "#email", errorStrings[ 3 ] );
+            loginErrort( "#email", errorStrings[ 3 ] );
             passed = false;
         }
         else
         {
-            loginError( "#email", "" );
+            loginErrort( "#email", "" );
         }
 
         if( passed )
@@ -228,7 +237,7 @@ function usernameAvailable()
 
 function cpasswordInvalid()
 {
-    loginError( "#cpass", "Passwords did not match." );
+    loginErrort( "#cpassword", "Passwords did not match." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
@@ -236,7 +245,7 @@ function cpasswordInvalid()
 }
 function emailTaken()
 {
-    loginError( "#email", "Email is already associated with an account." );
+    loginErrort( "#email", "Email is already associated with an account." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
@@ -277,8 +286,8 @@ function validLogin( id )
 function invalidLoginCombo()
 {
     var str = "Invalid login information.";
-    loginError( "#user", str );
-    loginError( "#pass", str );
+    loginErrort( "#username", str );
+    loginErrort( "#password", str );
     restoreLoginForm();
 }
 
