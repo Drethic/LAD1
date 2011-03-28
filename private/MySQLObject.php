@@ -12,6 +12,7 @@
  *  getMinimizedCreator() : Gets the creator in a minimized format
  *      minimizeCreator() : Minimizes the input parameter to compress it
  *       escapifyString() : Escapes a string for use in the DB
+ *        getOnlyColumn() : Gets signle column(1-D array) based on parameters
  *
  * Abstracts:
  *       getColumns() : Return an array with column names in the values
@@ -56,21 +57,7 @@ abstract class MySQLObject
        $sql .= 'FROM `' . $this->getTableName() . '` ';
 
        // Filters
-       if( is_array( $filters ) && count( $filters ) > 0 )
-       {
-           $sql .= 'WHERE ';
-           $filterKeys = array_keys( $filters );
-           for( $i = 0; $i < count( $filters ); $i++ )
-           {
-               $filterKey = $filterKeys[ $i ];
-               $filter = $filters[ $filterKey ];
-               $sql .= "$filterKey=$filter ";
-               if( $i < count( $filters ) - 1 )
-               {
-                   $sql .= 'AND ';
-               }
-           }
-       }
+       $sql .= $this->arrayToFilterString( $filters );
 
        // Ordering
        if( is_array( $orders ) && count( $orders ) > 0 )
@@ -131,17 +118,9 @@ abstract class MySQLObject
 
    public function delete( $filters )
    {
-      $sql = 'DELETE FROM ' . $this->getTableName() . ' WHERE ';
-      $filterKeys = array_keys( $filters );
-      for( $i = 0; $i < count( $filters ); $i++ )
-      {
-         $filterKey = $filterKeys[ $i ];
-         $sql .= $filterKey . '=' . $filters[ $filterKey ];
-         if( $i < count( $filters ) - 1 )
-         {
-            $sql .= ' AND ';
-         }
-      }
+      $sql = 'DELETE FROM ' . $this->getTableName();
+
+      $sql .= $this->arrayToFilterString( $filters );
 
       $result = mysql_query( $sql );
 
@@ -170,19 +149,8 @@ abstract class MySQLObject
          }
       }
 
-      if( is_array( $conditions ) && count( $conditions ) > 0 )
-      {
-         $sql .= ' WHERE ';
-         for( $i = 0; $i < count( $conditions ); $i++ )
-         {
-            $conditionKey = $conditionKeys[ $i ];
-            $sql .= $conditionKey . '=' . $conditions[ $conditionKey ];
-            if( $i < count( $conditions ) - 1 )
-            {
-               $sql .= ' AND ';
-            }
-         }
-      }
+      // Add conditions
+      $sql .= $this->arrayToFilterString( $conditions );
 
       $result = mysql_query( $sql );
 
@@ -217,6 +185,68 @@ abstract class MySQLObject
    protected function escapifyString( $input )
    {
        return "'" . mysql_real_escape_string( $input ) . "'";
+   }
+
+   public function getOnlyColumn( $columnName, $order = 'DESC', $limit = 0,
+                                  $filters = NULL )
+   {
+       $sql = "SELECT `$columnName` from `" . $this->getTableName() . '` ';
+
+       // Add filters
+       $sql .= arrayToFilterString( $filters );
+
+       // Add ordering
+       $sql .= " ORDER BY `$columnName` ";
+       if( $order == 'ASC' )
+       {
+           $sql .= $order;
+       }
+       else
+       {
+           $sql .= 'DESC';
+       }
+
+       if( $limit > 0 )
+       {
+           $sql .= " LIMIT $limit";
+       }
+
+       $result = mysql_query( $sql );
+
+       if( !$result )
+       {
+           die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
+       }
+
+       $ret = array();
+       while( $result = mysql_fetch_row( $result ) )
+       {
+           $ret[] = $result[ 0 ];
+       }
+
+       return $ret;
+   }
+
+   private function arrayToFilterString( $arr )
+   {
+       // Filters
+       if( is_array( $filters ) && count( $filters ) > 0 )
+       {
+           $sql = ' WHERE ';
+           $filterKeys = array_keys( $filters );
+           for( $i = 0; $i < count( $filters ); $i++ )
+           {
+               $filterKey = $filterKeys[ $i ];
+               $filter = $filters[ $filterKey ];
+               $sql .= "$filterKey=$filter ";
+               if( $i < count( $filters ) - 1 )
+               {
+                   $sql .= 'AND ';
+               }
+           }
+           return $sql;
+       }
+       return '';
    }
 }
 
