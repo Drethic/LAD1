@@ -1,3 +1,9 @@
+function lEv()
+{
+    var lEv = loginErrort;
+    return lEv;
+}
+
 function doLogin()
 {
     $("body").html("");
@@ -75,38 +81,39 @@ function doLogin()
     ];
     $("#username, #password").bind('keyup', function(){
         var passed = true;
+        var lE = lEv();
         if( $("#username").val().substring( 0, 1 ).search( "[0-9]" ) > -1 )
         {
-            loginErrort( "#username", errorStrings[ 1 ] );
+            lE( "#username", errorStrings[ 1 ] );
             passed = false;
         }
         else if( $("#username").val().length == 0 )
         {
-            loginErrort( "#username", errorStrings[ 3 ] );
+            lE( "#username", errorStrings[ 3 ] );
             passed = false;
         }
         else if( $("#username").val().length < 4 )
         {
-            loginErrort( "#username", errorStrings[ 0 ] );
+            lE( "#username", errorStrings[ 0 ] );
             passed = false;
         }
         else
         {
-            loginErrort( "#username", "" );
+            lE( "#username", "" );
         }
         if( $("#password").val().length == 0 )
         {
-            loginErrort( "#password", errorStrings[ 4 ] );
+            lE( "#password", errorStrings[ 4 ] );
             passed = false;
         }
         else if( $("#password").val().length < 4 )
         {
-            loginErrort( "#password", errorStrings[ 2 ] );
+            lE( "#password", errorStrings[ 2 ] );
             passed = false;
         }
         else
         {
-            loginErrort( "#password", "" );
+            lE( "#password", "" );
         }
 
         if( passed )
@@ -168,8 +175,9 @@ function loginError( field, reason )
 
 function usernameTaken()
 {
-    loginErrort( "#username", "Username is already taken." );
-    loginErrort( "#password", "" );
+    var lE = lEv();
+    lE( "#username", "Username is already taken." );
+    lE( "#password", "" );
     restoreLoginForm();
 }
 
@@ -191,36 +199,37 @@ function usernameAvailable()
 
     $("#cpassword, #email").bind('keyup', function(){
         var passed = true;
+        var lE = lEv();
         var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
         var emailval = $("#email").val();
         if( $("#cpassword").val().length < 4 )
         {
-            loginErrort( "#cpassword", errorStrings[ 0 ] );
+            lE( "#cpassword", errorStrings[ 0 ] );
             passed = false;
         }
         else if( $("#password").val() != $("#cpassword").val() )
         {
-            loginErrort( "#password", errorStrings[ 1 ] );
-            loginErrort( "#cpassword", errorStrings[ 1 ] );
+            lE( "#password", errorStrings[ 1 ] );
+            lE( "#cpassword", errorStrings[ 1 ] );
             passed = false;
         }
         else
         {
-            loginErrort( "#cpassword", "" );
+            lE( "#cpassword", "" );
         }
         if( emailval.length < 1 )
         {
-            loginErrort( "#email", errorStrings[ 2 ] );
+            lE( "#email", errorStrings[ 2 ] );
             passed = false;
         }
         else if (!emailReg.test(emailval))
         {
-            loginErrort( "#email", errorStrings[ 3 ] );
+            lE( "#email", errorStrings[ 3 ] );
             passed = false;
         }
         else
         {
-            loginErrort( "#email", "" );
+            lE( "#email", "" );
         }
 
         if( passed )
@@ -237,7 +246,8 @@ function usernameAvailable()
 
 function cpasswordInvalid()
 {
-    loginErrort( "#cpassword", "Passwords did not match." );
+    var lE = lEv();
+    lE( "#cpassword", "Passwords did not match." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
@@ -245,7 +255,8 @@ function cpasswordInvalid()
 }
 function emailTaken()
 {
-    loginErrort( "#email", "Email is already associated with an account." );
+    var lE = lEv();
+    lE( "#email", "Email is already associated with an account." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
@@ -286,8 +297,9 @@ function validLogin( id )
 function invalidLoginCombo()
 {
     var str = "Invalid login information.";
-    loginErrort( "#username", str );
-    loginErrort( "#password", str );
+    var lE = lEv();
+    lE( "#username", str );
+    lE( "#password", str );
     restoreLoginForm();
 }
 
