@@ -73,7 +73,7 @@ function doLogin()
         "Type in a Username to Login or Register",
         "Type in a Password to Login or Register"
     ];
-    $("#username, #password").bind('keyup change', function(){
+    $("#username, #password").bind('keyup', function(){
         var passed = true;
         if( $("#username").val().substring( 0, 1 ).search( "[0-9]" ) > -1 )
         {
@@ -175,11 +175,12 @@ function usernameAvailable()
 
     var errorStrings = [
         "Password must be at least 4 characters.",
+        "Your Passwords do not match",
         "Email address required",
         "Email must be in the following format user@host.domain"
     ];
 
-    $("#cpassword, #email").bind('keyup change', function(){
+    $("#cpassword, #email").bind('keyup', function(){
         var passed = true;
         var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
         var emailval = $("#email").val();
@@ -188,18 +189,24 @@ function usernameAvailable()
             loginError( "#cpass", errorStrings[ 0 ] );
             passed = false;
         }
+        else if( $("#password").val() != $("#cpassword").val() )
+        {
+            loginError( "#pass", errorStrings[ 1 ] );
+            loginError( "#cpass", errorStrings[ 1 ] );
+            passed = false;
+        }
         else
         {
             loginError( "#cpass", "" );
         }
         if( emailval.length < 1 )
         {
-            loginError( "#email", errorStrings[ 1 ] );
+            loginError( "#email", errorStrings[ 2 ] );
             passed = false;
         }
         else if (!emailReg.test(emailval))
         {
-            loginError( "#email", errorStrings[ 2 ] );
+            loginError( "#email", errorStrings[ 3 ] );
             passed = false;
         }
         else
@@ -233,7 +240,7 @@ function emailTaken()
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
       .attr( "readonly", true );
-    $( "#loginbutton" ).button( "disable" );
+    $( "#loginbutton" ).button( "enable" );
 }
 
 function accountCreated( id )
