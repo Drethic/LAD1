@@ -142,32 +142,17 @@ elseif ($action == 'newuser1')
 /*********************************** STEP 1c **********************************/
 elseif ($action == 'newuser2')
 {
-    $snick = $_SESSION['username'];
-    if (!isset($snick))
+    if(!isset($_SESSION[ 'username' ]) || !isset($_SESSION[ 'password' ]) ||
+       !isset($_REQUEST[ 'email' ]))
     {
-        die('Stupid Muppet! Invalid Username!');
+        die('Stupid Muppet! Invalid Username/Passord!');
     }
-    else
-    {
-        $nick = $snick;
-    }
-    $spass = $_SESSION['password'];
-    if (!isset($spass))
-    {
-        die('Stupid Muppet! Invalid Password!');
-    }
-    else
-    {
-        $pass = $spass;
-    }
-    $remail = $_REQUEST['email'];
-    if (!isValidEmail($remail))
+    $nick = $_SESSION[ 'username' ];
+    $pass = $_SESSION['password'];
+    $email = $_REQUEST['email'];
+    if (!isValidEmail($email))
     {
         die('Stupid muppet!  Your email isn\'t formatted right!');
-    }
-    else
-    {
-        $email = $remail;
     }
     $cpass = $_REQUEST['cpassword'];
     if ($pass != $cpass)
