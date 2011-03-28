@@ -71,11 +71,11 @@ if ($action == 'login')
 {
     $rnick = $_REQUEST['username'];
     $rpass = $_REQUEST['password'];
-    if( !( strlen($rnick) > 3 && strlen($rnick) < 21 ) )
+    if( strlen($rnick) < 4 || strlen($rnick) > 20 )
     {
         die('Stupid Muppet!  Username is the wrong length!');
     }
-    if( !(strlen($rpass) > 3 && strlen($rpass) < 41 ) )
+    if( strlen($rpass) < 4 || strlen($rpass) > 40 )
     {
         die('Stupid Muppet!  Password is the wrong length!');
     }
