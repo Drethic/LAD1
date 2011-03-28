@@ -229,7 +229,7 @@ abstract class MySQLObject
        return $ret;
    }
 
-   private function arrayToFilterString( $arr )
+   private function arrayToFilterString( $filters )
    {
        // Filters
        if( is_array( $filters ) && count( $filters ) > 0 )
