@@ -12,6 +12,15 @@ define('JQUERY_UI_JS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom.min');
 define('DB_NAME', 'lad');
 define('DB_USERNAME', 'lad');
 
+define('DEFAULT_CPU', 350); // Expressed in MHz
+define('DEFAULT_RAM', 32);  // Expressed in MB
+define('DEFAULT_HDD', 250); // Expressed in MB
+define('DEFAULT_BW', 3);    // Expressed in KB
+
+define('STEP_CPU', 50);
+define('STEP_RAM', 4);
+define('STEP_HDD', 10);
+define('STEP_BW', 1);
 
 function clientfile_getName( $type, $base )
 {
