@@ -73,7 +73,7 @@ function doLogin()
         "Type in a Username to Login or Register",
         "Type in a Password to Login or Register"
     ];
-    $("#username, #password").bind('keyup', function(){
+    $("#username, #password").bind('keyup change', function(){
         var passed = true;
         if( $("#username").val().substring( 0, 1 ).search( "[0-9]" ) > -1 )
         {
@@ -117,7 +117,7 @@ function doLogin()
         {
             $("#loginform button").button( "disable" );
         }
-    });
+    }).keyup();
 }
 
 function loginError( field, reason )
@@ -179,7 +179,7 @@ function usernameAvailable()
         "Email must be in the following format user@host.domain"
     ];
 
-    $("#cpassword, #email").bind('keyup', function(){
+    $("#cpassword, #email").bind('keyup change', function(){
         var passed = true;
         var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
         var emailval = $("#email").val();
@@ -216,7 +216,7 @@ function usernameAvailable()
             $("#loginform button").button( "disable" );
             $( "#loginbutton" ).button( "enable" );
         }
-    });
+    }).keyup();
 }
 
 function cpasswordInvalid()
