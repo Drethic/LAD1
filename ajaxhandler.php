@@ -75,17 +75,9 @@ if ($action == 'login')
     {
         die('Stupid Muppet!  Username is the wrong length!');
     }
-    else
-    {
-        $nick = $rnick;
-    }
     if( !(strlen($rpass) > 3 && strlen($rpass) < 41 ) )
     {
         die('Stupid Muppet!  Password is the wrong length!');
-    }
-    else
-    {
-        $pass = $rpass;
     }
     $user = new Users();
     $result = $user->checkCombo( $rnick, $rpass );
