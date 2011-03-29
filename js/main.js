@@ -1,7 +1,19 @@
 function lEv()
 {
-    var lEv = loginErrort;
+    var lEv = loginError;
     return lEv;
+}
+
+function createLoginInput( label, type, name, maxlen, optional )
+{
+    return $("<span id='" + name + "span'>")
+      .append( "<label for='" + name + "'>" + label + ":</label>" )
+      .append( "<input type='" + type + "' name='" + name + "' id='" + name +
+               "' maxlength=" + maxlen + " " + optional + " " +
+               "autocomplete='off'>")
+      .append( "<span id='" + name + "error' class='ui-state-error " +
+               "ui-corner-all' style='padding: 0.2em;font-size:smaller'>" +
+               "</span><br>" );
 }
 
 function doLogin()
@@ -9,19 +21,12 @@ function doLogin()
     $("body").html("");
     
     $("<form id='loginform'>Login<br></form>")
-      .append("Username:<input type='text' name='username' " +
-              "maxlength=20 id='username' class='filterkeys' " +
-              "data-filterkeys='[a-zA-Z0-9]' autocomplete='off'>")
-      .append("<span id='usernameerror'></span><br>")
-      .append("Password:<input type='password' name='password' " +
-              "maxlength=40 id='password'>")
-      .append("<span id='passworderror'></span><br>")
-      .append("<span id='cpasswordspan'>Retype Password:<input "+
-              "type='password' name='cpassword' maxlength=40 id='cpassword'>" +
-              "<span id='cpassworderror'></span><br></span>")
-      .append("<span id='emailspan'>E-mail:<input type='text' name='email' " +
-              "maxlength=40 id='email' autocomplete='off'>" +
-              "<span id='emailerror'></span></span>")
+      .append( createLoginInput( "Username", "text", "username", 20,
+               "class='filterkeys' data-filterkeys='[a-zA-Z0-9]'") )
+      .append( createLoginInput( "Password", "password", "password", 40 ) )
+      .append( createLoginInput( "Retype Password", "password", "cpassword",
+                                 40 ) )
+      .append( createLoginInput( "E-mail:", "text", "email", 40 ) )
       .appendTo("body").filterKeys();
 
     $("<div>")
@@ -127,32 +132,6 @@ function doLogin()
     }).keyup();
 }
 
-function loginErrort ( field, reason )
-{
-    var inputObject = $(field);
-    var warnObject = $(field + 'error');
-
-    if( reason.length == 0 )
-    {
-        inputObject.css({"background-color" : "",
-                         "border-color" : ""});
-        warnObject.css( "display", "none" );
-        warnObject.removeClass('ui-icon ui-icon-notice ui-state-error');
-        warnObject.removeAttr('style', 'display:inline-block;' +
-            'background-image:url(img/ui-icons_cd0a0a_256x240.png);');
-        warnObject.removeAttr('title', reason );
-    }
-    else
-    {
-        inputObject.css({"background-color" : "#FFAAAA",
-                         "border-color" : "#DD4444"});
-        warnObject.addClass('ui-icon ui-icon-notice ui-state-error');
-        warnObject.attr('style', 'display:inline-block;' +
-            'background-image:url(img/ui-icons_cd0a0a_256x240.png);');
-        warnObject.attr('title', reason );
-    }
-}
-
 function loginError( field, reason )
 {
     var inputObject = $(field);
@@ -168,8 +147,10 @@ function loginError( field, reason )
     {
         inputObject.css({"background-color" : "#FFAAAA",
                          "border-color" : "#DD4444"});
-        warnObject.css( "display", "" );
-        warnObject.html( reason );
+        warnObject.html( "<span class='ui-icon ui-icon-alert' " +
+                         "style='float:left'></span>" + reason );
+        warnObject.css( { "display" : "inline-block",
+                          "title" : reason } );
     }
 }
 
