@@ -93,7 +93,7 @@ if ($action == 'login')
         $id = $result[0][0];
         $_SESSION['id'] = $id;
         $_SESSION['username'] = $rnick;
-        echo "validLogin($id);";
+        echo "validLogint($id);";
     }
 }
 /*********************************** STEP 1b **********************************/
