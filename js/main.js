@@ -149,8 +149,7 @@ function loginError( field, reason )
                          "border-color" : "#DD4444"});
         warnObject.html( "<span class='ui-icon ui-icon-alert' " +
                          "style='float:left'></span>" + reason );
-        warnObject.css( { "display" : "inline-block",
-                          "title" : reason } );
+        warnObject.css( { "display" : "inline-block"} );
     }
 }
 
