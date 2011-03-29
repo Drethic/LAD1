@@ -10,6 +10,10 @@ echo "<link rel='stylesheet' type='text/css' href='" .
      clientfile_buildRequest( 'C', JQUERY_UI_CSS ) .
      "'>";
 
+echo "<link rel='stylesheet' type='text/css' href='" .
+     clientfile_buildRequest( 'C', JQUERY_LAYOUT_CSS ) .
+     "'>";
+
 function writeJS( $filebase )
 {
     echo "<script type='text/javascript' src='" .
@@ -19,8 +23,10 @@ function writeJS( $filebase )
 
 writeJS(JQUERY_JS);
 writeJS(JQUERY_UI_JS);
+writeJS(JQUERY_LAYOUT_JS);
 writeJS('plugins');
 writeJS('main');
+writeJS('ui');
 
 ?></head><body><script type='text/javascript'>$(document).ready(function(){
     doLogin();
