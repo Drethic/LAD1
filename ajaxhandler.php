@@ -71,9 +71,10 @@ if ($action == 'login')
 {
     $rnick = $_REQUEST['username'];
     $rpass = $_REQUEST['password'];
-    if( strlen($rnick) < 4 || strlen($rnick) > 20 )
+    if( strlen($rnick) < 4 || strlen($rnick) > 20 || !ctype_alnum($rnick) ||
+        preg_match('/^\d/', $rnick) === 1 )
     {
-        die('Stupid Muppet!  Username is the wrong length!');
+        die('Stupid Muppet!  Username is the wrong!');
     }
     if( strlen($rpass) < 4 || strlen($rpass) > 40 )
     {
@@ -100,9 +101,10 @@ elseif ($action == 'newuser1')
 {
     $rnick = $_REQUEST['username'];
     $rpass = $_REQUEST['password'];
-    if( !( strlen($rnick) > 3 && strlen($rnick) < 21 ) )
+    if( !( strlen($rnick) > 3 && strlen($rnick) < 21 || !ctype_alnum($rnick) ||
+        preg_match('/^\d/', $rnick) === 1 ) )
     {
-        die('Stupid Muppet!  Username is the wrong length!');
+        die('Stupid Muppet!  Username is the wrong!');
     }
     else
     {
