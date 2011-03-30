@@ -17,9 +17,12 @@
  * 4. Validate the file exists
  * 5. Validate the mtime of the file
  * 6. Return the file back with a 60-day expiration
+ * 6a. Handle the special jquery UI file
+ * 6b. Handle JS files with minifying and caching said minified file
  */
 
 require_once( 'private/defs.php' );
+require_once( 'private/jsmin.php' );
 
 // Setup admin only files
 $adminOnlyFiles = array();
@@ -73,7 +76,9 @@ header( "Content-Type: $applicationType" );
 header( "Last-Modified: " . date( DateTime::COOKIE, $_REQUEST[ 'm' ] ) );
 header( "Expires: " . date( DateTime::COOKIE, time() + (365 * 24 * 60 * 60) ) );
 
+$outbuffer = '';
 // JQuery UI has special pre processing
+/********************************** STEP 6a ***********************************/
 if( $_REQUEST[ 't' ] == 'C' && $_REQUEST[ 'f' ] == JQUERY_UI_CSS )
 {
     // Read each line one at a time
@@ -104,13 +109,36 @@ if( $_REQUEST[ 't' ] == 'C' && $_REQUEST[ 'f' ] == JQUERY_UI_CSS )
                                           $dotIndex - $urlIndex ) . "\n";
         }
     }
-    header( "Content-Length: " . strlen( $outBuffer ) );
-    echo $outBuffer;
+}
+else if( $_REQUEST[ 't' ] == 'J' && !in_array( $_REQUEST[ 'f' ], $JQUERY_JS ) )
+{
+/********************************** STEP 6b ***********************************/
+    $cacheFileName = clientfile_getJSCacheName( $_REQUEST[ 'f' ] );
+    if( !file_exists( $cacheFileName ) ||
+         filemtime( $cacheFileName ) < filemtime( $actualFileName ) )
+    {
+        if( !file_exists( 'js/cache' ) )
+        {
+            mkdir( 'js/cache' );
+        }
+        // Rebuild cache
+        $optimized = JSMin::minify( file_get_contents( $actualFileName ) );
+        file_put_contents( $cacheFileName, $optimized );
+
+        $outBuffer = $optimized;
+    }
+    else
+    {
+        $outBuffer = file_get_contents( $cacheFileName );
+    }
 }
 else
 {
-    header( "Content-Length: " . filesize( $actualFileName ) );
-    readfile( $actualFileName );
+    $outBuffer = file_get_contents( $actualFileName );
 }
+
+// OMG actually write it out...
+header( "Content-Length: " . strlen( $outBuffer ) );
+echo $outBuffer;
 
 ?>

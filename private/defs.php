@@ -12,6 +12,8 @@ define('JQUERY_UI_JS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom.min');
 define('JQUERY_LAYOUT_JS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION . '.min');
 define('JQUERY_LAYOUT_CSS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION);
 
+$JQUERY_JS = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS );
+
 define('DB_NAME', 'lad');
 define('DB_USERNAME', 'lad');
 
@@ -24,6 +26,11 @@ define('STEP_CPU', 50);
 define('STEP_RAM', 4);
 define('STEP_HDD', 10);
 define('STEP_BW', 1);
+
+function clientfile_getJSCacheName( $base )
+{
+    return "js/cache/$base.js";
+}
 
 function clientfile_getName( $type, $base )
 {
