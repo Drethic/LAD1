@@ -27,25 +27,6 @@ class Users extends MySQLObject
         return "SERVERS";
     }
 
-    function getTableCreator( )
-    {
-        return "CREATE TABLE `SERVERS` (\n" .
-               "`ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
-               "`OWNER_ID` int(10) unsigned NOT NULL,\n" .
-               "`IP` int(10) unsigned NOT NULL,\n" .
-               "`CPU` int(10) unsigned NOT NULL,\n" .
-               "`RAM` int(10) unsigned NOT NULL,\n" .
-               "`HDD` int(10) unsigned NOT NULL,\n" .
-               "`BANDWIDTH` int(10) unsigned NOT NULL,\n" .
-               "PRIMARY KEY (`ID`)\n" .
-               ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
-    }
-
-    function getDependents( )
-    {
-        return array( 'USERS' );
-    }
-
     function addServer( $ownerid )
     {
         $takenIPs = $this->getOnlyColumn( 'IP' );

@@ -18,8 +18,6 @@
  *       getColumns() : Return an array with column names in the values
  *         getIndex() : Return an int with the column that is the index
  *     getTableName() : Return the table name
- *  getTableCreator() : Return the statement used to create the table
- *    getDependents() : Return an array with names of tables this one depends on
  *
  * Todo:
  *  Expand get to allow OR in the WHERE
@@ -31,8 +29,6 @@ abstract class MySQLObject
    abstract protected function getColumns();
    abstract protected function getIndex();
    abstract protected function getTableName();
-   abstract protected function getTableCreator();
-   abstract protected function getDependents();
 
    // Filters = key/value for columnName/columnValue
    // Orders = key for each columnName, value is ASC/DESC
