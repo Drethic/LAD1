@@ -6,13 +6,11 @@ require_once( 'private/defs.php' );
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title></title><?php
 
-echo "<link rel='stylesheet' type='text/css' href='" .
-     clientfile_buildRequest( 'C', JQUERY_UI_CSS ) .
-     "'>";
-
-echo "<link rel='stylesheet' type='text/css' href='" .
-     clientfile_buildRequest( 'C', JQUERY_LAYOUT_CSS ) .
-     "'>";
+function writeCSS( $filebase )
+{
+    echo "<link rel='stylesheet' type='text/css' href='" .
+         clientfile_buildRequest( 'C', $filebase ) . "'>";
+}
 
 function writeJS( $filebase )
 {
@@ -20,6 +18,9 @@ function writeJS( $filebase )
          clientfile_buildRequest( 'J', $filebase ) .
          "'></script>";
 }
+
+writeCSS( JQUERY_UI_CSS );
+writeCSS( JQUERY_LAYOU_CSS );
 
 writeJS(JQUERY_JS);
 writeJS(JQUERY_UI_JS);
