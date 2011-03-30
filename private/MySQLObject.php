@@ -246,6 +246,15 @@ abstract class MySQLObject
        }
        return '';
    }
+
+   protected function adjustSingleByID( $id, $field, $amount )
+   {
+       $columns = $this->getColumns();
+       $index = $this->getIndex();
+       $indexStr = $columns[ $index ];
+       return $this->update( array( $field => "$field+$amount" ),
+                             array( $indexStr => $id ) );
+   }
 }
 
 ?>
