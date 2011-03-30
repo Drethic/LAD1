@@ -4,7 +4,7 @@ function validLogint( id )
     $("body").html("");
     $("body").append(
       $("<div id='layout-container' style='width:100%;height:100%'>")
-        .append("<div id='south' class='ui-layout-south'>Taskbar</div>")
+        .append("<div id='south' class='ui-layout-south'></div>")
         .append("<div id='east' class='ui-layout-east'>Chat(closeable)</div>")
         .append("<div id='center' class='ui-layout-center'>Desktop</div>")
     );
@@ -17,13 +17,38 @@ function validLogint( id )
         ,   east: {
             initClosed: true
         ,   resizable: false
-        }});
+        }}).sizePane("south", 44);
 
     $("#south")
-      .append("<button id='logout'>Logout</button>")
-      .css({"background-color" : "#808080"});
+        .addClass("slide")
+        .append("<div id='start' class='start-menu-button'></div>")
+        .append("<div id='menu' class='inner'>Slide from bottom</div>")
+        .css({"background" : "url(img/taskbar/taskbar-bg.png)"});
+
+    $("#menu").css({"display" : "none"});
+
+    $('#start').live("mouseover mouseout",function(event){if(event.type=='mouseover')
+        $(this).addClass('hover');else
+        $(this).removeClass('hover');
+    });
+
+    $('#start').live("click",function(){if($(this).hasClass('active'))
+        {
+            $(this).removeClass('active');
+        }
+        else
+        {
+            $(this).addClass('active');
+        }
+    });
+
+    $("#menu").append("<button id='logout'>Logout</button>");
 
     $("#logout").click(function( evt ){
         doLogin();
+    });
+    $('#start').click(function() {
+        $("#layout-container").layout().allowOverflow('south');
+        $(this).next().slideToggle();
     });
 }
