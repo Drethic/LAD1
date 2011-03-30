@@ -38,6 +38,43 @@ html, body {
     _width:     700px; /* min-width for IE6 */
 }
 
+.slide {
+  position: relative;
+}
+.slide .inner {
+  position: absolute;
+  left: 0;
+  bottom: 44px;
+  width: 150px;
+  height: 36px;
+  padding: 6px;
+  background-color: #4c5;
+  color: #333;
+}
+
+.taskbar {
+
+  background: url(img/taskbar/taskbar-bg.png);
+  height: 40px;
+  width: 100%;
+  position: fixed;
+  bottom: 0px;
+  z-index: 10000;
+}
+
+.start-menu-button {
+  height: 39px;
+  width: 46px;
+  /*padding-left: 1px;*/
+  background: url(img/taskbar/StartButtonIcon.png) 0 -7px no-repeat;
+}
+.start-menu-button.hover {
+  background-position: 0px -61px;
+}
+.start-menu-button.active {
+  background-position: 0px -115px;
+}
+
 /*
  *  PANES & CONTENT-DIVs
  */
@@ -47,15 +84,16 @@ html, body {
     /* DO NOT add scrolling (or padding) to 'panes' that have a content-div,
        otherwise you may get double-scrollbars - on the pane AND on the content-div
     */
-    padding:    10px;
+    padding:    1px;
     overflow:   auto;
     }
 .ui-layout-pane-south {
-    overflow: hidden !important;
+    /*overflow: hidden !important;*/
+    overflow: auto;
 }
     /* (scrolling) content-div inside pane allows for fixed header(s) and/or footer(s) */
     .ui-layout-content {
-        padding:    10px;
+        padding:    1px;
         position:   relative; /* contain floated or positioned elements */
         overflow:   auto; /* add scrolling to content-div */
     }
