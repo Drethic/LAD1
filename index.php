@@ -20,7 +20,7 @@ function writeJS( $filebase )
 }
 
 writeCSS( JQUERY_UI_CSS );
-writeCSS( JQUERY_LAYOU_CSS );
+writeCSS( JQUERY_LAYOUT_CSS );
 
 writeJS(JQUERY_JS);
 writeJS(JQUERY_UI_JS);
