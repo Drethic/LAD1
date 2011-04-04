@@ -54,7 +54,7 @@ html, body {
 
 .taskbar {
 
-  background: url(img/taskbar-bg.png);
+  background: url(images/taskbar-bg.png);
   height: 40px;
   width: 100%;
   position: fixed;
@@ -66,7 +66,7 @@ html, body {
   height: 39px;
   width: 46px;
   /*padding-left: 1px;*/
-  background: url(img/StartButtonIcon.png) 0 -7px no-repeat;
+  background: url(images/StartButtonIcon.png) 0 -7px no-repeat;
 }
 .start-menu-button.hover {
   background-position: 0px -61px;
