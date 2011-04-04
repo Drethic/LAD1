@@ -17,8 +17,9 @@
  * 4. Validate the file exists
  * 5. Validate the mtime of the file
  * 6. Return the file back with a 60-day expiration
- * 6a. Handle the special jquery UI file
- * 6b. Handle JS files with minifying and caching said minified file
+ * 6a. Handle all JS/CSS files with images/get.php replacement
+ * 6b. Handle JS files with minifying
+ * 6c. Cache JS/CSS
  */
 
 require_once( 'private/defs.php' );
@@ -77,60 +78,61 @@ header( "Last-Modified: " . date( DateTime::COOKIE, $_REQUEST[ 'm' ] ) );
 header( "Expires: " . date( DateTime::COOKIE, time() + (365 * 24 * 60 * 60) ) );
 
 $outbuffer = '';
-// JQuery UI has special pre processing
+// JS/CSS has special processing
 /********************************** STEP 6a ***********************************/
-if( $_REQUEST[ 't' ] == 'C' && $_REQUEST[ 'f' ] == JQUERY_UI_CSS )
+if( $_REQUEST[ 't' ] == 'C' || $_REQUEST[ 't' ] == 'J' )
 {
-    // Read each line one at a time
-    $lineArray = file( $actualFileName );
-    $outBuffer = '';
-    foreach( $lineArray as $line )
+    $cacheFileName = clientfile_getCacheName( $_REQUEST[ 't' ],
+                                              $_REQUEST[ 'f' ] );
+    if( file_exists( $cacheFileName ) &&
+        filemtime( $cacheFileName ) > filemtime( $actualFileName ) )
     {
-        // URL's are not correct so...let's fix em
-        // We need to extract the image name out of the url() and then replace
-        // it with a string that we build
-        $urlIndex = strpos( $line, 'url(' );
-        if( $urlIndex == false )
-        {
-            // No URL, just echo out
-            $outBuffer .= $line;
-        }
-        else
-        {
-            // Alright, there is a URL, so figure out exactly where it is
-            $fileIndex = $urlIndex + 11;
-            $dotIndex = strpos( $line, '.png' );
-
-            $fileName = substr( $line, $fileIndex, $dotIndex - $fileIndex );
-            $replacement = clientfile_buildRequest( 'N', $fileName );
-
-            // Now just replace it and echo out
-            $outBuffer .= substr_replace( $line, $replacement, $urlIndex + 4,
-                                          $dotIndex - $urlIndex ) . "\n";
-        }
+        $outBuffer = file_get_contents( $cacheFileName );
     }
-}
-else if( $_REQUEST[ 't' ] == 'J' && !in_array( $_REQUEST[ 'f' ], $JQUERY_JS ) )
-{
-/********************************** STEP 6b ***********************************/
-    $cacheFileName = clientfile_getJSCacheName( $_REQUEST[ 'f' ] );
-    if( !file_exists( $cacheFileName ) ||
-         filemtime( $cacheFileName ) < filemtime( $actualFileName ) )
+    else
     {
         if( !file_exists( 'js/cache' ) )
         {
             mkdir( 'js/cache' );
         }
         // Rebuild cache
-        $optimized = JSMin::minify( file_get_contents( $actualFileName ) );
-        file_put_contents( $cacheFileName, $optimized );
+        // Read each line one at a time
+        $lineArray = file( $actualFileName );
+        $outBuffer = '';
+        foreach( $lineArray as $line )
+        {
+            // URL's are not correct so...let's fix em
+            // We need to extract the image name out of the url()
+            // and then replace it with a string that we build
+            $urlIndex = strpos( $line, 'url(' );
+            if( $urlIndex == false )
+            {
+                // No URL, just echo out
+                $outBuffer .= $line;
+            }
+            else
+            {
+                // Alright, there is a URL, so figure out exactly where it is
+                $fileIndex = $urlIndex + 11;
+                $dotIndex = strpos( $line, '.png' );
 
-        $outBuffer = $optimized;
+                $fileName = substr( $line, $fileIndex, $dotIndex - $fileIndex );
+                $replacement = clientfile_buildRequest( 'N', $fileName );
+
+                // Now just replace it and echo out
+                $outBuffer .= substr_replace( $line, $replacement, $urlIndex + 4,
+                                              $dotIndex - $urlIndex ) . "\n";
+            }
+        }
+/********************************** STEP 6b ***********************************/
+        if( $_REQUEST[ 't' ] == 'J' &&
+            !in_array( $_REQUEST[ 'f' ], $JQUERY_JS ) )
+        {
+            $outBuffer = JSMin::minify( $outBuffer );
+        }
     }
-    else
-    {
-        $outBuffer = file_get_contents( $cacheFileName );
-    }
+/********************************** STEP 6c ***********************************/
+    file_put_contents( $cacheFileName, $outBuffer );
 }
 else
 {

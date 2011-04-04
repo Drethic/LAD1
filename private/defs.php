@@ -27,9 +27,14 @@ define('STEP_RAM', 4);
 define('STEP_HDD', 10);
 define('STEP_BW', 1);
 
-function clientfile_getJSCacheName( $base )
+// Only works with CSS or JS files
+function clientfile_getCacheName( $type, $base )
 {
-    return "js/cache/$base.js";
+    if( $type == 'J' )
+    {
+        return "js/cache/$base.js";
+    }
+    return "css/cache/$base.css";
 }
 
 function clientfile_getName( $type, $base )
