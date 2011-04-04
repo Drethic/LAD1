@@ -95,6 +95,10 @@ if( $_REQUEST[ 't' ] == 'C' || $_REQUEST[ 't' ] == 'J' )
         {
             mkdir( 'js/cache' );
         }
+        if( !file_exists( 'css/cache' ) )
+        {
+            mkdir( 'css/cache' );
+        }
         // Rebuild cache
         // Read each line one at a time
         $lineArray = file( $actualFileName );

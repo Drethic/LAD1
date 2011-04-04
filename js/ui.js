@@ -23,7 +23,7 @@ function validLogint( id )
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
         .append("<div id='menu' class='inner'>Slide from bottom</div>")
-        .css({"background" : "url(img/taskbar/taskbar-bg.png)"});
+        .css({"background" : "url(images/taskbar-bg.png)"});
 
     $("#menu").css({"display" : "none"});
 
