@@ -383,6 +383,7 @@ function getDefault( val )
     {
         return 10;
     }
+    return 0;
 }
 
 function getTempCache( ind )
@@ -394,7 +395,11 @@ function getTempCache( ind )
 
 function tempCache( ind, val )
 {
-    var old = this.ind;
-    this.ind = val;
+    if( this.values == undefined )
+    {
+        this.values = new Array();
+    }
+    var old = this.values[ ind ];
+    this.values[ ind ] = val;
     return old;
 }
