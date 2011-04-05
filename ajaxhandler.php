@@ -65,6 +65,7 @@ require_once( 'private/defs.php' );
 require_once( 'private/users.php' );
 require_once( 'private/servers.php' );
 require_once( 'private/programs.php' );
+require_once( 'private/processes.php' );
 
 function isValidEmail($email){
     $pattern = "/^[-_a-z0-9\'+*$^&%=~!?{}]++(?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*"
@@ -328,6 +329,27 @@ elseif( $action == 'viewserver' )
         {
             echo 'new Array(' . implode( ',', $allPrograms[ $i ] ) . ')';
             if( $i < $programCount - 1 )
+            {
+                echo ',';
+            }
+        }
+    }
+
+    $processes = new Processes();
+    $allProcesses = $processes->getProcessesByServer( $id );
+
+    $processCount = count( $allProcesses );
+    if( $processCount == 0 )
+    {
+        echo 'noServerProcesses();';
+    }
+    else
+    {
+        echo 'serverProcesses(new Array(';
+        for( $i = 0; $i < $processCount; $i++ )
+        {
+            echo 'new Array(' . implode( ',', $allProcesses[ $i ] ) . ')';
+            if( $i < $processCount - 1 )
             {
                 echo ',';
             }
