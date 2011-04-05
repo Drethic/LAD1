@@ -210,11 +210,40 @@ abstract class MySQLObject
        }
 
        $ret = array();
-       while( $result = mysql_fetch_row( $result ) )
+       while( $row = mysql_fetch_row( $result ) )
        {
-           $ret[] = $result[ 0 ];
+           $ret[] = $row[ 0 ];
        }
 
+       return $ret;
+   }
+
+   protected function getCustom( $sql )
+   {
+       $result = mysql_query( $sql );
+
+       if( !$result )
+       {
+           die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
+       }
+
+       $ret = array();
+       while( $row = mysql_fetch_row( $result ) )
+       {
+           if( count( $row ) == 1 )
+           {
+               $ret[] = $row[ 0 ];
+           }
+           else
+           {
+               $ret[] = $row;
+           }
+       }
+
+       if( count( $ret ) == 1 )
+       {
+           $ret = $ret[ 0 ];
+       }
        return $ret;
    }
 

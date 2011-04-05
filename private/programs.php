@@ -52,6 +52,14 @@ class Programs extends MySQLObject
     {
         return $this->getSingle( $programid );
     }
+
+    function getProgramOwnerByID( $programid )
+    {
+        $programid = intval( $programid );
+        return $this->getCustom( "SELECT U.ID FROM USERS AS U, SERVERS AS S," +
+                                 "PROGRAMS AS P WHERE U.ID=S.OWNER_ID AND " +
+                                 "S.ID=P.SERVER_ID AND P.ID=$programid" );
+    }
 }
 
 ?>
