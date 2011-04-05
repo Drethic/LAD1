@@ -28,7 +28,7 @@ class Processes extends MySQLObject
         return "PROCESSES";
     }
 
-    function addProcess( $target, $owner, $cpu, $ram, $bw, $operation,
+    function addProcess( $target, $owningServer, $cpu, $ram, $bw, $operation,
                          $completion )
     {
         return $this->insert( array( "NULL", $target, $owner, $cpu,
@@ -58,6 +58,17 @@ class Processes extends MySQLObject
     function getAllProcesses( )
     {
         return $this->get( NULL, array( 'ID' => 'ASC' ) );
+    }
+
+    function getHDDConsumersByServer( $serverid )
+    {
+        return $this->getCustom( 'SELECT P.SIZE, P.TYPE, R.* FROM ' +
+                                 'PROCESSES AS R INNER JOIN PROGRAMS AS P ON ' +
+                                 'P.ID=R.TARGET_PROGRAM WHERE ' +
+                                 "R.OWNING_SERVER=$serverid AND " +
+                                 'P.TYPE IN(' +
+                                 implode( ',', getHDDConsumingOperations() ) +
+                                 ') ORDER BY R.ID' );
     }
 
     function deleteProcess( $id )
