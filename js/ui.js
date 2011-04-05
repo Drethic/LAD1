@@ -334,4 +334,6 @@ function startedResearch( programid, processid, completiontime )
     addServerProcess( processid, programid, getTempCache("currentserver"), 100,
                       10, 0, 2, completiontime );
     updateProgramOperations();
+
+    tempCache( "processes", getTempCache( "processes" ) + "," + processid );
 }
