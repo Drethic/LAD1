@@ -350,3 +350,24 @@ function intToProgramType( val )
             return "Malware";
     }
 }
+
+function getProgramSize( type, version )
+{
+    switch( type )
+    {
+        case 1:
+            return version * 5;
+        case 2:
+            return version * 10;
+        case 3:
+            return version * 2;
+        case 4:
+            return version * 4;
+        case 5:
+            return version * 40;
+        case 6:
+            return version * 40;
+        case 7:
+            return version * 25;
+    }
+}

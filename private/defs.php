@@ -49,6 +49,15 @@ define('PROGRAM_TYPE_ENCRYPTER', 5);
 define('PROGRAM_TYPE_DECRYPTER', 6);
 define('PROGRAM_TYPE_MALWARE', 7);
 
+// Some sizes for level 1 programs
+define('FIREWALL_SIZE', 5);
+define('FIREWALLBREAKER_SIZE', 10);
+define('PASSWORD_SIZE', 2);
+define('PASSWORDBREAKER_SIZE', 4);
+define('ENCRYPTOR_SIZE', 40);
+define('DECRYPTOR_SIZE', 40);
+define('MALWARE_SIZE', 25);
+
 // Tells JS to handle a 2D array based on its existence
 function echo2DArray( $validfunc, $invalidfunc, $arr )
 {
