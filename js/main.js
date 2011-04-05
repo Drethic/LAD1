@@ -401,7 +401,7 @@ function tempCache( ind, val )
     return old;
 }
 
-function runTimeUpdater( object )
+function runTimeUpdater( object, id, callback )
 {
     if( object != undefined )
     {
@@ -413,8 +413,18 @@ function runTimeUpdater( object )
         {
             this.remaining = new Array();
         }
+        if( this.ids == undefined )
+        {
+            this.ids = new Array();
+        }
+        if( this.callbacks == undefined )
+        {
+            this.callbacks = new Array();
+        }
 
         this.values[ this.values.length ] = object;
+        this.ids[ this.ids.length ] = id;
+        this.callbacks[ this.callbacks.length ] = callback;
 
         var etic = getTempCache( object ).toString();
         var timestamp = Date.now() / 1000;
@@ -425,7 +435,8 @@ function runTimeUpdater( object )
         eticObject.setHours( etic.substring( 8, 10 ), etic.substring( 10, 12 ),
                              etic.substring( 12, 14 ) );
         var etics = eticObject.getTime() / 1000;
-        this.remaining[ this.remaining.length ] = etics - timestamp;
+        var secsremaining = etics > timestamp ? etics - timestamp : 0;
+        this.remaining[ this.remaining.length ] = secsremaining;
 
         if( this.timer == undefined || this.timer == -1 )
         {
@@ -437,10 +448,14 @@ function runTimeUpdater( object )
         for( var i = 0; i < this.values.length; i++ )
         {
             var entry = this.values[ i ];
-            var remain = this.remaining[ i ] - 1;
+            var remain = this.remaining[ i ];
             var obj = $("#" + entry);
 
-            this.remaining[ i ] = remain;
+            if( remain > 0 )
+            {
+                remain--;
+                this.remaining[ i ] = remain;
+            }
 
             var seconds = remain % 60;
             remain -= seconds;
@@ -452,31 +467,30 @@ function runTimeUpdater( object )
             remain -= hours;
             remain /= 24;
             var days = remain;
-            var output = "";
 
-            if( days > 0 )
+            if( days == 0 && hours == 0 && minutes == 0 && seconds == 0 )
             {
-                output = days.toString() + "d ";
+                this.callbacks[ i ]( this.ids[ i ], obj );
             }
-            if( hours > 0 || output != "" )
+            else
             {
-                output += hours.toString() + "h ";
-            }
-            if( minutes > 0 || output != "" )
-            {
-                output += minutes.toString() + "m ";
-            }
-            if( seconds > 0 || output != "" )
-            {
+                var output = "";
+                if( days > 0 )
+                {
+                    output = days.toString() + "d ";
+                }
+                if( hours > 0 || output != "" )
+                {
+                    output += hours.toString() + "h ";
+                }
+                if( minutes > 0 || output != "" )
+                {
+                    output += minutes.toString() + "m ";
+                }
                 output += seconds.toString() + "s ";
-            }
 
-            if( output == "" )
-            {
-                output = "Done!";
+                obj.html( output );
             }
-
-            obj.html( output );
         }
     }
 }

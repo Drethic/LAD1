@@ -272,7 +272,12 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempCache( "process-" + id + "-operation", operation );
     tempCache( "process-" + id + "-completetime", completiontime );
 
-    runTimeUpdater( "process-" + id + "-completetime" );
+    runTimeUpdater( "process-" + id + "-completetime", id, function(id,domEl) {
+        domEl.html( "<a href='#'>Complete</a>" );
+        $("#process-" + id + "-completetime a").click(function(evt){
+            //wait
+        });
+    });
 }
 
 function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
