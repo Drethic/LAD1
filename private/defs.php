@@ -63,6 +63,19 @@ define('ENCRYPTOR_SIZE', 40);
 define('DECRYPTOR_SIZE', 40);
 define('MALWARE_SIZE', 25);
 
+// Forces an array to be 2D
+function force2DArray( $val )
+{
+    if( !is_array( $val ) )
+    {
+        return array( array( $val ) );
+    }
+    if( isset( $val[ 0 ] ) && !is_array(  $val[ 0 ] ) )
+    {
+        return array( $val );
+    }
+    return $val;
+}
 // Gets all the operations that increase the capacity of a server
 function getHDDConsumingOperations( )
 {

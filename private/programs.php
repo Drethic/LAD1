@@ -62,17 +62,18 @@ class Programs extends MySQLObject
 
     function getServerUsage( $serverid )
     {
-        return $this->get( array( 'SERVER_ID' => $serverid ), NULL, 0,
+        $ret = $this->get( array( 'SERVER_ID' => $serverid ), NULL, 0,
                            "SUM(SIZE)" );
+        return $ret[ 0 ][ 0 ];
     }
 
     // Returns 2D array [ userID, serverID, programInfo... ]
     function getProgramOwnerAndServerByID( $programid )
     {
         $programid = intval( $programid );
-        return $this->getCustom( "SELECT U.ID, S.ID, P.* FROM PROGRAMS AS P " +
-                                 "INNER JOIN SERVERS AS S ON " +
-                                 "P.SERVER_ID=S.ID INNER JOIN USERS AS U ON " +
+        return $this->getCustom( "SELECT U.ID, S.ID, P.* FROM PROGRAMS AS P " .
+                                 "INNER JOIN SERVERS AS S ON " .
+                                 "P.SERVER_ID=S.ID INNER JOIN USERS AS U ON " .
                                  "U.ID=S.OWNER_ID WHERE P.ID=$programid" );
     }
 }

@@ -203,9 +203,16 @@ function addServerProgram( id, serverid, type, size, version )
     tempOut += "<td name='type'>" + intToProgramType( type ) + "</td>";
     tempOut += "<td name='size'>" + size + "</td>";
     tempOut += "<td name='version'>" + version + "</td>";
-    tempOut += "<td><span id='research-" + id + "'>Research</span></td>";
+    tempOut += "<td><span id='research-" + id + "'><a href='#research-" +
+               id + "'>Research</a></span></td>";
     tempOut += "</tr>";
     $('#programtable').append( tempOut );
+
+    $('#research-' + id).click(function( evt ){
+        doAjax( "startresearch", {
+            PROGRAM_ID: id
+        });
+    });
 
     tempCache( "program-" + id + "-server", serverid );
     tempCache( "program-" + id + "-type", type );
@@ -221,11 +228,6 @@ function noServerProcesses()
 
 function serverProcesses( list )
 {
-    $('#processdiv').html( "<table id='processtable'><thead><td>Target ID" +
-                           "</td><td>CPU</td><td>RAM</td><td>BW</td>" +
-                           "<td>Operation</td><td title='Estimated Time of " +
-                           "Completion'>ETC</td></thead></table>" );
-
     var processes = new Array();
     for( var i = 0; i < list.length; i++ )
     {
@@ -243,6 +245,16 @@ function serverProcesses( list )
 function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
                            operation, completiontime )
 {
+    var processtable = $('#processtable');
+    if( processtable.length == 0 )
+    {
+        $('#processdiv').html( "<table id='processtable'><thead><td>Target ID" +
+                               "</td><td>CPU</td><td>RAM</td><td>BW</td>" +
+                               "<td>Operation</td><td title='Estimated Time " +
+                               "of Completion'>ETC</td></thead></table>" );
+        processtable = $('#processtable');
+    }
+
     var tempOut = "<tr>";
     tempOut += "<td>" + targetprog + "</td>";
     tempOut += "<td>" + cpu + "</td>";
@@ -251,7 +263,7 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempOut += "<td>" + intToProcessOperation( operation ) + "</td>";
     tempOut += "<td>" + completiontime + "</td>";
     tempOut += "</tr>";
-    $('#processtable').append( tempOut );
+    processtable.append( tempOut );
 
     tempCache( "process-" + id + "-target", targetprog );
     tempCache( "process-" + id + "-server", owningserver );
@@ -310,4 +322,16 @@ function updateProgramOperations( )
             $('#research-' + programid).removeClass( 'disabledOperation' );
         }
     }
+}
+
+function notEnoughFileSpace()
+{
+    alert( 'Not enough file space!' );
+}
+
+function startedResearch( programid, processid, completiontime )
+{
+    addServerProcess( processid, programid, getTempCache("currentserver"), 100,
+                      10, 0, 2, completiontime );
+    updateProgramOperations();
 }

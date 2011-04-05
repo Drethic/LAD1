@@ -21,6 +21,7 @@
  * requestfreeserver = User wants their first server for free
  *        viewserver = User wants to see all information about a server
  *      freeprograms = User is requesting their free programs
+ *     startresearch = User wants to start researching a program
  *
  * Session vars:
  *  id          = Sets the ID into session to help control authorization
@@ -62,7 +63,12 @@
  * 2g. User wants their free programs
  * 2g1. Ensure the user actually owns the server
  * 2g2. Ensure they don't have all of the free programs
- * 2h. If there is nothing to handle echo alert('Nothing to handle.')
+ * 2h. User wants to research their program
+ * 2h1. Check to make sure the program belongs to them
+ * 2h2. Do a quick check if there's enough space after that research
+ * 2h3. Also check to make sure there is enough space after all researches are
+ *      done to hold this one as well
+ * 2i. If there is nothing to handle echo alert('Nothing to handle.')
  */
 
 require_once( 'private/defs.php' );
@@ -91,7 +97,8 @@ $actionRequirements =
          'requestservers' => NEED_LOGIN,
          'requestfreeserver' => NEED_LOGIN,
          'viewserver' => NEED_LOGIN,
-         'freeprograms' => NEED_LOGIN );
+         'freeprograms' => NEED_LOGIN,
+         'startresearch' => NEED_LOGIN );
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
@@ -363,6 +370,79 @@ elseif( $action == 'freeprograms' )
     echo "grantedFreePrograms($id1,$id2,$id3,$id4);";
 }
 /*********************************** STEP 2h **********************************/
+elseif( $action == 'startresearch' )
+{
+    if( !isset( $_REQUEST[ 'PROGRAM_ID' ] ) )
+    {
+        die( 'Ha! Funny!' );
+    }
+
+    $programid = $_REQUEST[ 'PROGRAM_ID' ];
+
+    $programs = new Programs();
+    $servers = new Servers();
+    list( $userid, $serverid, $a, $a, $programtype ) =
+        $programs->getProgramOwnerAndServerByID( $programid );
+
+/*********************************** STEP 2h1 *********************************/
+    if( $userid != $_SESSION[ 'id' ] )
+    {
+        die( 'Researching for other people are we?' );
+    }
+
+    $serverInfo = $servers->getServerByID( $serverid );
+
+    $maxHDD = $serverInfo[ 5 ];
+
+    $usedHDD = $programs->getServerUsage( $serverid );
+
+    $fileSize = getProgramSize( $programtype );
+
+/*********************************** STEP 2h2 *********************************/
+    if( $fileSize + $usedHDD > $maxHDD )
+    {
+        echo( 'notEnoughFileSpace();' );
+    }
+    else
+    {
+        // Get all the processes that will increase the HDD usage on the server
+        $processes = new Processes();
+        $consumers = force2DArray(
+                 $processes->getHDDConsumersByServer( $serverid ) );
+        foreach( $consumers as $consumer )
+        {
+            switch( $consumer[ 8 ] )
+            {
+                case PROCESS_OP_COPY:
+                case PROCESS_OP_TRANSFER:
+                    $usedHDD += $consumer[ 0 ];
+                    break;
+                case PROCESS_OP_RESEARCH:
+                    $usedHDD += getProgramSize( $consumer[ 1 ] );
+                    break;
+            }
+        }
+
+/*********************************** STEP 2h3 *********************************/
+        if( $usedHDD > $maxHDD )
+        {
+            echo( 'notEnoughFileSpace();' );
+        }
+        else
+        {
+            // Alright, the user can research it
+            $t = DEFAULT_RESEARCH_TIME;
+            $researchid = $processes->addProcess( $programid, $serverid,
+                    DEFAULT_RESEARCH_CPU, DEFAULT_RESEARCH_RAM, 0,
+                    PROCESS_OP_RESEARCH, "NOW()+$t" );
+            $result = $processes->getProcessByID( $researchid );
+            $etic = $result[ 7 ];
+            echo( "startedResearch($programid,$researchid,$etic);" );
+        }
+    }
+}
+/*********************************** STEP 2i **********************************/
+
 elseif( $action == 'nothing' )
 {
     echo 'Nothing to handle.  Now go back to the index ya muppet!';
