@@ -1,4 +1,4 @@
-function validLogint( id )
+function validLogin( id )
 {
     $("head").css('pane', 'display:none;}');
     $("body").html("");
