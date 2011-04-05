@@ -128,7 +128,7 @@ function noServerPrograms()
 
 function serverPrograms( list )
 {
-    $('#programdiv').html( "<table id='programtable'></table>");
+    $('#programdiv').html( "<table id='programtable'></table>" );
     for( var i = 0; i < list.length; i++ )
     {
         var tempOut = "<tr>";
@@ -141,5 +141,27 @@ function serverPrograms( list )
         }
         tempOut += "</tr>";
         $('#programtable').append( tempOut );
+    }
+}
+
+function noServerProcesses()
+{
+    $('#processdiv').html( "This server has no processes!" );
+}
+
+function serverProcesses( list )
+{
+    $('#processdiv').html( "<table id='processtable'></table>" );
+    for( var i = 0; i < list.length; i++ )
+    {
+        var tempOut = "<tr>";
+        // Target Program
+        tempOut += "<td>" + list[ i ][ 1 ];
+        for( var j = 3; j < 7; j++ )
+        {
+            tempOut += "<td>" + list[ i ][ j ] + "</td>";
+        }
+        tempOut += "</tr>";
+        $('#processtable').append( tempOut );
     }
 }
