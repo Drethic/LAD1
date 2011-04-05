@@ -29,15 +29,21 @@ class Servers extends MySQLObject
 
     function getAvailableIP( )
     {
+        // Generate random numbers!
+        srand();
 
+        // Get what IPs are already taken
         $takenIPs = $this->getOnlyColumn( 'IP' );
 
+        // Generate a new random IP
         $randomIP = rand( 1, 4294967296 ); // 256 ^ 4
 
+        // While the IP is already taken, generate a new one
         while( in_array( $randomIP, $takenIPs ) )
         {
             $randomIP = rand( 1, 4294967296 );
         }
+        // Return the new/available one
         return $randomIP;
     }
 
