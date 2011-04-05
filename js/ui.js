@@ -52,6 +52,7 @@ function validLogin( id )
       .append( "<button id='server'>Servers</button>" );
 
     $("#logout").click(function( evt ){
+        window.location = '#';
         doLogin();
     });
     $("#server").click(function( evt ){
