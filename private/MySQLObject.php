@@ -170,16 +170,6 @@ abstract class MySQLObject
        return $ret[ 0 ];
    }
 
-   public function getMinimizedCreator( )
-   {
-       return $this->minimizeCreator( $this->getTableCreator() );
-   }
-
-   public static function minimizeCreator( $creator )
-   {
-       return str_replace( array( ' ', '\n', '\r', '\t' ), '', $creator );
-   }
-
    protected function escapifyString( $input )
    {
        return "'" . mysql_real_escape_string( $input ) . "'";
