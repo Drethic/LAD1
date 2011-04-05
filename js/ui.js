@@ -81,7 +81,9 @@ function ownedServers( id, list )
     for( var i = 0; i < list.length; i++ )
     {
         var tempOut = "<tr>";
-        tempOut += "<td>" + intToIP( list[ i ][ 2 ] ) + "</td>";
+        tempOut += "<td><a href='#server-" + list[ i ][ 0 ] + "' " +
+                   "title='View Server'>" + intToIP( list[ i ][ 2 ] ) +
+                   "</a></td>";
         for( var j = 3; j < list[ i ].length; j++ )
         {
             tempOut += "<td>" + list[ i ][ j ] + "</td>";
@@ -89,9 +91,53 @@ function ownedServers( id, list )
         tempOut += "</tr>";
         $('#servertable').append( tempOut );
     }
+    $('#servertable a').click(function( evt ){
+       var t = $(this);
+       var href = t.attr( 'href' );
+       if( href.indexOf( 'server-' ) == 1 )
+       {
+           doAjax( "viewserver", {
+               SERVER_ID: href.slice( 8 )
+           });
+       }
+    });
 }
 
 function requestServers()
 {
     doAjax( "requestservers" );
+}
+
+function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
+{
+    $('#center').html( "Server #" + id );
+    $('#center').append( "<p>IP: " + intToIP( ip ) + "</p>" )
+      .append( "<p>CPU: " + cpu + "</p>" )
+      .append( "<p>RAM: " + ram + "</p>" )
+      .append( "<p>HDD: " + hdd + "</p>" )
+      .append( "<p>BW: " + bw + "</p>" );
+
+    $('#center').append( "<div id='programdiv'></div>" )
+      .append( "<div id='processdiv'></div>" );
+}
+
+function noServerPrograms()
+{
+    $('#programdiv').html( "This server has no programs!" );
+}
+
+function serverPrograms( list )
+{
+    $('#programdiv').html( "<table id='programtable'></table>");
+    for( var i = 0; i < list.length; i++ )
+    {
+        var tempOut = "<tr>";
+        // Type Size Version
+        for( var j = 2; j < list[ i ].length; j++ )
+        {
+            tempOut += "<td>" + list[ i ][ j ] + "</td>";
+        }
+        tempOut += "</tr>";
+        $('#programtable').append( tempOut );
+    }
 }

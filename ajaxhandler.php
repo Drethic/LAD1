@@ -19,6 +19,7 @@
  *             login = User is logging in
  *    requestservers = User is requesting their list of servers
  * requestfreeserver = User wants their first server for free
+ *        viewserver = User wants to see all information about a server
  *
  * Session vars:
  *  id          = Sets the ID into session to help control authorization
@@ -53,12 +54,17 @@
  *     servers that belongs to the user
  * 2e. User want to request their free server, make sure they don't have one
  *     already then give them a free one
- * 2f. If there is nothing to handle echo alert('Nothing to handle.')
+ * 2f. User wants to view a server
+ * 2f1. For now we'll just make sure it's theirs and if it is they can view
+ * 2f2. After this then we'll report back the server information followed
+ *      by all programs and processes
+ * 2g. If there is nothing to handle echo alert('Nothing to handle.')
  */
 
 require_once( 'private/defs.php' );
 require_once( 'private/users.php' );
 require_once( 'private/servers.php' );
+require_once( 'private/programs.php' );
 
 function isValidEmail($email){
     $pattern = "/^[-_a-z0-9\'+*$^&%=~!?{}]++(?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*"
@@ -73,11 +79,13 @@ function isValidEmail($email){
 /*********************************** STEP 1 ***********************************/
 define( 'NEED_LOGIN', 1 );
 
-$actionRequirements = array( 'login' => 0,
-                             'newuser1' => 0,
-                             'newuser2' => 0,
-                             'requestservers' => NEED_LOGIN,
-                             'requestfreeserver' => NEED_LOGIN );
+$actionRequirements =
+  array( 'login' => 0,
+         'newuser1' => 0,
+         'newuser2' => 0,
+         'requestservers' => NEED_LOGIN,
+         'requestfreeserver' => NEED_LOGIN,
+         'viewserver' => NEED_LOGIN );
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
@@ -234,6 +242,10 @@ elseif( $action == 'requestservers' )
         for( $i = 0; $i < $serverCount; $i++ )
         {
             echo 'new Array(' . implode( ',', $result[ $i ] ) . ')';
+            if( $i < $serverCount - 1 )
+            {
+                echo ',';
+            }
         }
         echo '));';
     }
@@ -271,11 +283,58 @@ elseif( $action == 'requestfreeserver' )
         for( $i = 0; $i < $serverCount; $i++ )
         {
             echo 'new Array(' . implode( ',', $result[ $i ] ) . ')';
+            if( $i < $serverCount - 1 )
+            {
+                echo ',';
+            }
         }
         echo '));';
     }
 }
 /*********************************** STEP 2f **********************************/
+elseif( $action == 'viewserver' )
+{
+    if( !isset( $_REQUEST[ 'SERVER_ID' ] ) )
+    {
+        die( 'Bad!' );
+    }
+
+    $id = $_REQUEST[ 'SERVER_ID' ];
+    $servers = new Servers();
+    $serverInfo = $servers->getServerByID( $id );
+
+/*********************************** STEP 2f1 *********************************/
+    if( $serverInfo[ 1 ] != $_SESSION[ 'id' ] )
+    {
+        die( 'You don\'t own this server nutmeg.' );
+    }
+
+    // General Server Information plus layout the screen for programs/processes
+    echo 'beginServerView(' . implode( ',', $serverInfo ) . ');';
+
+    $programs = new Programs();
+    $allPrograms = $programs->getProgramsByServer( $id );
+
+/*********************************** STEP 2f1 *********************************/
+    $programCount = count( $allPrograms );
+    if( $programCount == 0 )
+    {
+        echo 'noServerPrograms();';
+    }
+    else
+    {
+        echo 'serverPrograms(new Array(';
+        for( $i = 0; $i < $programCount; $i++ )
+        {
+            echo 'new Array(' . implode( ',', $allPrograms[ $i ] ) . ')';
+            if( $i < $programCount - 1 )
+            {
+                echo ',';
+            }
+        }
+    }
+}
+/*********************************** STEP 2g **********************************/
 elseif( $action == 'nothing' )
 {
     echo 'Nothing to handle.  Now go back to the index ya muppet!';
