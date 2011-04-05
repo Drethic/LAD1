@@ -132,7 +132,9 @@ function noServerPrograms()
 
 function serverPrograms( list )
 {
-    $('#programdiv').html( "<table id='programtable'></table>" );
+    $('#programdiv').html( "<table id='programtable'><thead><td>Program Type" +
+                           "</td><td>Size (MB)</td><td>Version</td></thead>" +
+                           "</table>" );
 
     // If any of these are not true at the end of the program listing,
     // then the user can opt to instantly get a L1 of each for free
@@ -197,19 +199,30 @@ function noServerProcesses()
 
 function serverProcesses( list )
 {
-    $('#processdiv').html( "<table id='processtable'></table>" );
+    $('#processdiv').html( "<table id='processtable'><thead><td>Target ID" +
+                           "</td><td>CPU</td><td>RAM</td><td>BW</td>" +
+                           "<td>Operation</td><td title='Estimated Time of " +
+                           "Completion'>ETC</td></thead></table>" );
     for( var i = 0; i < list.length; i++ )
     {
-        var tempOut = "<tr>";
-        // Target Program
-        tempOut += "<td>" + list[ i ][ 1 ];
-        for( var j = 3; j < 7; j++ )
-        {
-            tempOut += "<td>" + list[ i ][ j ] + "</td>";
-        }
-        tempOut += "</tr>";
-        $('#processtable').append( tempOut );
+        var pro = list[ i ];
+        addServerProcess( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ],
+                          pro[ 5 ], pro[ 6 ], pro[ 7 ] );
     }
+}
+
+function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
+                           operation, completiontime )
+{
+    var tempOut = "<tr>";
+    tempOut += "<td>" + targetprog + "</td>";
+    tempOut += "<td>" + cpu + "</td>";
+    tempOut += "<td>" + ram + "</td>";
+    tempOut += "<td>" + bw + "</td>";
+    tempOut += "<td>" + intToProcessOperation( operation ) + "</td>";
+    tempOut += "<td>" + completiontime + "</td>";
+    tempOut += "</tr>";
+    $('#processtable').append( tempOut );
 }
 
 function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
