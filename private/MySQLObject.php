@@ -162,7 +162,10 @@ abstract class MySQLObject
 
    public function getSingle( $value )
    {
-       $ret = $this->get( array( $this->getIndex() => $value ), NULL, 1 );
+       $columns = $this->getColumns();
+       $index = $this->getIndex();
+       $columnStr = $columns[ $index ];
+       $ret = $this->get( array( $columnStr => $value ), NULL, 1 );
        if( count( $ret ) == 0 )
        {
            return false;
