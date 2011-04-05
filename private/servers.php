@@ -29,9 +29,6 @@ class Servers extends MySQLObject
 
     function getAvailableIP( )
     {
-        // Generate random numbers!
-        srand();
-
         // Get what IPs are already taken
         $takenIPs = $this->getOnlyColumn( 'IP' );
 

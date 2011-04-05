@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+srand();
 
 define('JQUERY_VERSION', '1.5.1');
 define('JQUERY_UI_VERSION', '1.8.10');
@@ -17,15 +18,27 @@ $JQUERY_JS = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS );
 define('DB_NAME', 'lad');
 define('DB_USERNAME', 'lad');
 
+// Some default hardware for a computer
 define('DEFAULT_CPU', 350); // Expressed in MHz
 define('DEFAULT_RAM', 32);  // Expressed in MB
 define('DEFAULT_HDD', 250); // Expressed in MB
 define('DEFAULT_BW', 3);    // Expressed in KB
 
+// How much every research point will grant in each category
 define('STEP_CPU', 50);
 define('STEP_RAM', 4);
 define('STEP_HDD', 10);
 define('STEP_BW', 1);
+
+// Basic operations that processes can perform
+define('OP_TRANSFER', 1);
+define('OP_RESEARCH', 2);
+define('OP_ENCRYPT', 3);
+define('OP_DECRYPT', 4);
+define('OP_DELETE', 5);
+define('OP_COPY', 6);
+define('OP_INSTALL', 7);
+define('OP_UNINSTALL', 8);
 
 // Only works with CSS or JS files
 function clientfile_getCacheName( $type, $base )
