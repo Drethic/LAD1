@@ -35,8 +35,8 @@ function doLogin()
       .appendTo("#loginform");
 
     $("#cpasswordspan, #emailspan").css( "display", "none" );
-    $("#loginbutton, #newuserbutton").button().css( "font-size", "0.6em" )
-      .button( "disable" ).click(function( evt ){
+    $("#loginbutton, #newuserbutton").button().button( "disable" )
+      .click(function( evt ){
         $("#loginform input, #loginform button").button( "disable" )
           .button( "refresh" ).attr( "disabled", "disabled" )
           .attr( "readonly", true );
@@ -73,9 +73,6 @@ function doLogin()
         }
         evt.preventDefault();
     });
-
-    $("#usernameerror, #passworderror", "#cpassworderror", "#emailerror")
-        .css( "font-weight", "bold" );
 
     var errorStrings = [
         "Username must be at least 4 characters.",
@@ -165,7 +162,7 @@ function usernameAvailable()
 {
     $( "#cpasswordspan, #emailspan" ).css( "display", "" );
     restoreLoginForm();
-        $( "#username, #password" ).attr( "disabled", "disabled" )
+    $( "#username, #password" ).attr( "disabled", "disabled" )
         .attr( "readonly", true );
     $( "#loginbutton" ).button( "option", "label", "Reset Form", "enable" );
     $( "#newuserbutton" ).button( "option", "label", "Create Account" );

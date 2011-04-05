@@ -3,7 +3,7 @@ function validLogin( id )
     $("head").css('pane', 'display:none;}');
     $("body").html("");
     $("body").append(
-      $("<div id='layout-container' style='width:100%;height:100%'>")
+      $("<div id='layout-container'>")
         .append("<div id='south' class='ui-layout-south'></div>")
         .append("<div id='east' class='ui-layout-east'>Chat(closeable)</div>")
         .append("<div id='center' class='ui-layout-center'>Desktop</div>")
@@ -22,8 +22,7 @@ function validLogin( id )
     $("#south")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
-        .append("<div id='menu' class='inner'>Slide from bottom</div>")
-        .css({"background" : "url(images/taskbar-bg.png)"});
+        .append("<div id='menu' class='inner'>Slide from bottom</div>");
 
     $("#menu").css({"display" : "none"});
 
@@ -57,7 +56,7 @@ function validLogin( id )
     });
     $("#server").click(function( evt ){
         requestServers();
-        $('#start').next().slideToggle();
+        $('#start').click();
     });
     $('#start').click(function() {
         $("#layout-container").layout().allowOverflow('south');
