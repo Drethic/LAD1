@@ -21,7 +21,6 @@
  *
  * Todo:
  *  Expand get to allow OR in the WHERE
- *  Expand get to allow arrays in the WHERE
  */
 
 abstract class MySQLObject
@@ -257,7 +256,15 @@ abstract class MySQLObject
            {
                $filterKey = $filterKeys[ $i ];
                $filter = $filters[ $filterKey ];
-               $sql .= "$filterKey=$filter ";
+
+               if( is_array( $filter ) )
+               {
+                   $sql .= "$filterKey IN (" . implode( ',', $filter) . ") ";
+               }
+               else
+               {
+                   $sql .= "$filterKey=$filter ";
+               }
                if( $i < count( $filters ) - 1 )
                {
                    $sql .= 'AND ';
