@@ -18,20 +18,21 @@ require_once 'users.php';
 
 $version = array();
 
-$version[ 0 ] = "CREATE TABLE `SYSTEM` ( \n" .
+$version[ 0 ] = "DROP TABLE IF EXISTS SYSTEM";
+$version[ 1 ] = "CREATE TABLE `SYSTEM` ( \n" .
                 "`DUMMY_ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
                 "`VERSION` int(10) unsigned NOT NULL,\n" .
                 "PRIMARY KEY (`DUMMY_ID`)\n" .
                 ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
-$version[ 1 ] = "DROP TABLE IF EXISTS USERS, SERVERS";
-$version[ 2 ] = "CREATE TABLE `USERS` (\n" .
+$version[ 2 ] = "DROP TABLE IF EXISTS USERS, SERVERS";
+$version[ 3 ] = "CREATE TABLE `USERS` (\n" .
                 "`ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
                 "`NICK` varchar(20) NOT NULL,\n" .
                 "`PASSWORD` varchar(40) NOT NULL,\n" .
                 "`EMAIL` varchar(40) NOT NULL,\n" .
                 "PRIMARY KEY (`ID`)\n" .
                 ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
-$version[ 3 ] = "CREATE TABLE `SERVERS` (\n" .
+$version[ 4 ] = "CREATE TABLE `SERVERS` (\n" .
                 "`ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
                 "`OWNER_ID` int(10) unsigned NOT NULL,\n" .
                 "`IP` int(10) unsigned NOT NULL,\n" .
@@ -39,6 +40,24 @@ $version[ 3 ] = "CREATE TABLE `SERVERS` (\n" .
                 "`RAM` int(10) unsigned NOT NULL,\n" .
                 "`HDD` int(10) unsigned NOT NULL,\n" .
                 "`BANDWIDTH` int(10) unsigned NOT NULL,\n" .
+                "PRIMARY KEY (`ID`)\n" .
+                ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
+$version[ 5 ] = "DROP TABLE IF EXISTS PROGRAMS, PROCESSES";
+$version[ 6 ] = "CREATE TABLE `PROGRAMS` (\n" .
+                "`ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
+                "`SERVER_ID` int(10) unsigned NOT NULL,\n" .
+                "`TYPE` int(10) unsigned NOT NULL,\n" .
+                "`SIZE` int(10) unsigned NOT NULL,\n" .
+                "PRIMARY KEY (`ID`)\n" .
+                ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
+$version[ 7 ] = "CREATE TABLE `PROCESSES` (\n" .
+                "`ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
+                "`TARGET_PROGRAM` int(10) unsigned NOT NULL,\n" .
+                "`OWNING_SERVER` int(10) unsigned NOT NULL,\n" .
+                "`CPU_USAGE` int(10) unsigned NOT NULL,\n" .
+                "`RAM_USAGE` int(10) unsigned NOT NULL,\n" .
+                "`BW_USAGE` int(10) unsigned NOT NULL,\n" .
+                "`OPERATION` int(10) unsigned NOT NULL,\n" .
                 "PRIMARY KEY (`ID`)\n" .
                 ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
 
@@ -74,7 +93,7 @@ $allTables = array();
 while( $row = mysql_fetch_row( $allTablesResult ) )
 {
     $allTables[] = $row[ 0 ];
-    if( $row[ 0 ] == 'SYSTEM' )
+    if( strcasecmp( $row[ 0 ], 'system' ) == 0 )
     {
         $foundSystem = true;
         break;
@@ -92,13 +111,14 @@ else
 
     if( !$versionResult )
     {
-        mysql_die( 'Failed to get version with system table available.' );
+        die( 'Failed to get version with system table available.' );
     }
 
     $row = mysql_fetch_row( $versionResult );
-    if( !$row )
+    if( !is_array( $row ) )
     {
         $startVersion = 0;
+        echo "Couldn't find a valid version, setting version to 0. ";
     }
     else
     {
@@ -109,6 +129,11 @@ else
 /*********************************** STEP 3 ***********************************/
 $rowCount = count( $version );
 $actualVersion = $startVersion;
+
+if( $rowCount == $actualVersion )
+{
+    die( "No update needed. Already at version $actualVersion." );
+}
 
 for( $i = $startVersion; $i < $rowCount; $i++, $actualVersion++ )
 {
