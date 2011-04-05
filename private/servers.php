@@ -61,7 +61,7 @@ class Servers extends MySQLObject
 
     function getServerByIP( $ip )
     {
-        return $this->get( array( 'IP' => $ip ), NULL, 1 );
+        return $this->getSingle( $ip );
     }
 
     function getServerIDByIP( $ip )
