@@ -47,6 +47,11 @@ class Programs extends MySQLObject
     {
         return $this->delete( array( 'ID' => $id ) );
     }
+
+    function getProgramByID( $programid )
+    {
+        return $this->getSingle( $programid );
+    }
 }
 
 ?>
