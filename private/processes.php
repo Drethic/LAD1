@@ -52,12 +52,12 @@ class Processes extends MySQLObject
     function getProcessesByServer( $serverid )
     {
         return $this->get( array( 'OWNING_SERVER' => $serverid ),
-                           array( 'ID' => 'DESC' ) );
+                           array( 'ID' => 'ASC' ) );
     }
 
     function getAllProcesses( )
     {
-        return $this->get( NULL, array( 'ID' => 'DESC' ) );
+        return $this->get( NULL, array( 'ID' => 'ASC' ) );
     }
 
     function deleteProcess( $id )

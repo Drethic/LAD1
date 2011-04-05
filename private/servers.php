@@ -54,12 +54,12 @@ class Servers extends MySQLObject
     function getServersByOwner( $ownerid )
     {
         return $this->get( array( 'OWNER_ID' => $ownerid ),
-                           array( 'ID' => 'DESC' ) );
+                           array( 'ID' => 'ASC' ) );
     }
 
     function getAllServers( )
     {
-        return $this->get( NULL, array( 'ID' => 'DESC' ) );
+        return $this->get( NULL, array( 'ID' => 'ASC' ) );
     }
 
     function getServerByIP( $ip )

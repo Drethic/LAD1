@@ -35,12 +35,12 @@ class Programs extends MySQLObject
     function getProgramsByServer( $serverid )
     {
         return $this->get( array( 'SERVER_ID' => $serverid ),
-                           array( 'ID' => 'DESC' ) );
+                           array( 'ID' => 'ASC' ) );
     }
 
     function getAllPrograms( )
     {
-        return $this->get( NULL, array( 'ID' => 'DESC' ) );
+        return $this->get( NULL, array( 'ID' => 'ASC' ) );
     }
 
     function deleteProgram( $id )
