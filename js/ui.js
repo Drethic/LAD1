@@ -132,8 +132,10 @@ function serverPrograms( list )
     for( var i = 0; i < list.length; i++ )
     {
         var tempOut = "<tr>";
-        // Type Size Version
-        for( var j = 2; j < list[ i ].length; j++ )
+        // Type
+        tempOut += "<td>" + intToProgramType( list[ i ][ 2 ] ) + "</td>";
+        // Size Version
+        for( var j = 3; j < list[ i ].length; j++ )
         {
             tempOut += "<td>" + list[ i ][ j ] + "</td>";
         }
