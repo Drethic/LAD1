@@ -66,6 +66,8 @@ $version[ 9 ] = "ALTER TABLE PROCESSES ADD COLUMN `COMPLETION_TIME` " .
                 "datetime NOT NULL AFTER `OPERATION`";
 $version[ 10 ] = "ALTER TABLE PROCESSES ADD COLUMN `LINKED_ID` int(10) " .
                  "unsigned NOT NULL AFTER `COMPLETION_TIME`";
+$version[ 11 ] = "ALTER TABLE PROCESSES MODIFY COLUMN `COMPLETION_TIME` " .
+                 "bigint unsigned NOT NULL";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);
