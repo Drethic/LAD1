@@ -74,7 +74,7 @@ function noOwnedServers()
     });
 }
 
-function ownedServers( id, list )
+function ownedServers( list )
 {
     $('#center').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
                        "<td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );

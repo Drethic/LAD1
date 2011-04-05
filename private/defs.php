@@ -49,6 +49,30 @@ define('PROGRAM_TYPE_ENCRYPTER', 5);
 define('PROGRAM_TYPE_DECRYPTER', 6);
 define('PROGRAM_TYPE_MALWARE', 7);
 
+// Tells JS to handle a 2D array based on its existence
+function echo2DArray( $validfunc, $invalidfunc, $arr )
+{
+    $arrayCount = count( $arr );
+    if( $arrayCount == 0 )
+    {
+        echo "$invalidfunc();";
+    }
+    else
+    {
+        $arrayCountM1 = $arrayCount - 1;
+        echo "$validfunc(new Array(";
+        for( $i = 0; $i < $arrayCount; $i++ )
+        {
+            echo 'new Array(' . implode( ',', $arr[ $i ] ) . ')';
+            if( $i < $arrayCountM1 )
+            {
+                echo ',';
+            }
+        }
+        echo '));';
+    }
+}
+
 // Only works with CSS or JS files
 function clientfile_getCacheName( $type, $base )
 {

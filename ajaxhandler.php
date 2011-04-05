@@ -230,26 +230,8 @@ elseif( $action == 'requestservers' )
     // Now we simply need to get the 2D array from servers
     $result = $servers->getServersByOwner( $id );
 
-    // If the user doesn't have a server, this will return false
-    if( $result == false )
-    {
-        echo 'noOwnedServers();';
-    }
-    else
-    {
-        // User has some servers, so spit them out pretty like
-        echo "ownedServers($id,new Array(";
-        $serverCount = count( $result );
-        for( $i = 0; $i < $serverCount; $i++ )
-        {
-            echo 'new Array(' . implode( ',', $result[ $i ] ) . ')';
-            if( $i < $serverCount - 1 )
-            {
-                echo ',';
-            }
-        }
-        echo '));';
-    }
+    // Echo out the array
+    echo2DArray( 'ownedServers', 'noOwnedServers', $result );
 }
 /*********************************** STEP 2e **********************************/
 elseif( $action == 'requestfreeserver' )
@@ -272,25 +254,7 @@ elseif( $action == 'requestfreeserver' )
     $result = $servers->getServersByOwner( $id );
 
     // If the user still doesn't have a server, this will return false
-    if( $result == false )
-    {
-        echo 'WTF!!!';
-    }
-    else
-    {
-        // User has some servers, so spit them out pretty like
-        echo "ownedServers($id,new Array(";
-        $serverCount = count( $result );
-        for( $i = 0; $i < $serverCount; $i++ )
-        {
-            echo 'new Array(' . implode( ',', $result[ $i ] ) . ')';
-            if( $i < $serverCount - 1 )
-            {
-                echo ',';
-            }
-        }
-        echo '));';
-    }
+    echo2DArray( 'ownedServers', 'noOwnedServers', $result );
 }
 /*********************************** STEP 2f **********************************/
 elseif( $action == 'viewserver' )
@@ -317,44 +281,12 @@ elseif( $action == 'viewserver' )
     $allPrograms = $programs->getProgramsByServer( $id );
 
 /*********************************** STEP 2f1 *********************************/
-    $programCount = count( $allPrograms );
-    if( $programCount == 0 )
-    {
-        echo 'noServerPrograms();';
-    }
-    else
-    {
-        echo 'serverPrograms(new Array(';
-        for( $i = 0; $i < $programCount; $i++ )
-        {
-            echo 'new Array(' . implode( ',', $allPrograms[ $i ] ) . ')';
-            if( $i < $programCount - 1 )
-            {
-                echo ',';
-            }
-        }
-    }
+    echo2DArray( 'serverPrograms', 'noServerPrograms', $allPrograms );
 
     $processes = new Processes();
     $allProcesses = $processes->getProcessesByServer( $id );
 
-    $processCount = count( $allProcesses );
-    if( $processCount == 0 )
-    {
-        echo 'noServerProcesses();';
-    }
-    else
-    {
-        echo 'serverProcesses(new Array(';
-        for( $i = 0; $i < $processCount; $i++ )
-        {
-            echo 'new Array(' . implode( ',', $allProcesses[ $i ] ) . ')';
-            if( $i < $processCount - 1 )
-            {
-                echo ',';
-            }
-        }
-    }
+    echo2DArray( 'serverProcesses', 'noServerProcesses', $allProcesses );
 }
 /*********************************** STEP 2g **********************************/
 elseif( $action == 'nothing' )
