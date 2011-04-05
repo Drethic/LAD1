@@ -331,3 +331,47 @@ function intToIP( val )
     ret += "." + median.toString();
     return ret;
 }
+
+function intToProcessOperation( val )
+{
+    switch( val )
+    {
+        case 1:
+            return "Transfer";
+        case 2:
+            return "Research";
+        case 3:
+            return "Encrypt";
+        case 4:
+            return "Decrypt";
+        case 5:
+            return "Delete";
+        case 6:
+            return "Copy";
+        case 7:
+            return "Install";
+        case 8:
+            return "Uninstall";
+    }
+}
+
+function intToProgramType( val )
+{
+    switch( val )
+    {
+        case 1:
+            return "Firewall";
+        case 2:
+            return "Firewall Bypasser";
+        case 3:
+            return "Password";
+        case 4:
+            return "Password Breaker";
+        case 5:
+            return "Encryptor";
+        case 6:
+            return "Decryptor";
+        case 7:
+            return "Malware";
+    }
+}

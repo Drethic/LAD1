@@ -31,14 +31,23 @@ define('STEP_HDD', 10);
 define('STEP_BW', 1);
 
 // Basic operations that processes can perform
-define('OP_TRANSFER', 1);
-define('OP_RESEARCH', 2);
-define('OP_ENCRYPT', 3);
-define('OP_DECRYPT', 4);
-define('OP_DELETE', 5);
-define('OP_COPY', 6);
-define('OP_INSTALL', 7);
-define('OP_UNINSTALL', 8);
+define('PROCESS_OP_TRANSFER', 1);
+define('PROCESS_OP_RESEARCH', 2);
+define('PROCESS_OP_ENCRYPT', 3);
+define('PROCESS_OP_DECRYPT', 4);
+define('PROCESS_OP_DELETE', 5);
+define('PROCESS_OP_COPY', 6);
+define('PROCESS_OP_INSTALL', 7);
+define('PROCESS_OP_UNINSTALL', 8);
+
+// Basic program types
+define('PROGRAM_TYPE_FIREWALL', 1);
+define('PROGRAM_TYPE_FIREWALLBREAKER', 2);
+define('PROGRAM_TYPE_PASSWORD', 3);
+define('PROGRAM_TYPE_PASSWORDBREAKER', 4);
+define('PROGRAM_TYPE_ENCRYPTER', 5);
+define('PROGRAM_TYPE_DECRYPTER', 6);
+define('PROGRAM_TYPE_MALWARE', 7);
 
 // Only works with CSS or JS files
 function clientfile_getCacheName( $type, $base )
