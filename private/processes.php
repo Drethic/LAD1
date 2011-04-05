@@ -39,7 +39,7 @@ class Processes extends MySQLObject
                                $targetCPU, $ownerRAM, $targetRAM, $bw,
                                $operation, $completion )
     {
-        $id1 = $this->insrt( array( "NULL", $target, $ownerServer, $ownerCPU,
+        $id1 = $this->insert( array( "NULL", $target, $ownerServer, $ownerCPU,
                                     $ownerRAM, $bw, $operation, $completion,
                                     0 ) );
         $id2 = $this->insert( array( "NULL", $target, $targetServer, $targetCPU,

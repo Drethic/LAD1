@@ -33,11 +33,11 @@ abstract class MySQLObject
    // Filters = key/value for columnName/columnValue
    // Orders = key for each columnName, value is ASC/DESC
    // Limit = integer
-   // excludeColumns = value for each columnName
+   // onlyColumns = value for each columnName
    // All except limit expect an array
    // Offset = integer
    public function get( $filters = NULL, $orders = NULL, $limit = 0,
-                        $excludeColumns = NULL, $offset = 0 )
+                        $onlyColumns = NULL, $offset = 0 )
    {
        $sql = 'SELECT ';
        // Only specific columns to pull
@@ -47,8 +47,7 @@ abstract class MySQLObject
        }
        else
        {
-            $columns = array_diff( $this->getColumns(), $excludeColumns );
-            $sql .= implode( ', ', $columns ) . ' ';
+            $sql .= implode( ', ', $onlyColumns ) . ' ';
        }
 
        // Table name

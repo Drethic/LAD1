@@ -60,6 +60,12 @@ class Programs extends MySQLObject
                                  "PROGRAMS AS P WHERE U.ID=S.OWNER_ID AND " +
                                  "S.ID=P.SERVER_ID AND P.ID=$programid" );
     }
+
+    function getServerUsage( $serverid )
+    {
+        return $this->get( array( 'SERVER_ID' => $serverid ), NULL, 0,
+                           "SUM(SIZE)")
+    }
 }
 
 ?>
