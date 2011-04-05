@@ -63,7 +63,9 @@ $version[ 7 ] = "CREATE TABLE `PROCESSES` (\n" .
 $version[ 8 ] = "ALTER TABLE PROGRAMS ADD COLUMN `VERSION` int(10) unsigned " .
                 "NOT NULL AFTER SIZE";
 $version[ 9 ] = "ALTER TABLE PROCESSES ADD COLUMN `COMPLETION_TIME` " .
-                "datetime NOT NULL AFTER OPERATION";
+                "datetime NOT NULL AFTER `OPERATION`";
+$version[ 10 ] = "ALTER TABLE PROCESSES ADD COLUMN `LINKED_ID` int(10) " .
+                 "unsigned NOT NULL AFTER `COMPLETION_TIME`";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);
