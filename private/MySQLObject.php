@@ -191,7 +191,7 @@ abstract class MySQLObject
        $sql = "SELECT `$columnName` from `" . $this->getTableName() . '` ';
 
        // Add filters
-       $sql .= arrayToFilterString( $filters );
+       $sql .= $this->arrayToFilterString( $filters );
 
        // Add ordering
        $sql .= " ORDER BY `$columnName` ";

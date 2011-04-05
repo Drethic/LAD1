@@ -14,10 +14,11 @@
  *            created.
  *
  * Valid $action values:
- *       newuser1 = Step 1 in user creation process
- *       newuser2 = Step 2 in user creation process
- *          login = User is logging in
- * requestservers = User is requesting their list of servers
+ *          newuser1 = Step 1 in user creation process
+ *          newuser2 = Step 2 in user creation process
+ *             login = User is logging in
+ *    requestservers = User is requesting their list of servers
+ * requestfreeserver = User wants their first server for free
  *
  * Session vars:
  *  id          = Sets the ID into session to help control authorization
@@ -50,11 +51,14 @@
  *      var and echo back to main.js acountCreated() with their new ID.
  * 2d. If action was to request servers then we need to simply return the
  *     servers that belongs to the user
- * 2e. If there is nothing to handle echo alert('Nothing to handle.')
+ * 2e. User want to request their free server, make sure they don't have one
+ *     already then give them a free one
+ * 2f. If there is nothing to handle echo alert('Nothing to handle.')
  */
 
 require_once( 'private/defs.php' );
 require_once( 'private/users.php' );
+require_once( 'private/servers.php' );
 
 function isValidEmail($email){
     $pattern = "/^[-_a-z0-9\'+*$^&%=~!?{}]++(?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*"
@@ -72,7 +76,8 @@ define( 'NEED_LOGIN', 1 );
 $actionRequirements = array( 'login' => 0,
                              'newuser1' => 0,
                              'newuser2' => 0,
-                             'requestservers' => NEED_LOGIN );
+                             'requestservers' => NEED_LOGIN,
+                             'requestfreeserver' => NEED_LOGIN );
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
@@ -91,7 +96,7 @@ if( isset( $_REQUEST['action'] ) )
         $requirements = $actionRequirements[ $action ];
         // If the user needs to be logged in they'll have the NEED_LOGIN bit
         // in the requirements and they *should* have the session ID set
-        if( $requirements & NEED_LOGIN && !isset( $_SESSION[ 'ID' ] ) )
+        if( $requirements & NEED_LOGIN && !isset( $_SESSION[ 'id' ] ) )
         {
             $action = 'nothing';
         }
@@ -224,16 +229,53 @@ elseif( $action == 'requestservers' )
     else
     {
         // User has some servers, so spit them out pretty like
-        echo "ownedServers($id,array(";
+        echo "ownedServers($id,new Array(";
         $serverCount = count( $result );
         for( $i = 0; $i < $serverCount; $i++ )
         {
-            echo 'array(' . implode( ',', $result[ $i ] ) . ')';
+            echo 'new Array(' . implode( ',', $result[ $i ] ) . ')';
         }
-        echo ');';
+        echo '));';
     }
 }
 /*********************************** STEP 2e **********************************/
+elseif( $action == 'requestfreeserver' )
+{
+    // User wants their free server, check if they have one already
+    $id = $_SESSION[ 'id' ];
+    $servers = new Servers();
+
+    $ownerServers = $servers->getServersByOwner( $id );
+
+    // If they have a server then this will be an array...and not false
+    if( $ownerServers != false )
+    {
+        die( 'You already have servers.' );
+    }
+    // They don't have a server, great, give them one
+    $servers->addServer( $id );
+
+    // Now we simply need to get the 2D array from servers
+    $result = $servers->getServersByOwner( $id );
+
+    // If the user still doesn't have a server, this will return false
+    if( $result == false )
+    {
+        echo 'WTF!!!';
+    }
+    else
+    {
+        // User has some servers, so spit them out pretty like
+        echo "ownedServers($id,new Array(";
+        $serverCount = count( $result );
+        for( $i = 0; $i < $serverCount; $i++ )
+        {
+            echo 'new Array(' . implode( ',', $result[ $i ] ) . ')';
+        }
+        echo '));';
+    }
+}
+/*********************************** STEP 2f **********************************/
 elseif( $action == 'nothing' )
 {
     echo 'Nothing to handle.  Now go back to the index ya muppet!';

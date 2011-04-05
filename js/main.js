@@ -149,7 +149,7 @@ function loginError( field, reason )
                          "border-color" : "#DD4444"});
         warnObject.html( "<span class='ui-icon ui-icon-alert' " +
                          "style='float:left'></span>" + reason );
-        warnObject.css( { "display" : "inline-block"} );
+        warnObject.css( {"display" : "inline-block"} );
     }
 }
 
@@ -295,12 +295,39 @@ function restoreForm(frm)
       .attr( "readonly", false );
 }
 
-function doAjax( action, outData )
+function doAjax( actionPara, outData )
 {
-    outData[ "action" ] = action;
+    if( outData == undefined )
+    {
+        outData = {action: actionPara};
+    }
+    else
+    {
+        outData[ "action" ] = actionPara;
+    }
     $.ajax({
        url: "ajaxhandler.php",
        data: outData,
        dataType: "script"
     });
+}
+
+function intToIP( val )
+{
+    val = new Number( val );
+    var ret = "";
+    var median = val & 255;
+    ret += median.toString();
+    val -= median;
+    val /= 256;
+    median = val & 255;
+    ret += "." + median.toString();
+    val -= median;
+    val /= 256;
+    median = val & 255;
+    ret += "." + median.toString();
+    val -= median;
+    val /= 256;
+    ret += "." + median.toString();
+    return ret;
 }

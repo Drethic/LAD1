@@ -27,12 +27,19 @@ function validLogint( id )
 
     $("#menu").css({"display" : "none"});
 
-    $('#start').live("mouseover mouseout",function(event){if(event.type=='mouseover')
-        $(this).addClass('hover');else
-        $(this).removeClass('hover');
+    $('#start').live("mouseover mouseout",function(event){
+        if(event.type=='mouseover')
+        {
+            $(this).addClass('hover');
+        }
+        else
+        {
+            $(this).removeClass('hover');
+        }
     });
 
-    $('#start').live("click",function(){if($(this).hasClass('active'))
+    $('#start').live("click",function(){
+        if($(this).hasClass('active'))
         {
             $(this).removeClass('active');
         }
@@ -42,10 +49,14 @@ function validLogint( id )
         }
     });
 
-    $("#menu").append("<button id='logout'>Logout</button>");
+    $("#menu").append("<button id='logout'>Logout</button>")
+      .append( "<button id='server'>Servers</button>" );
 
     $("#logout").click(function( evt ){
         doLogin();
+    });
+    $("#server").click(function( evt ){
+        requestServers();
     });
     $('#start').click(function() {
         $("#layout-container").layout().allowOverflow('south');
@@ -55,20 +66,32 @@ function validLogint( id )
 
 function noOwnedServers()
 {
-    $('#center').html( "You don't have any server!" );
+    $('#center').html( "You don't have any servers!" )
+      .append( "<button id='requestfree'>Request a Free One</button>");
+
+    $('#requestfree').click(function( evt ){
+        doAjax( "requestfreeserver" );
+    });
 }
 
 function ownedServers( id, list )
 {
-    $('#center').html( "<table></table>" );
+    $('#center').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
+                       "<td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
     for( var i = 0; i < list.length; i++ )
     {
         var tempOut = "<tr>";
-        for( var j = 0; j < list[ i ].length; j++ )
+        tempOut += "<td>" + intToIP( list[ i ][ 2 ] ) + "</td>";
+        for( var j = 3; j < list[ i ].length; j++ )
         {
             tempOut += "<td>" + list[ i ][ j ] + "</td>";
         }
-        tempOut = "</tr>";
-        $('#center table').append( tempOut );
+        tempOut += "</tr>";
+        $('#servertable').append( tempOut );
     }
+}
+
+function requestServers()
+{
+    doAjax( "requestservers" );
 }
