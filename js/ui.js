@@ -119,29 +119,74 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 
     $('#center').append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
+    $('#center').append( "<div id='currentserver' style='display:none'>" +
+                         id + "</div>" );
 }
 
 function noServerPrograms()
 {
     $('#programdiv').html( "This server has no programs!" );
+    enableFreePrograms();
 }
 
 function serverPrograms( list )
 {
     $('#programdiv').html( "<table id='programtable'></table>" );
+
+    // If any of these are not true at the end of the program listing,
+    // then the user can opt to instantly get a L1 of each for free
+    var hasFWD = false;
+    var hasFWB = false;
+    var hasPWD = false;
+    var hasPWB = false;
     for( var i = 0; i < list.length; i++ )
     {
-        var tempOut = "<tr>";
-        // Type
-        tempOut += "<td>" + intToProgramType( list[ i ][ 2 ] ) + "</td>";
-        // Size Version
-        for( var j = 3; j < list[ i ].length; j++ )
+        var pro = list[ i ];
+        // Check if this type is accounted for
+        switch( pro[ 2 ] )
         {
-            tempOut += "<td>" + list[ i ][ j ] + "</td>";
+            case 1:
+                hasFWD = true;
+                break;
+            case 2:
+                hasFWB = true;
+                break;
+            case 3:
+                hasPWD = true;
+                break;
+            case 4:
+                hasPWB = true;
         }
-        tempOut += "</tr>";
-        $('#programtable').append( tempOut );
+        addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ] );
     }
+
+    // Check if the user is missing one of the basics
+    if( !hasFWD || !hasFWB || !hasPWD || !hasPWB )
+    {
+        enableFreePrograms();
+    }
+}
+
+function enableFreePrograms()
+{
+    $('#programdiv').prepend( "<div id='freeprogramdiv'>You are missing " +
+       "critical programs that may be loaded from CD.  <a href='#' " +
+       "id='loadfreeprogram'>Load Now</a></div>" );
+    $('#loadfreeprogram').click(function( evt ){
+        doAjax( "freeprograms", {
+            SERVER_ID: $('#currentserver').html()
+        });
+    });
+}
+
+function addServerProgram( id, serverid, type, size, version )
+{
+    var tempOut = "<tr>";
+    tempOut += "<td>" + intToProgramType( type ) + "</td>";
+    tempOut += "<td>" + size + "</td>";
+    tempOut += "<td>" + version + "</td>";
+    tempOut += "</tr>";
+    $('#programtable').append( tempOut );
 }
 
 function noServerProcesses()
@@ -164,4 +209,22 @@ function serverProcesses( list )
         tempOut += "</tr>";
         $('#processtable').append( tempOut );
     }
+}
+
+function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
+{
+    $('#freeprogramdiv').replaceWith( "" );
+    var programtable = $('#programtable');
+    if( programtable.length == 0 )
+    {
+        $('#programdiv').html( "<table id='programtable'></table>" );
+        programtable = $('#programtable');
+    }
+
+    var serverid = $('#currentserver').html();
+
+    addServerProgram( fwdid, serverid, 1, getProgramSize( 1, 1 ), 1 );
+    addServerProgram( fwbid, serverid, 2, getProgramSize( 2, 1 ), 1 );
+    addServerProgram( pwdid, serverid, 3, getProgramSize( 3, 1 ), 1 );
+    addServerProgram( pwbid, serverid, 4, getProgramSize( 4, 1 ), 1 );
 }

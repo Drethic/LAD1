@@ -20,6 +20,7 @@
  *    requestservers = User is requesting their list of servers
  * requestfreeserver = User wants their first server for free
  *        viewserver = User wants to see all information about a server
+ *      freeprograms = User is requesting their free programs
  *
  * Session vars:
  *  id          = Sets the ID into session to help control authorization
@@ -58,7 +59,10 @@
  * 2f1. For now we'll just make sure it's theirs and if it is they can view
  * 2f2. After this then we'll report back the server information followed
  *      by all programs and processes
- * 2g. If there is nothing to handle echo alert('Nothing to handle.')
+ * 2g. User wants their free programs
+ * 2g1. Ensure the user actually owns the server
+ * 2g2. Ensure they don't have all of the free programs
+ * 2h. If there is nothing to handle echo alert('Nothing to handle.')
  */
 
 require_once( 'private/defs.php' );
@@ -86,7 +90,8 @@ $actionRequirements =
          'newuser2' => 0,
          'requestservers' => NEED_LOGIN,
          'requestfreeserver' => NEED_LOGIN,
-         'viewserver' => NEED_LOGIN );
+         'viewserver' => NEED_LOGIN,
+         'freeprograms' => NEED_LOGIN );
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
@@ -289,6 +294,75 @@ elseif( $action == 'viewserver' )
     echo2DArray( 'serverProcesses', 'noServerProcesses', $allProcesses );
 }
 /*********************************** STEP 2g **********************************/
+elseif( $action == 'freeprograms' )
+{
+    if( !isset( $_REQUEST[ 'SERVER_ID' ] ) )
+    {
+        die( 'Bad!' );
+    }
+
+    $serverid = $_REQUEST[ 'SERVER_ID' ];
+    $servers = new Servers();
+    $serverInfo = $servers->getServerByID( $serverid );
+
+    $programs = new Programs();
+
+/*********************************** STEP 2g1 *********************************/
+    if( $serverInfo[ 1 ] != $_SESSION[ 'id' ] )
+    {
+        die( 'Why would you do that...' );
+    }
+
+    $serverPrograms = $programs->getProgramsByServer( $serverid );
+
+/*********************************** STEP 2g2 *********************************/
+    // Cool trick here, since there's 4 critical programs we can handle both
+    // no programs and less than 4 at same time
+    if( count( $serverPrograms ) > 4 )
+    {
+        $hasFWD = false;
+        $hasFWB = false;
+        $hasPWD = false;
+        $hasPWB = false;
+        foreach( $serverPrograms as $serverProgram )
+        {
+            switch( $serverProgram[ 2 ] )
+            {
+                case PROGRAM_TYPE_FIREWALL:
+                    $hasFWD = true;
+                    break;
+                case PROGRAM_TYPE_FIREWALLBREAKER:
+                    $hasFWB = true;
+                    break;
+                case PROGRAM_TYPE_PASSWORD:
+                    $hasPWD = true;
+                    break;
+                case PROGRAM_TYPE_PASSWORDBREAKER:
+                    $hasPWB = true;
+                    break;
+                default:
+            }
+        }
+        if( $hasFWD && $hasFWB && $hasPWD && $hasPWB )
+        {
+            die( 'Stupid people trying to get what they already have!' );
+        }
+    }
+
+    // Alright, the person is eligible!
+    $id1 = $programs->addProgram( $serverid, PROGRAM_TYPE_FIREWALL,
+                                  FIREWALL_SIZE, 1 );
+    $id2 = $programs->addProgram( $serverid, PROGRAM_TYPE_FIREWALLBREAKER,
+                                  FIREWALLBREAKER_SIZE, 1 );
+    $id3 = $programs->addProgram( $serverid, PROGRAM_TYPE_PASSWORD,
+                                  PASSWORD_SIZE, 1 );
+    $id4 = $programs->addProgram( $serverid, PROGRAM_TYPE_PASSWORDBREAKER,
+                                  PASSWORDBREAKER_SIZE, 1 );
+
+    // And now we tell the user
+    echo "grantedFreePrograms($id1,$id2,$id3,$id4);";
+}
+/*********************************** STEP 2h **********************************/
 elseif( $action == 'nothing' )
 {
     echo 'Nothing to handle.  Now go back to the index ya muppet!';
