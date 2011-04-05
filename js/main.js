@@ -403,3 +403,83 @@ function tempCache( ind, val )
     this.values[ ind ] = val;
     return old;
 }
+
+function runTimeUpdater( object )
+{
+    if( object != undefined )
+    {
+        if( this.values == undefined )
+        {
+            this.values = new Array();
+        }
+        if( this.remaining == undefined )
+        {
+            this.remaining = new Array();
+        }
+
+        this.values[ this.values.length ] = object;
+
+        var etic = getTempCache( object ).toString();
+        var timestamp = Date.now() / 1000;
+        var eticObject = new Date();
+        eticObject.setFullYear( etic.substring( 0, 4 ),
+                                Number( etic.substring( 4, 6 ) ) - 1,
+                                etic.substring( 6, 8 ) );
+        eticObject.setHours( etic.substring( 8, 10 ), etic.substring( 10, 12 ),
+                             etic.substring( 12, 14 ) );
+        var etics = eticObject.getTime() / 1000;
+        this.remaining[ this.remaining.length ] = etics - timestamp;
+
+        if( this.timer == undefined || this.timer == -1 )
+        {
+            this.timer = setInterval( "runTimeUpdater();", 1000 );
+        }
+    }
+    else
+    {
+        for( var i = 0; i < this.values.length; i++ )
+        {
+            var entry = this.values[ i ];
+            var remain = this.remaining[ i ] - 1;
+            var obj = $("#" + entry);
+
+            this.remaining[ i ] = remain;
+
+            var seconds = remain % 60;
+            remain -= seconds;
+            remain /= 60;
+            var minutes = remain % 60;
+            remain -= minutes;
+            remain /= 60;
+            var hours = remain % 24;
+            remain -= hours;
+            remain /= 24;
+            var days = remain;
+            var output = "";
+
+            if( days > 0 )
+            {
+                output = days.toString() + "d ";
+            }
+            if( hours > 0 || output != "" )
+            {
+                output += hours.toString() + "h ";
+            }
+            if( minutes > 0 || output != "" )
+            {
+                output += minutes.toString() + "m ";
+            }
+            if( seconds > 0 || output != "" )
+            {
+                output += seconds.toString() + "s ";
+            }
+
+            if( output == "" )
+            {
+                output = "Done!";
+            }
+
+            obj.html( output );
+        }
+    }
+}

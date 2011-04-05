@@ -261,7 +261,7 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempOut += "<td>" + ram + "</td>";
     tempOut += "<td>" + bw + "</td>";
     tempOut += "<td>" + intToProcessOperation( operation ) + "</td>";
-    tempOut += "<td>" + completiontime + "</td>";
+    tempOut += "<td id='process-" + id + "-completetime'></td>";
     tempOut += "</tr>";
     processtable.append( tempOut );
 
@@ -272,6 +272,8 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempCache( "process-" + id + "-bw", bw );
     tempCache( "process-" + id + "-operation", operation );
     tempCache( "process-" + id + "-completetime", completiontime );
+
+    runTimeUpdater( "process-" + id + "-completetime" );
 }
 
 function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
