@@ -57,6 +57,7 @@ function validLogin( id )
     });
     $("#server").click(function( evt ){
         requestServers();
+        $('#start').next().slideToggle();
     });
     $('#start').click(function() {
         $("#layout-container").layout().allowOverflow('south');
