@@ -40,7 +40,7 @@ abstract class MySQLObject
    {
        $sql = 'SELECT ';
        // Only specific columns to pull
-       if( !is_array( $excludeColumns ) )
+       if( !is_array( $onlyColumns ) )
        {
            $sql .= '* ';
        }
