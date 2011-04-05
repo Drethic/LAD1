@@ -79,6 +79,8 @@ function ownedServers( list )
 {
     $('#center').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
                        "<td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
+
+    var serverids = new Array();
     for( var i = 0; i < list.length; i++ )
     {
         var tempOut = "<tr>";
@@ -90,7 +92,13 @@ function ownedServers( list )
             tempOut += "<td>" + list[ i ][ j ] + "</td>";
         }
         tempOut += "</tr>";
+        serverids[ i ] = list[ i ][ 0 ];
         $('#servertable').append( tempOut );
+        tempCache( "server-" + list[ i ][ 0 ] + "-ip", list[ i ][ 2 ] );
+        tempCache( "server-" + list[ i ][ 0 ] + "-cpu", list[ i ][ 3 ] );
+        tempCache( "server-" + list[ i ][ 0 ] + "-ram", list[ i ][ 4 ] );
+        tempCache( "server-" + list[ i ][ 0 ] + "-hdd", list[ i ][ 5 ] );
+        tempCache( "server-" + list[ i ][ 0 ] + "-bw", list[ i ][ 6 ] );
     }
     $('#servertable a').click(function( evt ){
        var t = $(this);
@@ -102,6 +110,8 @@ function ownedServers( list )
            });
        }
     });
+
+    tempCache( "servers", serverids.join(",") );
 }
 
 function requestServers()
@@ -120,8 +130,8 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 
     $('#center').append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
-    $('#center').append( "<div id='currentserver' style='display:none'>" +
-                         id + "</div>" );
+
+    tempCache( "currentserver", id );
 }
 
 function noServerPrograms()
@@ -133,8 +143,8 @@ function noServerPrograms()
 function serverPrograms( list )
 {
     $('#programdiv').html( "<table id='programtable'><thead><td>Program Type" +
-                           "</td><td>Size (MB)</td><td>Version</td></thead>" +
-                           "</table>" );
+                           "</td><td>Size (MB)</td><td>Version</td><td>" +
+                           "Operations</td></thead></table>" );
 
     // If any of these are not true at the end of the program listing,
     // then the user can opt to instantly get a L1 of each for free
@@ -142,6 +152,7 @@ function serverPrograms( list )
     var hasFWB = false;
     var hasPWD = false;
     var hasPWB = false;
+    var programids = new Array();
     for( var i = 0; i < list.length; i++ )
     {
         var pro = list[ i ];
@@ -161,6 +172,8 @@ function serverPrograms( list )
                 hasPWB = true;
         }
         addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ] );
+
+        programids[ i ] = pro[ 0 ];
     }
 
     // Check if the user is missing one of the basics
@@ -168,6 +181,8 @@ function serverPrograms( list )
     {
         enableFreePrograms();
     }
+
+    tempCache( "programs", programids.join(",") );
 }
 
 function enableFreePrograms()
@@ -185,16 +200,23 @@ function enableFreePrograms()
 function addServerProgram( id, serverid, type, size, version )
 {
     var tempOut = "<tr>";
-    tempOut += "<td>" + intToProgramType( type ) + "</td>";
-    tempOut += "<td>" + size + "</td>";
-    tempOut += "<td>" + version + "</td>";
+    tempOut += "<td name='type'>" + intToProgramType( type ) + "</td>";
+    tempOut += "<td name='size'>" + size + "</td>";
+    tempOut += "<td name='version'>" + version + "</td>";
+    tempOut += "<td><span id='research-" + id + "'>Research</span></td>";
     tempOut += "</tr>";
     $('#programtable').append( tempOut );
+
+    tempCache( "program-" + id + "-server", serverid );
+    tempCache( "program-" + id + "-type", type );
+    tempCache( "program-" + id + "-size", size );
+    tempCache( "program-" + id + "-version", version );
 }
 
 function noServerProcesses()
 {
     $('#processdiv').html( "This server has no processes!" );
+    updateProgramOperations();
 }
 
 function serverProcesses( list )
@@ -203,12 +225,19 @@ function serverProcesses( list )
                            "</td><td>CPU</td><td>RAM</td><td>BW</td>" +
                            "<td>Operation</td><td title='Estimated Time of " +
                            "Completion'>ETC</td></thead></table>" );
+
+    var processes = new Array();
     for( var i = 0; i < list.length; i++ )
     {
         var pro = list[ i ];
         addServerProcess( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ],
                           pro[ 5 ], pro[ 6 ], pro[ 7 ] );
+
+        processes[ i ] = pro[ 0 ];
     }
+
+    tempCache( "processes", processes.join(",") );
+    updateProgramOperations();
 }
 
 function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
@@ -223,6 +252,14 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempOut += "<td>" + completiontime + "</td>";
     tempOut += "</tr>";
     $('#processtable').append( tempOut );
+
+    tempCache( "process-" + id + "-target", targetprog );
+    tempCache( "process-" + id + "-server", owningserver );
+    tempCache( "process-" + id + "-cpu", cpu );
+    tempCache( "process-" + id + "-ram", ram );
+    tempCache( "process-" + id + "-bw", bw );
+    tempCache( "process-" + id + "-operation", operation );
+    tempCache( "process-" + id + "-completetime", completiontime );
 }
 
 function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
@@ -241,4 +278,36 @@ function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
     addServerProgram( fwbid, serverid, 2, getProgramSize( 2, 1 ), 1 );
     addServerProgram( pwdid, serverid, 3, getProgramSize( 3, 1 ), 1 );
     addServerProgram( pwbid, serverid, 4, getProgramSize( 4, 1 ), 1 );
+}
+
+function updateProgramOperations( )
+{
+    var programstring = getTempCache( "programs" );
+    var programs = programstring.split( "," );
+
+    var processstring = getTempCache( "processes" );
+    var processes = processstring.split( "," );
+
+    var i;
+    var cantResearch = new Array();
+    // Handle various stuff that I don't want to think about now'
+    for( i = 0; i < processes.length; i++ )
+    {
+
+    }
+
+    for( i = 0; i < programs.length; i++ )
+    {
+        var programid = programs[ i ];
+        if( cantResearch.indexOf( programid ) != -1 )
+        {
+            $('#research-' + programid).addClass( 'disabledOperation' );
+            $('#research-' + programid).removeClass( 'doableOperation' );
+        }
+        else
+        {
+            $('#research-' + programid).addClass( 'doableOperation' );
+            $('#research-' + programid).removeClass( 'disabledOperation' );
+        }
+    }
 }

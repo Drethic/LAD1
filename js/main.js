@@ -19,7 +19,7 @@ function createLoginInput( label, type, name, maxlen, optional )
 function doLogin()
 {
     $("body").html("");
-    
+
     $("<form id='loginform'>Login<br></form>")
       .append( createLoginInput( "Username", "text", "username", 20,
                "class='filterkeys' data-filterkeys='[a-zA-Z0-9]'") )
@@ -370,4 +370,18 @@ function getProgramSize( type, version )
         case 7:
             return version * 25;
     }
+}
+
+function getTempCache( ind )
+{
+    var ret = tempCache( ind, 0 );
+    tempCache( ind, ret );
+    return ret;
+}
+
+function tempCache( ind, val )
+{
+    var old = this.ind;
+    this.ind = val;
+    return old;
 }

@@ -21,6 +21,7 @@ function writeJS( $filebase )
 
 writeCSS( JQUERY_UI_CSS );
 writeCSS( JQUERY_LAYOUT_CSS );
+writeCSS( 'main' );
 
 writeJS(JQUERY_JS);
 writeJS(JQUERY_UI_JS);
