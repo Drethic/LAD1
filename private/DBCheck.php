@@ -60,6 +60,8 @@ $version[ 7 ] = "CREATE TABLE `PROCESSES` (\n" .
                 "`OPERATION` int(10) unsigned NOT NULL,\n" .
                 "PRIMARY KEY (`ID`)\n" .
                 ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
+$version[ 8 ] = "ALTER TABLE PROGRAMS ADD COLUMN `VERSION` int(10) unsigned " .
+                "NOT NULL AFTER SIZE";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);
