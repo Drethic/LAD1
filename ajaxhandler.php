@@ -13,6 +13,12 @@
  *  $id     = ID from existing user, or returned after new user has been
  *            created.
  *
+ * Valid $action values:
+ *       newuser1 = Step 1 in user creation process
+ *       newuser2 = Step 2 in user creation process
+ *          login = User is logging in
+ * requestservers = User is requesting their list of servers
+ *
  * Session vars:
  *  id          = Sets the ID into session to help control authorization
  *  username    = Sets the Username into session to send to newuser2 during
@@ -20,28 +26,31 @@
  *  password    = Sets the Password into session to send to newuser2 during
  *                creation of account.
  *
- * 1.  Requests the action from main.js. Also forces a redirect back to
+ * 1.  Perform validation by only allowing specific actions when logged in
+ * 2.  Requests the action from main.js. Also forces a redirect back to
  *     index.php if not called via main.js.
- * 1a. If Login was selected checks if user/pass combo is valid. Does a sanity
+ * 2a. If Login was selected checks if user/pass combo is valid. Does a sanity
  *     check on the user/pass for length else die.
- * 1a1. If Login was invalid echo back to main.js invalidLoginCombo().
- * 1a2. If Login was valid sets session for ID and NICK. Then echo back to
+ * 2a1. If Login was invalid echo back to main.js invalidLoginCombo().
+ * 2a2. If Login was valid sets session for ID and NICK. Then echo back to
  *      main.js validLogin() with ID of the user.
- * 1b. If New User was selected it requests username/password from main.js login
+ * 2b. If New User was selected it requests username/password from main.js login
  *     form. Does a sanity check on the user/pass for length else die.
- * 1b1. Checks to see if Username is already taken.  If unavailable echo back to
+ * 2b1. Checks to see if Username is already taken.  If unavailable echo back to
  *      main.js usernameTaken().
- * 1b2. If Username is available puts username/password into session vars and
+ * 2b2. If Username is available puts username/password into session vars and
  *      echo back to main.js usernameAvailable().
- * 1c. Once user inputs the retyped password and email newuser2 checks if the
+ * 2c. Once user inputs the retyped password and email newuser2 checks if the
  *     password matches and if the email is already in use.  It pulls in the
  *     session vars from step 1b2 and checks if they are valid else die.
- * 1c1. If the Email is already in the database echo back to main.js
+ * 2c1. If the Email is already in the database echo back to main.js
  *      emailTaken()
- * 1c2. If the Email isn't used places username, password, and email into the
+ * 2c2. If the Email isn't used places username, password, and email into the
  *      database.  Gets the ID for the new user, and places that into session
  *      var and echo back to main.js acountCreated() with their new ID.
- * 1d. If there is nothing to handle echo alert('Nothing to handle.')
+ * 2d. If action was to request servers then we need to simply return the
+ *     servers that belongs to the user
+ * 2e. If there is nothing to handle echo alert('Nothing to handle.')
  */
 
 require_once( 'private/defs.php' );
@@ -58,16 +67,42 @@ function isValidEmail($email){
 }
 
 /*********************************** STEP 1 ***********************************/
-if (isset($_REQUEST['action']))
+define( 'NEED_LOGIN', 1 );
+
+$actionRequirements = array( 'login' => 0,
+                             'newuser1' => 0,
+                             'newuser2' => 0,
+                             'requestservers' => NEED_LOGIN );
+
+// First of all make sure the action is set
+/*********************************** STEP 2 ***********************************/
+if( isset( $_REQUEST['action'] ) )
 {
+    // Action is set, now make sure it's in our list of valid actions
     $action = $_REQUEST['action'];
+    if( !isset( $actionRequirements[ $action ] ) )
+    {
+        // Not in the list, deny it
+        $action = 'nothing';
+    }
+    else
+    {
+        // It's in the list, now we need to perform more checks
+        $requirements = $actionRequirements[ $action ];
+        // If the user needs to be logged in they'll have the NEED_LOGIN bit
+        // in the requirements and they *should* have the session ID set
+        if( $requirements & NEED_LOGIN && !isset( $_SESSION[ 'ID' ] ) )
+        {
+            $action = 'nothing';
+        }
+    }
 }
 else
 {
     $action = 'nothing';
 }
-/*********************************** STEP 1a **********************************/
-if ($action == 'login')
+/*********************************** STEP 2a **********************************/
+if( $action == 'login' )
 {
     $rnick = $_REQUEST['username'];
     $rpass = $_REQUEST['password'];
@@ -82,12 +117,12 @@ if ($action == 'login')
     }
     $user = new Users();
     $result = $user->checkCombo( $rnick, $rpass );
-/*********************************** STEP 1a1 *********************************/
+/*********************************** STEP 2a1 *********************************/
     if( $result == false )
     {
         echo "invalidLoginCombo();";
     }
-/*********************************** STEP 1a2 *********************************/
+/*********************************** STEP 2a2 *********************************/
     else
     {
         $id = $result[0][0];
@@ -96,8 +131,8 @@ if ($action == 'login')
         echo "validLogint($id);";
     }
 }
-/*********************************** STEP 1b **********************************/
-elseif ($action == 'newuser1')
+/*********************************** STEP 21b **********************************/
+elseif( $action == 'newuser1' )
 {
     $rnick = $_REQUEST['username'];
     $rpass = $_REQUEST['password'];
@@ -120,12 +155,12 @@ elseif ($action == 'newuser1')
     }
     $user = new Users();
     $result = $user->checkUsernameExists( $nick );
-/*********************************** STEP 1b1 *********************************/
+/*********************************** STEP 2b1 *********************************/
     if ($result !=0)
     {
         echo "usernameTaken()";
     }
-/*********************************** STEP 1b2 *********************************/
+/*********************************** STEP 2b2 *********************************/
     else
     {
         $_SESSION['username'] = $nick;
@@ -133,8 +168,8 @@ elseif ($action == 'newuser1')
         echo "usernameAvailable()";
     }
 }
-/*********************************** STEP 1c **********************************/
-elseif ($action == 'newuser2')
+/*********************************** STEP 2c **********************************/
+elseif( $action == 'newuser2' )
 {
     if(!isset($_SESSION[ 'username' ]) || !isset($_SESSION[ 'password' ]) ||
        !isset($_REQUEST[ 'email' ]))
@@ -157,12 +192,12 @@ elseif ($action == 'newuser2')
     {
         $user = new Users();
         $result = $user->checkEmailExists( $email );
-/*********************************** STEP 1c1 *********************************/
+/*********************************** STEP 2c1 *********************************/
         if ($result != 0)
         {
             echo "emailTaken()";
         }
-/*********************************** STEP 1c2 *********************************/
+/*********************************** STEP 2c2 *********************************/
         else
         {
             $id = $user->addUser($nick, $pass, $email);
@@ -171,8 +206,35 @@ elseif ($action == 'newuser2')
         }
     }
 }
-/*********************************** STEP 1d **********************************/
-elseif ($action == 'nothing')
+/*********************************** STEP 2d **********************************/
+elseif( $action == 'requestservers' )
+{
+    // Setup some local variables
+    $id = $_SESSION[ 'id' ];
+    $servers = new Servers();
+
+    // Now we simply need to get the 2D array from servers
+    $result = $servers->getServersByOwner( $id );
+
+    // If the user doesn't have a server, this will return false
+    if( $result == false )
+    {
+        echo 'noOwnedServers();';
+    }
+    else
+    {
+        // User has some servers, so spit them out pretty like
+        echo "ownedServers($id,array(";
+        $serverCount = count( $result );
+        for( $i = 0; $i < $serverCount; $i++ )
+        {
+            echo 'array(' . implode( ',', $result[ $i ] ) . ')';
+        }
+        echo ');';
+    }
+}
+/*********************************** STEP 2e **********************************/
+elseif( $action == 'nothing' )
 {
     echo 'Nothing to handle.  Now go back to the index ya muppet!';
     header("refresh: 2; index.php");

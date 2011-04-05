@@ -9,7 +9,7 @@
 
 require_once( 'MySqlObject.php' );
 
-class Users extends MySQLObject
+class Servers extends MySQLObject
 {
     function getColumns( )
     {

@@ -52,3 +52,23 @@ function validLogint( id )
         $(this).next().slideToggle();
     });
 }
+
+function noOwnedServers()
+{
+    $('#center').html( "You don't have any server!" );
+}
+
+function ownedServers( id, list )
+{
+    $('#center').html( "<table></table>" );
+    for( var i = 0; i < list.length; i++ )
+    {
+        var tempOut = "<tr>";
+        for( var j = 0; j < list[ i ].length; j++ )
+        {
+            tempOut += "<td>" + list[ i ][ j ] + "</td>";
+        }
+        tempOut = "</tr>";
+        $('#center table').append( tempOut );
+    }
+}
