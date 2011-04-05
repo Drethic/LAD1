@@ -30,6 +30,11 @@ define('STEP_RAM', 4);
 define('STEP_HDD', 10);
 define('STEP_BW', 1);
 
+// Some research related stuff
+define('DEFAULT_RESEARCH_CPU', 100);
+define('DEFAULT_RESEARCH_RAM', 10);
+define('DEFAULT_RESEARCH_TIME', 300);
+
 // Basic operations that processes can perform
 define('PROCESS_OP_TRANSFER', 1);
 define('PROCESS_OP_RESEARCH', 2);
@@ -57,6 +62,34 @@ define('PASSWORDBREAKER_SIZE', 4);
 define('ENCRYPTOR_SIZE', 40);
 define('DECRYPTOR_SIZE', 40);
 define('MALWARE_SIZE', 25);
+
+// Gets all the operations that increase the capacity of a server
+function getHDDConsumingOperations( )
+{
+    return array( PROCESS_OP_COPY, PROCESS_OP_RESEARCH, PROCESS_OP_TRANSFER );
+}
+
+// Gets the size of a program based on its type
+function getProgramSize( $type )
+{
+    switch( $type )
+    {
+        case PROGRAM_TYPE_FIREWALL:
+            return FIREWALL_SIZE;
+        case PROGRAM_TYPE_FIREWALLBREAKER:
+            return FIREWALLBREAKER_SIZE;
+        case PROGRAM_TYPE_PASSWORD:
+            return PASSWORD_SIZE;
+        case PROGRAM_TYPE_PASSWORDBREAKER:
+            return PASSWORDBREAKER_SIZE;
+        case PROGRAM_TYPE_ENCRYPTER:
+            return ENCRYPTOR_SIZE;
+        case PROGRAM_TYPE_DECRYPTER:
+            return DECRYPTOR_SIZE;
+        case PROGRAM_TYPE_MALWARE:
+            return MALWARE_SIZE;
+    }
+}
 
 // Tells JS to handle a 2D array based on its existence
 function echo2DArray( $validfunc, $invalidfunc, $arr )

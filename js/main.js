@@ -372,6 +372,19 @@ function getProgramSize( type, version )
     }
 }
 
+// Some constants that are the same server-side
+function getDefault( val )
+{
+    if( val == "RESEARCH_CPU" )
+    {
+        return 100;
+    }
+    if( val == "RESEARCH_RAM" )
+    {
+        return 10;
+    }
+}
+
 function getTempCache( ind )
 {
     var ret = tempCache( ind, 0 );
