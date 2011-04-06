@@ -338,8 +338,9 @@ function notEnoughFileSpace()
 
 function startedResearch( programid, processid, completiontime )
 {
-    addServerProcess( processid, programid, getTempCache("currentserver"), 100,
-                      10, 0, 2, completiontime );
+    addServerProcess( processid, programid, getTempCache("currentserver"),
+                      getDefault( "RESEARCH_CPU" ),
+                      getDefault( "RESEARCH_RAM" ), 0, 2, completiontime );
     updateProgramOperations();
 
     tempCache( "processes", getTempCache( "processes" ) + "," + processid );
