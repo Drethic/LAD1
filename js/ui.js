@@ -309,10 +309,16 @@ function updateProgramOperations( )
 
     var i;
     var cantResearch = new Array();
-    // Handle various stuff that I don't want to think about now'
+    // If a process is being deleted, it can't be researched
     for( i = 0; i < processes.length; i++ )
     {
-
+        var processid = processes[ i ];
+        var operation = getTempCache( "process-" + processid + "-operation" );
+        var opstring = intToProcessOperation( operation );
+        if( opstring == "Delete" )
+        {
+            cantResearch[ cantResearch.length ] = processid;
+        }
     }
 
     for( i = 0; i < programs.length; i++ )
