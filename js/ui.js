@@ -4,7 +4,7 @@ function validLogin( id )
     $("body").html("");
     $("body").append(
       $("<div id='layout-container'>")
-        .append("<div id='south' class='ui-layout-south'></div>")
+        .append("<div id='taskbar' class='ui-layout-south'></div>")
         .append("<div id='east' class='ui-layout-east'>Chat(closeable)</div>")
         .append("<div id='center' class='ui-layout-center'>Desktop</div>")
     );
@@ -19,37 +19,30 @@ function validLogin( id )
         ,   resizable: false
         }}).sizePane("south", 44);
 
-    $("#south")
+    $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
         .append("<div id='menu' class='inner'>Slide from bottom</div>");
 
     $("#menu").css({"display" : "none"});
 
-    $('#start').live("mouseover mouseout",function(event){
-        if(event.type=='mouseover')
-        {
-            $(this).addClass('hover');
-        }
-        else
-        {
-            $(this).removeClass('hover');
-        }
-    });
-
     $('#start').live("click",function(){
         if($(this).hasClass('active'))
         {
             $(this).removeClass('active');
+            $("#menu").slideToggle();
+            $("#layout-container").layout().resetOverflow('south');
         }
         else
         {
             $(this).addClass('active');
+            $("#layout-container").layout().allowOverflow('south');
+            $("#menu").slideToggle();
         }
     });
 
     $("#menu").append("<button id='logout'>Logout</button>")
-      .append( "<button id='server'>Servers</button>" );
+      .append( "<br><button id='server'>Servers</button>" );
 
     $("#logout").click(function( evt ){
         window.location = '#';
@@ -58,10 +51,6 @@ function validLogin( id )
     $("#server").click(function( evt ){
         requestServers();
         $('#start').click();
-    });
-    $('#start').click(function() {
-        $("#layout-container").layout().allowOverflow('south');
-        $(this).next().slideToggle();
     });
 }
 
