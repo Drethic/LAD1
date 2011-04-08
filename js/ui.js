@@ -2,11 +2,12 @@ function validLogin( id )
 {
     $("head").css('pane', 'display:none;}');
     $("body").html("");
+    //$('div.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move'});
     $("body").append(
       $("<div id='layout-container'>")
         .append("<div id='taskbar' class='ui-layout-south'></div>")
         .append("<div id='east' class='ui-layout-east'>Chat(closeable)</div>")
-        .append("<div id='center' class='ui-layout-center'>Desktop</div>")
+        .append("<div id='center' class='ui-layout-center'></div>")
     );
     $("#layout-container").layout({
         south: {
@@ -19,10 +20,45 @@ function validLogin( id )
         ,   resizable: false
         }}).sizePane("south", 44);
 
+    $("#center")
+        .append("<div id='server'></div>");
+
+    $("#server")
+        .append("<div class='popup_title'><span>Servers</span></div>")
+        .append("<div class='min_popup' title='Cancel'><span>-</span></div>")
+        .append("<div class='close_popup' title='Cancel'><span>x</span></div>")
+        .append("<div id='serverpu' class='popup_body'></div>")
+        .css('display', 'none')
+        .draggable();
+
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
-        .append("<div id='menu' class='inner'>Slide from bottom</div>");
+        .append("<div id='menu' class='inner'>Start Menu INW</div>");
+    $("#taskbar")
+        .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
+
+    $('#jTaskBar').css('float', 'left');
+
+    $('.close_popup').click( function() {
+	$(this).parents('.popup').fadeOut('fast', function() {
+		$(this).removeClass('popup');
+	});
+    });
+
+    $('.min_popup').click( function() {
+        $(this).parents('.popup').fadeOut('fast');
+    });
+
+    $('a').click( function() {
+	var _id = $(this).parents('li').attr('id');
+	if ($('div#'+_id).css('display') == 'none') {
+		$('div#'+_id).fadeIn();
+	}
+	if (!$('div#'+_id).hasClass('popup')) {
+		$('div#'+_id).addClass('popup');
+	}
+    });
 
     $("#menu").css({"display" : "none"});
 
@@ -51,12 +87,19 @@ function validLogin( id )
     $("#server").click(function( evt ){
         requestServers();
         $('#start').click();
+        var _id = $(this).attr('id');
+	if ($('div#'+_id).css('display') == 'none') {
+		$('div#'+_id).fadeIn();
+	}
+	if (!$('div#'+_id).hasClass('popup')) {
+		$('div#'+_id).addClass('popup');
+	}
     });
 }
 
 function noOwnedServers()
 {
-    $('#center').html( "You don't have any servers!" )
+    $('#serverpu').html( "You don't have any servers!" )
       .append( "<button id='requestfree'>Request a Free One</button>");
 
     $('#requestfree').click(function( evt ){
@@ -66,7 +109,7 @@ function noOwnedServers()
 
 function ownedServers( list )
 {
-    $('#center').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
+    $('#serverpu').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
                        "<td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
 
     var serverids = new Array();
@@ -110,14 +153,14 @@ function requestServers()
 
 function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 {
-    $('#center').html( "Server #" + id );
-    $('#center').append( "<p>IP: " + intToIP( ip ) + "</p>" )
+    $('#serverpu').html( "Server #" + id );
+    $('#serverpu').append( "<p>IP: " + intToIP( ip ) + "</p>" )
       .append( "<p>CPU: " + cpu + "</p>" )
       .append( "<p>RAM: " + ram + "</p>" )
       .append( "<p>HDD: " + hdd + "</p>" )
       .append( "<p>BW: " + bw + "</p>" );
 
-    $('#center').append( "<div id='programdiv'></div>" )
+    $('#serverpu').append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
 
     tempCache( "currentserver", id );
