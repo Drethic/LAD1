@@ -26,7 +26,7 @@ function doLogin()
       .append( createLoginInput( "Password", "password", "password", 40 ) )
       .append( createLoginInput( "Retype Password", "password", "cpassword",
                                  40 ) )
-      .append( createLoginInput( "E-mail:", "text", "email", 40 ) )
+      .append( createLoginInput( "E-mail", "text", "email", 40 ) )
       .appendTo("body").filterKeys();
 
     $("<div>")
