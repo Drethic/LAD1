@@ -21,12 +21,13 @@ function validLogin( id )
         }}).sizePane("south", 44);
 
     $("#center")
-        .append("<div id='server'></div>");
+        .append("<div id='servers'></div>");
 
-    $("#server")
-        .append("<div class='popup_title'><span>Servers</span></div>")
-        .append("<div class='min_popup' title='Cancel'><span>-</span></div>")
-        .append("<div class='close_popup' title='Cancel'><span>x</span></div>")
+    $("#servers")
+        .append("<div class='popup_header' title='Servers'>" +
+        "<div class='popup_title'><span>Servers</span></div>" +
+        "<div class='min_popup' title='Minimize'><span>-</span></div>" +
+        "<div class='close_popup' title='Close'><span>x</span></div></div>")
         .append("<div id='serverpu' class='popup_body'></div>")
         .css('display', 'none')
         .draggable();
@@ -50,16 +51,6 @@ function validLogin( id )
         $(this).parents('.popup').fadeOut('fast');
     });
 
-    $('a').click( function() {
-	var _id = $(this).parents('li').attr('id');
-	if ($('div#'+_id).css('display') == 'none') {
-		$('div#'+_id).fadeIn();
-	}
-	if (!$('div#'+_id).hasClass('popup')) {
-		$('div#'+_id).addClass('popup');
-	}
-    });
-
     $("#menu").css({"display" : "none"});
 
     $('#start').live("click",function(){
@@ -78,22 +69,27 @@ function validLogin( id )
     });
 
     $("#menu").append("<button id='logout'>Logout</button>")
-      .append( "<br><button id='server'>Servers</button>" );
+      .append( "<br><button id='servers'>Servers</button>" );
 
     $("#logout").click(function( evt ){
-        window.location = '#';
+        window.location = '/lad';
         doLogin();
     });
-    $("#server").click(function( evt ){
-        requestServers();
-        $('#start').click();
+    $("#servers").click(function( evt ){
         var _id = $(this).attr('id');
 	if ($('div#'+_id).css('display') == 'none') {
-		$('div#'+_id).fadeIn();
+            $('div#'+_id).fadeIn();
+            $("#serverpu").empty();
+            requestServers();
 	}
 	if (!$('div#'+_id).hasClass('popup')) {
-		$('div#'+_id).addClass('popup');
+            $('div#'+_id).addClass('popup');
 	}
+        if ($('#jTaskBar').find('div#'+_id).hasClass('jTask-hidden')){
+            $('#jTaskBar').find('div#'+_id).removeClass('jTask-hidden');
+            $('div#'+_id).fadeIn();
+        }
+        $('#start').click();
     });
 }
 
@@ -224,7 +220,7 @@ function enableFreePrograms()
        "id='loadfreeprogram'>Load Now</a></div>" );
     $('#loadfreeprogram').click(function( evt ){
         doAjax( "freeprograms", {
-            SERVER_ID: $('#currentserver').html()
+            SERVER_ID: getTempCache('currentserver')
         });
     });
 }
