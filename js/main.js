@@ -403,6 +403,70 @@ function tempCache( ind, val )
 
 function runTimeUpdater( object, id, callback )
 {
+    this.updateItem = function( i ){
+        var entry = this.values[ i ];
+        var remain = this.remaining[ i ];
+        var obj = $("#" + entry);
+
+        if( obj.length == 0 )
+        {
+            this.deletions[ this.deletions.length ] = i;
+            return;
+        }
+
+        if( remain > 0 )
+        {
+            remain--;
+            this.remaining[ i ] = remain;
+        }
+
+        var seconds = remain % 60;
+        remain -= seconds;
+        remain /= 60;
+        var minutes = remain % 60;
+        remain -= minutes;
+        remain /= 60;
+        var hours = remain % 24;
+        remain -= hours;
+        remain /= 24;
+        var days = remain;
+
+        if( days == 0 && hours == 0 && minutes == 0 && seconds == 0 )
+        {
+            this.callbacks[ i ]( this.ids[ i ], obj );
+            this.deletions[ this.deletions.length ] = i;
+        }
+        else
+        {
+            var output = "";
+            if( days > 0 )
+            {
+                output = days.toString() + "d ";
+            }
+            if( hours > 0 || output != "" )
+            {
+                output += hours.toString() + "h ";
+            }
+            if( minutes > 0 || output != "" )
+            {
+                output += minutes.toString() + "m ";
+            }
+            output += seconds.toString() + "s ";
+
+            obj.html( output );
+        }
+    };
+    this.actualUpdater = function(){
+        var i;
+        this.deletions = new Array();
+        for( i = 0; i < this.values.length; i++ )
+        {
+            this.updateItem( i );
+        }
+    };
+
+    this.deletions = new Array();
+    var i;
     if( object != undefined )
     {
         if( this.values == undefined )
@@ -442,54 +506,47 @@ function runTimeUpdater( object, id, callback )
         {
             this.timer = setInterval( "runTimeUpdater();", 1000 );
         }
+
+        this.updateItem( this.values.length - 1 );
     }
     else
     {
-        for( var i = 0; i < this.values.length; i++ )
+        this.actualUpdater();
+
+        if( this.deletions.length )
         {
-            var entry = this.values[ i ];
-            var remain = this.remaining[ i ];
-            var obj = $("#" + entry);
-
-            if( remain > 0 )
+            if( this.deletions.length == this.values.length )
             {
-                remain--;
-                this.remaining[ i ] = remain;
-            }
-
-            var seconds = remain % 60;
-            remain -= seconds;
-            remain /= 60;
-            var minutes = remain % 60;
-            remain -= minutes;
-            remain /= 60;
-            var hours = remain % 24;
-            remain -= hours;
-            remain /= 24;
-            var days = remain;
-
-            if( days == 0 && hours == 0 && minutes == 0 && seconds == 0 )
-            {
-                this.callbacks[ i ]( this.ids[ i ], obj );
+                this.values = new Array();
+                this.remaining = new Array();
+                this.ids = new Array();
+                this.callbacks = new Array();
+                clearInterval( this.timer );
+                this.timer = -1;
             }
             else
             {
-                var output = "";
-                if( days > 0 )
+                this.deleteItem = function( i ){
+                    var len = this.values.length;
+                    for( ; i < len - 1; i++ )
+                    {
+                        this.values[ i ] = this.values[ i + 1 ];
+                        this.remaining[ i ] = this.remaining[ i + 1 ];
+                        this.ids[ i ] = this.ids[ i ];
+                        this.callbacks[ i ] = this.callbacks[ i + 1 ];
+                    }
+                };
+                // Delete deletions from all arrays
+                var offset = 0;
+                for( i = 0; i < this.deletions.length; i++ )
                 {
-                    output = days.toString() + "d ";
+                    this.deleteItem( this.deletions[ i ] - offset );
+                    offset++;
+                    this.values.pop();
+                    this.remaining.pop();
+                    this.ids.pop();
+                    this.callbacks.pop();
                 }
-                if( hours > 0 || output != "" )
-                {
-                    output += hours.toString() + "h ";
-                }
-                if( minutes > 0 || output != "" )
-                {
-                    output += minutes.toString() + "m ";
-                }
-                output += seconds.toString() + "s ";
-
-                obj.html( output );
             }
         }
     }
