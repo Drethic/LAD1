@@ -2,11 +2,12 @@ function validLogin( id )
 {
     $("head").css('pane', 'display:none;}');
     $("body").html("");
+    //$('div.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move'});
     $("body").append(
       $("<div id='layout-container'>")
-        .append("<div id='south' class='ui-layout-south'></div>")
+        .append("<div id='taskbar' class='ui-layout-south'></div>")
         .append("<div id='east' class='ui-layout-east'>Chat(closeable)</div>")
-        .append("<div id='center' class='ui-layout-center'>Desktop</div>")
+        .append("<div id='center' class='ui-layout-center'></div>")
     );
     $("#layout-container").layout({
         south: {
@@ -19,55 +20,82 @@ function validLogin( id )
         ,   resizable: false
         }}).sizePane("south", 44);
 
-    $("#south")
+    $("#center")
+        .append("<div id='servers'></div>");
+
+    $("#servers")
+        .append("<div class='popup_header' title='Servers'>" +
+        "<div class='popup_title'><span>Servers</span></div>" +
+        "<div class='min_popup' title='Minimize'><span>-</span></div>" +
+        "<div class='close_popup' title='Close'><span>x</span></div></div>")
+        .append("<div id='serverpu' class='popup_body'></div>")
+        .css('display', 'none')
+        .draggable();
+
+    $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
-        .append("<div id='menu' class='inner'>Slide from bottom</div>");
+        .append("<div id='menu' class='inner'>Start Menu INW</div>");
+    $("#taskbar")
+        .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
+
+    $('#jTaskBar').css('float', 'left');
+
+    $('.close_popup').click( function() {
+	$(this).parents('.popup').fadeOut('fast', function() {
+		$(this).removeClass('popup');
+	});
+    });
+
+    $('.min_popup').click( function() {
+        $(this).parents('.popup').fadeOut('fast');
+    });
 
     $("#menu").css({"display" : "none"});
-
-    $('#start').live("mouseover mouseout",function(event){
-        if(event.type=='mouseover')
-        {
-            $(this).addClass('hover');
-        }
-        else
-        {
-            $(this).removeClass('hover');
-        }
-    });
 
     $('#start').live("click",function(){
         if($(this).hasClass('active'))
         {
             $(this).removeClass('active');
+            $("#menu").slideToggle();
+            $("#layout-container").layout().resetOverflow('south');
         }
         else
         {
             $(this).addClass('active');
+            $("#layout-container").layout().allowOverflow('south');
+            $("#menu").slideToggle();
         }
     });
 
     $("#menu").append("<button id='logout'>Logout</button>")
-      .append( "<button id='server'>Servers</button>" );
+      .append( "<br><button id='servers'>Servers</button>" );
 
     $("#logout").click(function( evt ){
-        window.location = '#';
+        window.location = '/lad';
         doLogin();
     });
-    $("#server").click(function( evt ){
-        requestServers();
+    $("#servers").click(function( evt ){
+        var _id = $(this).attr('id');
+	if ($('div#'+_id).css('display') == 'none') {
+            $('div#'+_id).fadeIn();
+            $("#serverpu").empty();
+            requestServers();
+	}
+	if (!$('div#'+_id).hasClass('popup')) {
+            $('div#'+_id).addClass('popup');
+	}
+        if ($('#jTaskBar').find('div#'+_id).hasClass('jTask-hidden')){
+            $('#jTaskBar').find('div#'+_id).removeClass('jTask-hidden');
+            $('div#'+_id).fadeIn();
+        }
         $('#start').click();
-    });
-    $('#start').click(function() {
-        $("#layout-container").layout().allowOverflow('south');
-        $(this).next().slideToggle();
     });
 }
 
 function noOwnedServers()
 {
-    $('#center').html( "You don't have any servers!" )
+    $('#serverpu').html( "You don't have any servers!" )
       .append( "<button id='requestfree'>Request a Free One</button>");
 
     $('#requestfree').click(function( evt ){
@@ -77,7 +105,7 @@ function noOwnedServers()
 
 function ownedServers( list )
 {
-    $('#center').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
+    $('#serverpu').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
                        "<td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
 
     var serverids = new Array();
@@ -121,14 +149,14 @@ function requestServers()
 
 function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 {
-    $('#center').html( "Server #" + id );
-    $('#center').append( "<p>IP: " + intToIP( ip ) + "</p>" )
+    $('#serverpu').html( "Server #" + id );
+    $('#serverpu').append( "<p>IP: " + intToIP( ip ) + "</p>" )
       .append( "<p>CPU: " + cpu + "</p>" )
       .append( "<p>RAM: " + ram + "</p>" )
       .append( "<p>HDD: " + hdd + "</p>" )
       .append( "<p>BW: " + bw + "</p>" );
 
-    $('#center').append( "<div id='programdiv'></div>" )
+    $('#serverpu').append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
 
     tempCache( "currentserver", id );
@@ -192,7 +220,7 @@ function enableFreePrograms()
        "id='loadfreeprogram'>Load Now</a></div>" );
     $('#loadfreeprogram').click(function( evt ){
         doAjax( "freeprograms", {
-            SERVER_ID: $('#currentserver').html()
+            SERVER_ID: getTempCache('currentserver')
         });
     });
 }

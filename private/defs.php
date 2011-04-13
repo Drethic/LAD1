@@ -6,12 +6,14 @@ srand();
 define('JQUERY_VERSION', '1.5.1');
 define('JQUERY_UI_VERSION', '1.8.10');
 define('JQUERY_LAYOUT_VERSION', '1.3.0');
+define('JTASKBAR_VERSION', '0.2');
 
 define('JQUERY_JS', 'jquery-' . JQUERY_VERSION . '.min');
 define('JQUERY_UI_CSS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom');
 define('JQUERY_UI_JS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom.min');
 define('JQUERY_LAYOUT_JS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION . '.min');
 define('JQUERY_LAYOUT_CSS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION);
+define('JQUERY_JTASKBAR', 'jquery-jtaskbar-' . JTASKBAR_VERSION);
 
 $JQUERY_JS = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS );
 
