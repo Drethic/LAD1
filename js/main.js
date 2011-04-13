@@ -551,3 +551,8 @@ function runTimeUpdater( object, id, callback )
         }
     }
 }
+
+function forceRefresh()
+{
+    window.location.reload();
+}

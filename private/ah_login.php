@@ -57,11 +57,11 @@ if( $action == 'login' )
     if( strlen($rnick) < 4 || strlen($rnick) > 20 || !ctype_alnum($rnick) ||
         preg_match('/^\d/', $rnick) === 1 )
     {
-        die('Stupid Muppet!  Username is the wrong!');
+        ahdie('Stupid Muppet!  Username is the wrong!');
     }
     if( strlen($rpass) < 4 || strlen($rpass) > 40 )
     {
-        die('Stupid Muppet!  Password is the wrong length!');
+        ahdie('Stupid Muppet!  Password is the wrong length!');
     }
     $user = new Users();
     $result = $user->checkCombo( $rnick, $rpass );
@@ -87,7 +87,7 @@ elseif( $action == 'newuser1' )
     if( !( strlen($rnick) > 3 && strlen($rnick) < 21 || !ctype_alnum($rnick) ||
         preg_match('/^\d/', $rnick) === 1 ) )
     {
-        die('Stupid Muppet!  Username is the wrong!');
+        ahdie('Stupid Muppet!  Username is the wrong!');
     }
     else
     {
@@ -95,7 +95,7 @@ elseif( $action == 'newuser1' )
     }
     if( !( strlen($rpass) > 3 && strlen($rpass) < 41 ) )
     {
-        die('Stupid Muppet!  Password is the wrong length!');
+        ahdie('Stupid Muppet!  Password is the wrong length!');
     }
     else
     {
@@ -122,14 +122,14 @@ elseif( $action == 'newuser2' )
     if(!isset($_SESSION[ 'username' ]) || !isset($_SESSION[ 'password' ]) ||
        !isset($_REQUEST[ 'email' ]))
     {
-        die('Stupid Muppet! Invalid Username/Passord!');
+        ahdie('Stupid Muppet! Invalid Username/Passord!');
     }
     $nick = $_SESSION[ 'username' ];
     $pass = $_SESSION['password'];
     $email = $_REQUEST['email'];
     if (!isValidEmail($email))
     {
-        die('Stupid muppet!  Your email isn\'t formatted right!');
+        ahdie('Stupid muppet!  Your email isn\'t formatted right!');
     }
     $cpass = $_REQUEST['cpassword'];
     if ($pass != $cpass)

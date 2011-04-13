@@ -85,7 +85,7 @@ elseif( $action == 'viewserver' )
 {
     if( !isset( $_REQUEST[ 'SERVER_ID' ] ) )
     {
-        die( 'Bad!' );
+        ahdie( 'No server ID to view...makes sense.' );
     }
 
     $id = $_REQUEST[ 'SERVER_ID' ];
@@ -95,7 +95,7 @@ elseif( $action == 'viewserver' )
 /*********************************** STEP 3a **********************************/
     if( $serverInfo[ 1 ] != $_SESSION[ 'id' ] )
     {
-        die( 'You don\'t own this server nutmeg.' );
+        ahdie( 'You don\'t own this server nutmeg.' );
     }
 
     // General Server Information plus layout the screen for programs/processes
@@ -117,7 +117,7 @@ elseif( $action == 'freeprograms' )
 {
     if( !isset( $_REQUEST[ 'SERVER_ID' ] ) )
     {
-        die( 'Bad!' );
+        ahdie( 'No server to get free programs for.' );
     }
 
     $serverid = $_REQUEST[ 'SERVER_ID' ];
@@ -129,7 +129,7 @@ elseif( $action == 'freeprograms' )
 /*********************************** STEP 4a **********************************/
     if( $serverInfo[ 1 ] != $_SESSION[ 'id' ] )
     {
-        die( 'Why would you do that...' );
+        ahdie( 'Getting free programs for somebody else?' );
     }
 
     $serverPrograms = $programs->getProgramsByServer( $serverid );
@@ -164,7 +164,7 @@ elseif( $action == 'freeprograms' )
         }
         if( $hasFWD && $hasFWB && $hasPWD && $hasPWB )
         {
-            die( 'Stupid people trying to get what they already have!' );
+            ahdie( 'Stupid people trying to get what they already have!' );
         }
     }
 
@@ -186,7 +186,7 @@ elseif( $action == 'startresearch' )
 {
     if( !isset( $_REQUEST[ 'PROGRAM_ID' ] ) )
     {
-        die( 'Ha! Funny!' );
+        ahdie( 'Research with no program ID?' );
     }
 
     $programid = $_REQUEST[ 'PROGRAM_ID' ];
@@ -199,7 +199,7 @@ elseif( $action == 'startresearch' )
 /*********************************** STEP 5a **********************************/
     if( $userid != $_SESSION[ 'id' ] )
     {
-        die( 'Researching for other people are we?' );
+        ahdie( 'Researching for other people are we?' );
     }
 
     $serverInfo = $servers->getServerByID( $serverid );

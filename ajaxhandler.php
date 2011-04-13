@@ -26,6 +26,12 @@
 
 require_once( 'private/defs.php' );
 
+function ahdie( $reason )
+{
+    echo 'forceRefresh();';
+    header("refresh: 2; index.php");
+}
+
 /*********************************** STEP 1 ***********************************/
 define( 'NEED_LOGIN', 1 );
 
@@ -48,7 +54,7 @@ if( isset( $_REQUEST['action'] ) )
     if( !isset( $actionRequirements[ $action ] ) )
     {
         // Not in the list, deny it
-        die( 'Invalid action.' );
+        ahdie( 'Invalid action.' );
     }
     else
     {
@@ -59,7 +65,7 @@ if( isset( $_REQUEST['action'] ) )
         // in the requirements and they *should* have the session ID set
         if( $requirements & NEED_LOGIN && !isset( $_SESSION[ 'id' ] ) )
         {
-            die( 'Action requires login.' );
+            ahdie( 'Action requires login.' );
         }
 
         // Include the sub-file
@@ -68,7 +74,7 @@ if( isset( $_REQUEST['action'] ) )
 }
 else
 {
-    die( 'Invalid request.' );
+    ahdie( 'Invalid request.' );
 }
 /*********************************** STEP 2i **********************************/
 
