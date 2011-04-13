@@ -26,6 +26,7 @@ writeCSS( 'main' );
 writeJS(JQUERY_JS);
 writeJS(JQUERY_UI_JS);
 writeJS(JQUERY_LAYOUT_JS);
+writeJS(JQUERY_JTASKBAR);
 writeJS('plugins');
 writeJS('main');
 writeJS('ui');
