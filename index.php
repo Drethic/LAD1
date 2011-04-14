@@ -29,7 +29,8 @@ writeJS(JQUERY_LAYOUT_JS);
 writeJS(JQUERY_JTASKBAR);
 writeJS('plugins');
 writeJS('main');
-writeJS('ui');
+writeJS('servers');
+//writeJS('ui');
 
 ?></head><body><script type='text/javascript'>$(document).ready(function(){
     doLogin();
