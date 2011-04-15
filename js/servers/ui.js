@@ -22,8 +22,6 @@ function validLogin( id )
     $("#center")
         .append("<div class='popup' id='servers'></div>");
 
-
-
     $("#servers")
         .append("<div class='popup_header' title='Servers'>" +
         "<div class='popup_title'><span><span class='ui-icon ui-icon-image" +
@@ -32,8 +30,7 @@ function validLogin( id )
         " ui-icon-arrowrefresh-1-s'></span></div>" +
         "<div class='min_popup' title='Minimize'><span class='ui-icon" +
         " ui-icon-minus'></span></div>" +
-        "<div class='max_popup' title='Maximize'><span class='ui-icon" +
-        " ui-icon-extlink'></span></div>" +
+        "<div class='max_popup' title='Maximize'><span>□</span></div>" +
         "<div class='close_popup' title='Close'><span class='ui-icon" +
         " ui-icon-close'></span></div></div>")
         .append("<div id='serverpu' class='popup_body'></div>")
@@ -59,22 +56,32 @@ function validLogin( id )
 	$(this).parents('.popup').fadeOut('fast', function() {
 		$(this).removeClass('popup');
 	});
+        window.location.hash = '';
     });
 
     $('.max_popup').click( function() {
-        if(!$(this).parents('.popup').hasClass('popup_max')) {
-            var wheight = $(this).parents('.popup').height();
-            $(this).parents('.popup').addClass('popup_max');
-            $(this).parents('.popup').draggable('destroy');
-            $(this).parents('.popup').find('.popup_body')
-            .addClass('popup_body_max')
-            .css({'height': wheight});
+        var div = $(this).parents('.popup');
+        if(!div.hasClass('popup_max')) {
+            div.addClass('popup_max');
+            div.find('.popup_body')
+            .addClass('popup_body_max');
+            div.find('.max_popup').attr('title', 'Restore')
+            .addClass('restore_popup')
+            .removeClass('max_popup')
+            .empty()
+            .append("<span class='ui-icon ui-icon-newwin'></span>");
+            popupHeight( div );
         }
         else {
-            $(this).parents('.popup').removeClass('popup_max');
-            $(this).parents('.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move', 'containment': '#center'});
-            $(this).parents('.popup').find('.popup_body')
-            .removeClass('popup_body_max');
+            div.removeClass('popup_max');
+            div.find('.popup_body')
+            .removeClass('popup_body_max')
+            .removeAttr('style');
+            div.find('.restore_popup').attr('title', 'Maximize')
+            .addClass('max_popup')
+            .removeClass('restore_popup')
+            .empty()
+            .append("<span>□</span>");
         }
     });
 
@@ -126,6 +133,47 @@ function validLogin( id )
         }
         $('#start').click();
     });
+    $(document).mousemove(function() {
+        var div = $('#center');
+        var divpb = div.find('.popup_body');
+        var divp = div.find('.popup');
+        var centerh = div.height();
+        var divpbh = divpb.height();
+        var divph = divp.height();
+        if(divpbh != centerh-22 || divph != centerh)
+        {
+            if(divpb.hasClass('popup_body_max')){
+                divpb.removeAttr('style');
+                divp.removeAttr('style');
+                popupHeight( div );
+            }
+        }
+        if(divpbh > centerh-22 || divph > centerh)
+        {
+            if(!divpb.hasClass('popup_body_max'))
+            {
+                divpb.removeAttr('style');
+                divp.removeAttr('style');
+                divp.css('height', centerh);
+                divpb.css('height', centerh-22);
+            }
+        }
+        else if(divpbh < centerh-22 || divph < centerh)
+        {
+            if(!divpb.hasClass('popup_body_max'))
+            {
+                divp.css('height', '');
+                divpb.css('height', '');
+            }
+        }
+    });
+}
+
+function popupHeight( div )
+{
+    var wheight = $('#center').height();
+    div.find('.popup').css('height',wheight);
+    div.find('.popup_body').css('height',wheight-22);
 }
 
 function noOwnedServers()
