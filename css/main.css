@@ -95,12 +95,12 @@ div.popup_body {
     width:380px;
     min-height:180px;
     background-color:#DDD;
+    overflow:auto;
 }
 div.popup_max {
     top: 0px !important;
     left: 0px !important;
     width: auto;
-    height: inherit;
 }
 div.popup_body_max {
     width: auto;
@@ -118,20 +118,27 @@ div.popup_title {
     left:0;
     color: white;
 }
-div.close_popup, div.min_popup, div.refresh_popup, div.max_popup {
+div.close_popup, div.min_popup, div.refresh_popup, div.max_popup,
+div.restore_popup {
     position:absolute;
     top:1px;
     width:16px;
     height:16px;
     border:solid 1px;
     background-color:#999;
+    text-align:center;
+    color: white;
 }
 div.close_popup span, div.min_popup span, div.refresh_popup span,
-div.max_popup span {
+div.restore_popup span{
     position:relative;
 }
+div.max_popup span {
+    position: relative;
+    bottom: 4px;
+}
 div.close_popup:hover, div.min_popup:hover, div.refresh_popup:hover,
-div.max_popup:hover {
+div.max_popup:hover, div.restore_popup:hover {
     cursor:hand;
     cursor:pointer;
     background-color:#666;
@@ -141,6 +148,9 @@ div.close_popup {
     right:1px;
 }
 div.max_popup {
+    right:20px;
+}
+div.restore_popup {
     right:20px;
 }
 div.min_popup {
