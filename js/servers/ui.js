@@ -2,7 +2,6 @@ function validLogin( id )
 {
     $("head").css('pane', 'display:none;}');
     $("body").html("");
-    //$('div.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move'});
     $("body").append(
       $("<div id='layout-container'>")
         .append("<div id='taskbar' class='ui-layout-south'></div>")
@@ -21,16 +20,29 @@ function validLogin( id )
         }}).sizePane("south", 44);
 
     $("#center")
-        .append("<div id='servers'></div>");
+        .append("<div class='popup' id='servers'></div>");
+
+
 
     $("#servers")
         .append("<div class='popup_header' title='Servers'>" +
-        "<div class='popup_title'><span>Servers</span></div>" +
-        "<div class='min_popup' title='Minimize'><span>-</span></div>" +
-        "<div class='close_popup' title='Close'><span>x</span></div></div>")
+        "<div class='popup_title'><span><span class='ui-icon ui-icon-image" +
+        " popup_image' style='float:left'></span>Servers</span></div>" +
+        "<div class='refresh_popup' title='Refresh'><span class='ui-icon" +
+        " ui-icon-arrowrefresh-1-s'></span></div>" +
+        "<div class='min_popup' title='Minimize'><span class='ui-icon" +
+        " ui-icon-minus'></span></div>" +
+        "<div class='max_popup' title='Maximize'><span class='ui-icon" +
+        " ui-icon-extlink'></span></div>" +
+        "<div class='close_popup' title='Close'><span class='ui-icon" +
+        " ui-icon-close'></span></div></div>")
         .append("<div id='serverpu' class='popup_body'></div>")
-        .css('display', 'none')
-        .draggable();
+        .toggle(function() {
+		$(this).removeClass('popup');
+	})
+        .css('display', 'none');
+
+    $('div.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move', 'containment': '#center'});
 
     $("#taskbar")
         .addClass("slide")
@@ -41,14 +53,37 @@ function validLogin( id )
 
     $('#jTaskBar').css('float', 'left');
 
+    $('#jTaskBar').find('div#servers').remove();
+
     $('.close_popup').click( function() {
 	$(this).parents('.popup').fadeOut('fast', function() {
 		$(this).removeClass('popup');
 	});
     });
 
+    $('.max_popup').click( function() {
+        if(!$(this).parents('.popup').hasClass('popup_max')) {
+            var wheight = $(this).parents('.popup').height();
+            $(this).parents('.popup').addClass('popup_max');
+            $(this).parents('.popup').draggable('destroy');
+            $(this).parents('.popup').find('.popup_body')
+            .addClass('popup_body_max')
+            .css({'height': wheight});
+        }
+        else {
+            $(this).parents('.popup').removeClass('popup_max');
+            $(this).parents('.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move', 'containment': '#center'});
+            $(this).parents('.popup').find('.popup_body')
+            .removeClass('popup_body_max');
+        }
+    });
+
     $('.min_popup').click( function() {
         $(this).parents('.popup').fadeOut('fast');
+    });
+
+    $('.refresh_popup').click( function() {
+        refreshCurrent();
     });
 
     $("#menu").css({"display" : "none"});
@@ -72,7 +107,7 @@ function validLogin( id )
       .append( "<br><button id='servers'>Servers</button>" );
 
     $("#logout").click(function( evt ){
-        window.location = '/lad';
+        window.location = '';
         doLogin();
     });
     $("#servers").click(function( evt ){
