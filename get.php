@@ -57,14 +57,16 @@ if( ( !isset( $_SESSION[ 'isAdmin' ] ) || !$_SESSION[ 'isAdmin' ] ) &&
 }
 
 /*********************************** STEP 4 ***********************************/
-// File does not exist
-if( !is_readable( $actualFileName ) )
+// File does not exist and isn't a folder
+if( !is_readable( $actualFileName ) && !( is_dir( $_REQUEST[ 'f' ] ) &&
+                                          $_REQUEST[ 't' ] == 'J' ) )
 {
    die( 'GO AWAY5' );
 }
 
 /*********************************** STEP 5 ***********************************/
-if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] )
+if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] &&
+    !( $_REQUEST[ 't' ] == 'J' && is_dir( $_REQUEST[ 'F' ] ) ) )
 {
    die( 'GO AWAY6' );
 }
@@ -77,7 +79,7 @@ header( "Content-Type: $applicationType" );
 header( "Last-Modified: " . date( DateTime::COOKIE, $_REQUEST[ 'm' ] ) );
 header( "Expires: " . date( DateTime::COOKIE, time() + (365 * 24 * 60 * 60) ) );
 
-$outbuffer = '';
+$outBuffer = '';
 // JS/CSS has special processing
 /********************************** STEP 6a ***********************************/
 if( $_REQUEST[ 't' ] == 'C' || $_REQUEST[ 't' ] == 'J' )
@@ -101,7 +103,44 @@ if( $_REQUEST[ 't' ] == 'C' || $_REQUEST[ 't' ] == 'J' )
         }
         // Rebuild cache
         // Read each line one at a time
-        $lineArray = file( $actualFileName );
+        if( is_file( $actualFileName ) )
+        {
+            $lineArray = file( $actualFileName );
+        }
+        else
+        {
+            // File is actually a folder that needs to be compiled
+            $folder = 'js/' . $_REQUEST[ 'f' ];
+            $longString = '';
+            $maxtime = filemtime( $folder );
+            $foldermtime = $maxtime;
+            foreach( scandir( $folder ) as $subFile )
+            {
+                $subFilePath = "$folder/$subFile";
+                // Ignore . and ..
+                if( $subFile == '.' || $subFile == '..' )
+                {
+                    continue;
+                }
+
+                // Add each line to the long string
+                $longString .= file_get_contents( $subFilePath );
+
+                // Update max time if applicable
+                $mtime = filemtime( $subFilePath );
+                if( $maxtime < $mtime )
+                {
+                    $maxtime = $mtime;
+                }
+            }
+
+            if( $foldermtime != $maxtime )
+            {
+                touch( $folder );
+            }
+
+            $lineArray = preg_split( "[\\r\\n]", $longString );
+        }
         $outBuffer = '';
         foreach( $lineArray as $line )
         {
@@ -118,7 +157,7 @@ if( $_REQUEST[ 't' ] == 'C' || $_REQUEST[ 't' ] == 'J' )
             {
                 // Alright, there is a URL, so figure out exactly where it is
                 $fileIndex = $urlIndex + 11;
-                $dotIndex = strpos( $line, '.png' );
+                $dotIndex = strrpos( $line, '.' );
 
                 $fileName = substr( $line, $fileIndex, $dotIndex - $fileIndex );
                 $replacement = clientfile_buildRequest( 'N', $fileName );
@@ -134,9 +173,9 @@ if( $_REQUEST[ 't' ] == 'C' || $_REQUEST[ 't' ] == 'J' )
         {
             $outBuffer = JSMin::minify( $outBuffer );
         }
-    }
 /********************************** STEP 6c ***********************************/
-    file_put_contents( $cacheFileName, $outBuffer );
+        file_put_contents( $cacheFileName, $outBuffer );
+    }
 }
 else
 {

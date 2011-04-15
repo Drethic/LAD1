@@ -15,7 +15,8 @@ define('JQUERY_LAYOUT_JS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION . '.min');
 define('JQUERY_LAYOUT_CSS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION);
 define('JQUERY_JTASKBAR', 'jquery-jtaskbar-' . JTASKBAR_VERSION);
 
-$JQUERY_JS = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS );
+$JQUERY_JS = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS,
+                    JQUERY_JTASKBAR );
 
 define('DB_NAME', 'lad');
 define('DB_USERNAME', 'lad');
@@ -145,6 +146,10 @@ function clientfile_getName( $type, $base )
     switch( $type )
     {
         case 'J':
+            if( is_dir( "js/$base" ) )
+            {
+                return "js/$base";
+            }
             return "js/$base.js";
         case 'C':
             return "css/$base.css";
