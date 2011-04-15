@@ -82,27 +82,35 @@ html, body {
 /*jTask window items*/
 
 div.popup {
-    padding-top:20px;
     background-color:#456;
-    width:402px;
-    min-height:200px;
-    position:absolute;
+    width:384px;
+    min-height:203px;
+    position:relative;
 }
 div.popup_body {
-    padding:10px;
     border:solid 1px;
     position:absolute;
+    top: 20px;
     left:0;
     width:380px;
     min-height:180px;
     background-color:#DDD;
+}
+div.popup_max {
+    top: 0px !important;
+    left: 0px !important;
+    width: auto;
+    height: inherit;
+}
+div.popup_body_max {
+    width: auto;
+    position: relative;
 }
 div.popup_header {
     position:absolute;
     top:1px;
     width:100%;
     height:20px;
-    cursor:move;
 }
 div.popup_title {
     position:absolute;
@@ -110,22 +118,20 @@ div.popup_title {
     left:0;
     color: white;
 }
-div.close_popup, div.min_popup {
+div.close_popup, div.min_popup, div.refresh_popup, div.max_popup {
     position:absolute;
     top:1px;
     width:16px;
     height:16px;
     border:solid 1px;
     background-color:#999;
-    text-align:center;
-    font-weight:bold;
-    color: black;
 }
-div.close_popup span, div.min_popup span {
+div.close_popup span, div.min_popup span, div.refresh_popup span,
+div.max_popup span {
     position:relative;
-    bottom:3px;
 }
-div.close_popup:hover, div.min_popup:hover  {
+div.close_popup:hover, div.min_popup:hover, div.refresh_popup:hover,
+div.max_popup:hover {
     cursor:hand;
     cursor:pointer;
     background-color:#666;
@@ -134,8 +140,14 @@ div.close_popup:hover, div.min_popup:hover  {
 div.close_popup {
     right:1px;
 }
-div.min_popup {
+div.max_popup {
     right:20px;
+}
+div.min_popup {
+    right:39px;
+}
+div.refresh_popup {
+    right:58px;
 }
 
 /*jTask Taskbar items*/
@@ -175,11 +187,6 @@ div.min_popup {
     -moz-box-shadow:#FFF 0px 0px 20px;
     -webkit-box-shadow:#FFF 0px 0px 20px;
     box-shadow:#FFF 0px 0px 20px;
-}
-#draggable {
-    opacity: 0.7;
-    cancel: .popup_body;
-    cursor: move;
 }
 /*jTaskbar*/
 #jTaskBar {
