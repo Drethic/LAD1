@@ -87,6 +87,16 @@ function getHDDConsumingOperations( )
     return array( PROCESS_OP_COPY, PROCESS_OP_RESEARCH, PROCESS_OP_TRANSFER );
 }
 
+// Gets all variables that are client side
+function getClientSideDefines()
+{
+    return array(
+        'RESEARCH_CPU' => DEFAULT_RESEARCH_CPU,
+        'RESEARCH_RAM' => DEFAULT_RESEARCH_RAM,
+        'RESEARCH_TIME' => DEFAULT_RESEARCH_TIME
+    );
+}
+
 // Gets the size of a program based on its type
 function getProgramSize( $type )
 {
@@ -353,6 +363,24 @@ function clientfile_cache( $type, $base )
             $outBuffer .= substr_replace( $line, $replacement, $urlIndex + 4,
                                           strlen( $fullFileName ) + 7 ) . "\n";
         }
+    }
+
+    // Add defaults to main
+    if( $type == 'J' && $base == 'main' )
+    {
+        $outBuffer .= "function getDefault(val){";
+
+        $csd = getClientSideDefines();
+        foreach( $csd as $index => $value )
+        {
+            if( is_string( $value ) )
+            {
+                $value = "\"$value\"";
+            }
+            $outBuffer .= "if(val==\"$index\"){return $value;}";
+        }
+
+        $outBuffer .= "return 0;}";
     }
     if( $type == 'J' && !in_array( $base, $GLOBALS['JQUERY_FILES'] ) )
     {

@@ -414,10 +414,10 @@ function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
 
 function updateProgramOperations( )
 {
-    var programstring = getTempCache( "programs" );
+    var programstring = getTempCache( "programs" ).toString();
     var programs = programstring.split( "," );
 
-    var processstring = getTempCache( "processes" );
+    var processstring = getTempCache( "processes" ).toString();
     var processes = processstring.split( "," );
 
     var i;
