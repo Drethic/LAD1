@@ -46,27 +46,28 @@ preg_match( '/^[[:alnum:]\.\-\_]*$/i', $_REQUEST[ 'f' ] ) == 1 or
 in_array( $_REQUEST[ 't' ], array( 'J', 'C', 'P', 'E', 'N', 'S', 'G' ) ) or
     die( 'GO AWAY3' );
 
-$applicationType = clientfile_getApplicationType( $_REQUEST[ 't' ] );
-$actualFileName = clientfile_getName( $_REQUEST[ 't' ], $_REQUEST[ 'f' ] );
+$type = $_REQUEST[ 't' ];
+$file = $_REQUEST[ 'f' ];
+$applicationType = clientfile_getApplicationType( $type );
+$cacheFileName = clientfile_getCacheName( $type, $file );
+$actualFileName = clientfile_getName( $type, $file );
 
 /*********************************** STEP 3 ***********************************/
 if( ( !isset( $_SESSION[ 'isAdmin' ] ) || !$_SESSION[ 'isAdmin' ] ) &&
-    in_array( $actualFileName, $adminOnlyFiles ) )
+    in_array( $file, $adminOnlyFiles ) )
 {
     die( 'GO AWAY4' );
 }
 
 /*********************************** STEP 4 ***********************************/
-// File does not exist and isn't a folder
-if( !is_readable( $actualFileName ) && !( is_dir( $_REQUEST[ 'f' ] ) &&
-                                          $_REQUEST[ 't' ] == 'J' ) )
+// File/Folder does not exist
+if( !is_readable( $cacheFileName ) )
 {
    die( 'GO AWAY5' );
 }
 
 /*********************************** STEP 5 ***********************************/
-if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] &&
-    !( $_REQUEST[ 't' ] == 'J' && is_dir( $_REQUEST[ 'F' ] ) ) )
+if( filemtime( $actualFileName ) != $_REQUEST[ 'm' ] )
 {
    die( 'GO AWAY6' );
 }
@@ -79,109 +80,7 @@ header( "Content-Type: $applicationType" );
 header( "Last-Modified: " . date( DateTime::COOKIE, $_REQUEST[ 'm' ] ) );
 header( "Expires: " . date( DateTime::COOKIE, time() + (365 * 24 * 60 * 60) ) );
 
-$outBuffer = '';
-// JS/CSS has special processing
-/********************************** STEP 6a ***********************************/
-if( $_REQUEST[ 't' ] == 'C' || $_REQUEST[ 't' ] == 'J' )
-{
-    $cacheFileName = clientfile_getCacheName( $_REQUEST[ 't' ],
-                                              $_REQUEST[ 'f' ] );
-    if( file_exists( $cacheFileName ) &&
-        filemtime( $cacheFileName ) > filemtime( $actualFileName ) )
-    {
-        $outBuffer = file_get_contents( $cacheFileName );
-    }
-    else
-    {
-        if( !file_exists( 'js/cache' ) )
-        {
-            mkdir( 'js/cache' );
-        }
-        if( !file_exists( 'css/cache' ) )
-        {
-            mkdir( 'css/cache' );
-        }
-        // Rebuild cache
-        // Read each line one at a time
-        if( is_file( $actualFileName ) )
-        {
-            $lineArray = file( $actualFileName );
-        }
-        else
-        {
-            // File is actually a folder that needs to be compiled
-            $folder = 'js/' . $_REQUEST[ 'f' ];
-            $longString = '';
-            $maxtime = filemtime( $folder );
-            $foldermtime = $maxtime;
-            foreach( scandir( $folder ) as $subFile )
-            {
-                $subFilePath = "$folder/$subFile";
-                // Ignore . and ..
-                if( $subFile == '.' || $subFile == '..' )
-                {
-                    continue;
-                }
-
-                // Add each line to the long string
-                $longString .= file_get_contents( $subFilePath );
-
-                // Update max time if applicable
-                $mtime = filemtime( $subFilePath );
-                if( $maxtime < $mtime )
-                {
-                    $maxtime = $mtime;
-                }
-            }
-
-            if( $foldermtime != $maxtime )
-            {
-                touch( $folder );
-            }
-
-            $lineArray = preg_split( "[\\r\\n]", $longString );
-        }
-        $outBuffer = '';
-        foreach( $lineArray as $line )
-        {
-            // URL's are not correct so...let's fix em
-            // We need to extract the image name out of the url()
-            // and then replace it with a string that we build
-            $urlIndex = strpos( $line, 'url(' );
-            if( $urlIndex == false )
-            {
-                // No URL, just echo out
-                $outBuffer .= $line;
-            }
-            else
-            {
-                // Alright, there is a URL, so figure out exactly where it is
-                $fileIndex = $urlIndex + 11;
-                $dotIndex = strrpos( $line, '.' );
-
-                $fileName = substr( $line, $fileIndex, $dotIndex - $fileIndex );
-                $replacement = clientfile_buildRequest( 'N', $fileName );
-
-                // Now just replace it and echo out
-                $outBuffer .= substr_replace( $line, $replacement, $urlIndex + 4,
-                                              $dotIndex - $urlIndex ) . "\n";
-            }
-        }
-/********************************** STEP 6b ***********************************/
-        if( $_REQUEST[ 't' ] == 'J' &&
-            !in_array( $_REQUEST[ 'f' ], $JQUERY_JS ) )
-        {
-            $outBuffer = JSMin::minify( $outBuffer );
-        }
-/********************************** STEP 6c ***********************************/
-        file_put_contents( $cacheFileName, $outBuffer );
-    }
-}
-else
-{
-    $outBuffer = file_get_contents( $actualFileName );
-}
-
+$outBuffer = file_get_contents( $cacheFileName );
 // OMG actually write it out...
 header( "Content-Length: " . strlen( $outBuffer ) );
 echo $outBuffer;

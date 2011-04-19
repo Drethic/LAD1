@@ -23,10 +23,10 @@ writeCSS( JQUERY_UI_CSS );
 writeCSS( JQUERY_LAYOUT_CSS );
 writeCSS( 'main' );
 
-writeJS(JQUERY_JS);
-writeJS(JQUERY_UI_JS);
-writeJS(JQUERY_LAYOUT_JS);
-writeJS(JQUERY_JTASKBAR);
+foreach( $GLOBALS['JQUERY_FILES'] as $jqueryjs )
+{
+    writeJS( $jqueryjs );
+}
 writeJS('plugins');
 writeJS('main');
 writeJS('servers');
