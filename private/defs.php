@@ -1,5 +1,7 @@
 <?php
 
+require_once( 'jsmin.php' );
+
 session_start();
 srand();
 
@@ -15,8 +17,8 @@ define('JQUERY_LAYOUT_JS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION . '.min');
 define('JQUERY_LAYOUT_CSS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION);
 define('JQUERY_JTASKBAR', 'jquery-jtaskbar-' . JTASKBAR_VERSION);
 
-$JQUERY_JS = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS,
-                    JQUERY_JTASKBAR );
+$GLOBALS['JQUERY_FILES'] = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS,
+                                  JQUERY_JTASKBAR );
 
 define('DB_NAME', 'lad');
 define('DB_USERNAME', 'lad');
@@ -134,15 +136,73 @@ function echo2DArray( $validfunc, $invalidfunc, $arr )
 // Only works with CSS or JS files
 function clientfile_getCacheName( $type, $base )
 {
+    $folder = clientfile_getFolder( $type );
+    $extension = clientfile_getExtension( $type );
+    if( $type == 'J' || $type == 'C' )
+    {
+        $folder = "$folder/cache";
+    }
+    return "$folder/$base.$extension";
+}
+
+function clientfile_getType( $extension )
+{
+    switch( $extension )
+    {
+        case 'js':
+            return 'J';
+        case 'css':
+            return 'C';
+        case 'jpg':
+            return 'P';
+        case 'jpeg':
+            return 'E';
+        case 'png':
+            return 'N';
+        case 'svg':
+            return 'S';
+        case 'gif':
+            return 'G';
+    }
+}
+
+function clientfile_getExtension( $type )
+{
+    switch( $type )
+    {
+        case 'J':
+            return 'js';
+        case 'C':
+            return 'css';
+        case 'P':
+            return 'jpg';
+        case 'E':
+            return 'jpeg';
+        case 'N':
+            return 'png';
+        case 'S':
+            return 'svg';
+        case 'G':
+            return 'gif';
+    }
+}
+
+function clientfile_getFolder( $type )
+{
     if( $type == 'J' )
     {
-        return "js/cache/$base.js";
+        return 'js';
     }
-    return "css/cache/$base.css";
+    if( $type == 'C' )
+    {
+        return 'css';
+    }
+    return 'img';
 }
 
 function clientfile_getName( $type, $base )
 {
+    $extension = clientfile_getExtension( $type );
     switch( $type )
     {
         case 'J':
@@ -150,19 +210,15 @@ function clientfile_getName( $type, $base )
             {
                 return "js/$base";
             }
-            return "js/$base.js";
+            return "js/$base.$extension";
         case 'C':
-            return "css/$base.css";
+            return "css/$base.$extension";
         case 'P':
-            return "img/$base.jpg";
         case 'E':
-            return "img/$base.jpeg";
         case 'N':
-            return "img/$base.png";
         case 'S':
-            return "img/$base.svg";
         case 'G':
-            return "img/$base.gif";
+            return "img/$base.$extension";
     }
 }
 
@@ -188,8 +244,121 @@ function clientfile_getApplicationType( $type )
 
 function clientfile_buildRequest( $type, $base )
 {
-    return "get.php?t=$type&f=$base&m=" .
-           filemtime( clientfile_getName( $type, $base ) );
+    $folder = clientfile_getFolder( $type );
+    $extension = clientfile_getExtension( $type );
+    $cacheName = clientfile_getCacheName( $type, $base );
+    $actualFile = clientfile_getName( $type, $base );
+    if( $type == 'C' || $type == 'J' )
+    {
+        if( !is_dir( $actualFile ) )
+        {
+            $mtime = filemtime( $actualFile );
+        }
+        else
+        {
+            $maxTime = 0;
+            foreach( scandir( $actualFile ) as $subFile )
+            {
+                if( $subFile == '.' || $subFile == '..' )
+                {
+                    continue;
+                }
+                $subTime = filemtime( "$actualFile/$subFile" );
+                if( $subTime > $maxTime )
+                {
+                    $maxTime = $subTime;
+                }
+            }
+            touch( $actualFile, $maxTime );
+            $mtime = $maxTime;
+        }
+        if( !is_file( $cacheName ) || $mtime > filemtime( $cacheName ) )
+        {
+            clientfile_cache( $type, $base );
+        }
+    }
+    else
+    {
+        $mtime = filemtime( $actualFile );
+    }
+    return "get.php?t=$type&f=$base&m=$mtime";
+}
+
+function clientfile_cache( $type, $base )
+{
+    $cacheFileName = clientfile_getCacheName( $type, $base );
+    $actualFileName = clientfile_getName( $type, $base );
+    if( !file_exists( 'js/cache' ) )
+    {
+        mkdir( 'js/cache' );
+    }
+    if( !file_exists( 'css/cache' ) )
+    {
+        mkdir( 'css/cache' );
+    }
+    // Rebuild cache
+    // Read each line one at a time
+    if( is_file( $actualFileName ) )
+    {
+        $lineArray = file( $actualFileName );
+    }
+    else
+    {
+        // File is actually a folder that needs to be compiled
+        $folder = "js/$base";
+        $longString = '';
+        foreach( scandir( $folder ) as $subFile )
+        {
+            $subFilePath = "$folder/$subFile";
+            // Ignore . and ..
+            if( $subFile == '.' || $subFile == '..' )
+            {
+                continue;
+            }
+
+            // Add each line to the long string
+            $longString .= file_get_contents( $subFilePath );
+
+        }
+
+        $lineArray = preg_split( "[\\r\\n]", $longString );
+    }
+    $outBuffer = '';
+    foreach( $lineArray as $line )
+    {
+        // URL's are not correct so...let's fix em
+        // We need to extract the image name out of the url()
+        // and then replace it with a string that we build
+        $urlIndex = strpos( $line, 'url(' );
+        if( $urlIndex === false )
+        {
+            // No URL, just echo out
+            $outBuffer .= $line;
+        }
+        else
+        {
+            // Alright, there is a URL, so figure out exactly where it is
+            $fileIndex = $urlIndex + 11;
+            $otherparenIndex = strpos( $line, ')', $urlIndex );
+            $fullFileName = substr( $line, $fileIndex,
+                                    $otherparenIndex - $fileIndex );
+            $dotIndex = strrpos( $fullFileName, '.' );
+
+            $extension = substr( $fullFileName, $dotIndex + 1 );
+            $fileName = substr( $fullFileName, 0, $dotIndex );
+            $extensionType = clientfile_getType( $extension );
+            $replacement = clientfile_buildRequest( $extensionType, $fileName );
+
+            // Now just replace it and echo out
+            $outBuffer .= substr_replace( $line, $replacement, $urlIndex + 4,
+                                          strlen( $fullFileName ) + 7 ) . "\n";
+        }
+    }
+    if( $type == 'J' && !in_array( $base, $GLOBALS['JQUERY_FILES'] ) )
+    {
+        $outBuffer = JSMin::minify( $outBuffer );
+    }
+    file_put_contents( $cacheFileName, $outBuffer );
 }
 
 /*************** END OF FUNCTIONS - BEGIN INIT ********************************/
