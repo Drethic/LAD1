@@ -69,6 +69,7 @@ function intToProcessOperation( val )
         case 8:
             return "Uninstall";
     }
+    return "";
 }
 
 function intToProgramType( val )
@@ -90,6 +91,7 @@ function intToProgramType( val )
         case 7:
             return "Malware";
     }
+    return "";
 }
 
 function getProgramSize( type, version )
