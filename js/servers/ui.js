@@ -41,6 +41,8 @@ function validLogin( id )
 
     $('div.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move', 'containment': '#center'});
 
+    $('div.popup_body').css( "max-height", $("#center").css( "height" ) - 22 );
+
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
