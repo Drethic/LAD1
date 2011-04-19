@@ -43,6 +43,13 @@ class Programs extends MySQLObject
         return $this->get( NULL, array( 'ID' => 'ASC' ) );
     }
 
+    function upgradeProgram( $id, $type )
+    {
+        $sizeIncrease = getProgramSize( $type );
+        return $this->update( array('SIZE' => "SIZE+$sizeIncrease",
+                                    'VERSION' => 'VERSION+1'),
+                              array('ID' => $id ));
+    }
     function deleteProgram( $id )
     {
         return $this->delete( array( 'ID' => $id ) );

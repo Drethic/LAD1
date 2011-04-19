@@ -28,8 +28,7 @@ require_once( 'private/defs.php' );
 
 function ahdie( $reason )
 {
-    echo 'forceRefresh();';
-    header("refresh: 2; index.php");
+    die( 'forceRefresh();' );
 }
 
 /*********************************** STEP 1 ***********************************/
@@ -43,7 +42,8 @@ $actionRequirements =
          'requestfreeserver' => array( NEED_LOGIN, 'ah_server' ),
          'viewserver' => array( NEED_LOGIN, 'ah_server' ),
          'freeprograms' => array( NEED_LOGIN, 'ah_server' ),
-         'startresearch' => array( NEED_LOGIN, 'ah_server' ) );
+         'startresearch' => array( NEED_LOGIN, 'ah_server' ),
+         'finishresearch' => array( NEED_LOGIN, 'ah_server' ));
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/

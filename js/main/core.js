@@ -115,6 +115,31 @@ function getProgramSize( type, version )
     }
 }
 
+function addTempCacheList( ind, val )
+{
+    var curr = tempCache( ind );
+    curr = curr + "," + val;
+    tempCache( ind, val );
+}
+
+function removeTempCacheList( ind, val )
+{
+    var curr = getTempCache( ind );
+    if( curr == undefined || curr != curr.toString() )
+    {
+        return;
+    }
+    var currList = curr.toString().split( "," );
+    for( var i = 0; i < currList.length; i++ )
+    {
+        if( currList[ i ] == val )
+        {
+            currList.splice( i, 1 );
+            tempCache( ind, currList.join( "," ) );
+        }
+    }
+}
+
 function getTempCache( ind )
 {
     var ret = tempCache( ind, 0 );
@@ -156,16 +181,16 @@ function runTimeUpdater( object, id, callback )
             this.remaining[ i ] = remain;
         }
 
-        var seconds = remain % 60;
+        var seconds = Math.floor( remain % 60 );
         remain -= seconds;
         remain /= 60;
-        var minutes = remain % 60;
+        var minutes = Math.floor( remain % 60 );
         remain -= minutes;
         remain /= 60;
-        var hours = remain % 24;
+        var hours = Math.floor( remain % 24 );
         remain -= hours;
         remain /= 24;
-        var days = remain;
+        var days = Math.floor( remain );
 
         if( days == 0 && hours == 0 && minutes == 0 && seconds == 0 )
         {

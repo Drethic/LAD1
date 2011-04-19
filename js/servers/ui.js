@@ -312,10 +312,12 @@ function enableFreePrograms()
 
 function addServerProgram( id, serverid, type, size, version )
 {
-    var tempOut = "<tr>";
-    tempOut += "<td name='type'>" + intToProgramType( type ) + "</td>";
-    tempOut += "<td name='size'>" + size + "</td>";
-    tempOut += "<td name='version'>" + version + "</td>";
+    var tempOut = "<tr id='program-" + id + "-row'>";
+    tempOut += "<td id='program-" + id + "-type' name='type'>" +
+               intToProgramType( type ) + "</td>";
+    tempOut += "<td id='program-" + id + "-size' name='size'>" + size + "</td>";
+    tempOut += "<td id='program-" + id + "-version' " +
+               "name='version'>" + version + "</td>";
     tempOut += "<td><span id='research-" + id + "'><a href='#research-" +
                id + "'>Research</a></span></td>";
     tempOut += "</tr>";
@@ -368,11 +370,11 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
         processtable = $('#processtable');
     }
 
-    var tempOut = "<tr>";
-    tempOut += "<td>" + targetprog + "</td>";
-    tempOut += "<td>" + cpu + "</td>";
-    tempOut += "<td>" + ram + "</td>";
-    tempOut += "<td>" + bw + "</td>";
+    var tempOut = "<tr id='process-" + id + "-row'>";
+    tempOut += "<td id='process-" + id + "-target'>" + targetprog + "</td>";
+    tempOut += "<td id='process-" + id + "-cpu'>" + cpu + "</td>";
+    tempOut += "<td id='process-" + id + "-ram'>" + ram + "</td>";
+    tempOut += "<td id='process-" + id + "-bw'>" + bw + "</td>";
     tempOut += "<td>" + intToProcessOperation( operation ) + "</td>";
     tempOut += "<td id='process-" + id + "-completetime'></td>";
     tempOut += "</tr>";
@@ -389,7 +391,9 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     runTimeUpdater( "process-" + id + "-completetime", id, function(id,domEl) {
         domEl.html( "<a href='#'>Complete</a>" );
         $("#process-" + id + "-completetime a").click(function(evt){
-            //wait
+            doAjax( "finishresearch", {
+                PROCESS_ID: id
+            });
         });
     });
 }
@@ -462,5 +466,48 @@ function startedResearch( programid, processid, completiontime )
                       getDefault( "RESEARCH_RAM" ), 0, 2, completiontime );
     updateProgramOperations();
 
-    tempCache( "processes", getTempCache( "processes" ) + "," + processid );
+    addTempCacheList( "processes", processid );
+}
+
+function removeProcess( id, callback )
+{
+    var row = $( "#process-" + id + "-row" );
+    row.hide(1000, function(){
+        if( callback != undefined )
+        {
+            callback( id );
+        }
+
+        $(this).remove();
+        
+        tempCache( "process-" + id + "-target" );
+        tempCache( "process-" + id + "-server" );
+        tempCache( "process-" + id + "-cpu" );
+        tempCache( "process-" + id + "-ram" );
+        tempCache( "process-" + id + "-bw" );
+        tempCache( "process-" + id + "-operation" );
+        tempCache( "process-" + id + "-completetime" );
+
+        removeTempCacheList( "processes", id );
+    });
+
+}
+
+function finishedResearch( processid )
+{
+    removeProcess( processid, function(id){
+        var progid = getTempCache( "process-" + id + "-target" );
+        var programversion = getTempCache( "program-" + progid + "-version" );
+        var programsize = getTempCache( "program-" + progid + "-size" );
+        var programtype = getTempCache( "program-" + progid + "-type" );
+
+        var newversion = new Number( programversion ) + 1;
+        var newsize = new Number( programsize ) + getProgramSize( programtype, 1 );
+
+        $("#program-" + progid + "-version").html( newversion );
+        $("#program-" + progid + "-size").html( newsize );
+
+        tempCache( "program-" + progid + "-version", programversion );
+        tempCache( "program-" + progid + "-size", programsize );
+    });
 }

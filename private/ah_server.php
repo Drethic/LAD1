@@ -11,6 +11,7 @@
  *        viewserver = User wants to see all information about a server
  *      freeprograms = User is requesting their free programs
  *     startresearch = User wants to start researching a program
+ *    finishresearch = User wants to finish a research that is running
  *
  * Session vars:
  *  id          = Sets the ID into session to help control authorization
@@ -37,6 +38,12 @@
  * 5b. Do a quick check if there's enough space after that research
  * 5c. Also check to make sure there is enough space after all researches are
  *      done to hold this one as well
+ * 6. User wants to finish a research
+ * 6a. Make sure research belong to server user owns
+ * 6b. Make sure it is actually a research process
+ * 6c. Make sure no circumstances have happened to cause the server to not be
+ *     able to hold the research
+ * 6d. Finish up the research and grant the version
  */
 
 require_once( 'private/users.php' );
@@ -251,6 +258,59 @@ elseif( $action == 'startresearch' )
             $etic = $result[ 7 ];
             echo( "startedResearch($programid,$researchid,$etic);" );
         }
+    }
+}
+/*********************************** STEP 6 ***********************************/
+elseif( $action == 'finishresearch' )
+{
+    if( !isset( $_REQUEST[ 'PROCESS_ID' ] ) )
+    {
+        ahdie( 'Finishing...nothing...what...' );
+    }
+
+    // Get information about the process
+    $processid = $_REQUEST[ 'PROCESS_ID' ];
+    $processes = new Processes();
+    $processInfo = $processes->getProcessByID( $processid );
+
+    // Get information about the server owning the process
+    $serverid = $processInfo[ 2 ];
+    $servers = new Servers();
+    $serverInfo = $servers->getServerByID( $serverid );
+
+/*********************************** STEP 6a **********************************/
+    if( $serverInfo[ 1 ] != $_SESSION[ 'id' ] )
+    {
+        ahdie( 'Finishing research for someone else = bad.' );
+    }
+
+    // Look up the current HDD usage
+    $programid = $processInfo[ 1 ];
+    $programs = new Programs();
+    $programInfo = $programs->getProgramByID( $programid );
+    $usedHDD = $programs->getServerUsage( $serverid );
+    $maxHDD = $serverInfo[ 5 ];
+
+/*********************************** STEP 6b **********************************/
+    if( $processInfo[ 6 ] != PROCESS_OP_RESEARCH )
+    {
+        ahdie( 'Trying to research a non-research operation.' );
+    }
+    $programtype = $programInfo[ 2 ];
+    $fileSize = getProgramSize( $programtype );
+
+/*********************************** STEP 6c **********************************/
+    if( $fileSize + $usedHDD > $maxHDD )
+    {
+        echo( 'notEnoughFileSpace();' );
+    }
+    else
+    {
+/*********************************** STEP 6d **********************************/
+        $processes->deleteProcess( $processid );
+        $programs->upgradeProgram( $programid, $programtype );
+
+        echo "finishedResearch($processid);";
     }
 }
 ?>
