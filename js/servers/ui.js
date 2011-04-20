@@ -315,9 +315,8 @@ function addServerProgram( id, serverid, type, size, version )
     var tempOut = "<tr id='program-" + id + "-row'>";
     tempOut += "<td id='program-" + id + "-type' name='type'>" +
                intToProgramType( type ) + "</td>";
-    tempOut += "<td id='program-" + id + "-size' name='size'>" + size + "</td>";
-    tempOut += "<td id='program-" + id + "-version' " +
-               "name='version'>" + version + "</td>";
+    tempOut += "<td id='program-" + id + "-size' name='size'></td>";
+    tempOut += "<td id='program-" + id + "-version' name='version'></td>";
     tempOut += "<td><span id='research-" + id + "'><a href='#research-" +
                id + "'>Research</a></span></td>";
     tempOut += "</tr>";
@@ -330,9 +329,11 @@ function addServerProgram( id, serverid, type, size, version )
     });
 
     tempCache( "program-" + id + "-server", serverid );
-    tempCache( "program-" + id + "-type", type );
-    tempCache( "program-" + id + "-size", size );
-    tempCache( "program-" + id + "-version", version );
+    tempCache( "program-" + id + "-type", type, function(elem,val){
+        $(elem).html( intToProgramType( val ) );
+    });
+    tempCache( "program-" + id + "-size", size, true );
+    tempCache( "program-" + id + "-version", version, true );
 }
 
 function noServerProcesses()
@@ -371,26 +372,28 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     }
 
     var tempOut = "<tr id='process-" + id + "-row'>";
-    tempOut += "<td id='process-" + id + "-target'>" + targetprog + "</td>";
-    tempOut += "<td id='process-" + id + "-cpu'>" + cpu + "</td>";
-    tempOut += "<td id='process-" + id + "-ram'>" + ram + "</td>";
-    tempOut += "<td id='process-" + id + "-bw'>" + bw + "</td>";
-    tempOut += "<td>" + intToProcessOperation( operation ) + "</td>";
+    tempOut += "<td id='process-" + id + "-target'></td>";
+    tempOut += "<td id='process-" + id + "-cpu'></td>";
+    tempOut += "<td id='process-" + id + "-ram'></td>";
+    tempOut += "<td id='process-" + id + "-bw'></td>";
+    tempOut += "<td id='process-" + id + "-operation'></td>";
     tempOut += "<td id='process-" + id + "-completetime'></td>";
     tempOut += "</tr>";
     processtable.append( tempOut );
 
-    tempCache( "process-" + id + "-target", targetprog );
+    tempCache( "process-" + id + "-target", targetprog, true );
     tempCache( "process-" + id + "-server", owningserver );
-    tempCache( "process-" + id + "-cpu", cpu );
-    tempCache( "process-" + id + "-ram", ram );
-    tempCache( "process-" + id + "-bw", bw );
-    tempCache( "process-" + id + "-operation", operation );
+    tempCache( "process-" + id + "-cpu", cpu, true );
+    tempCache( "process-" + id + "-ram", ram, true );
+    tempCache( "process-" + id + "-bw", bw, true );
+    tempCache( "process-" + id + "-operation", operation, function(elem, val){
+        $(elem).html( intToProcessOperation( val ) );
+    });
     tempCache( "process-" + id + "-completetime", completiontime );
 
     runTimeUpdater( "process-" + id + "-completetime", id, function(id,domEl) {
         domEl.html( "<a href='#'>Complete</a>" );
-        $("#process-" + id + "-completetime a").click(function(evt){
+        domEl.children( "a" ).click(function(evt){
             doAjax( "finishresearch", {
                 PROCESS_ID: id
             });
@@ -490,7 +493,6 @@ function removeProcess( id, callback )
 
         removeTempCacheList( "processes", id );
     });
-
 }
 
 function finishedResearch( processid )
@@ -504,10 +506,7 @@ function finishedResearch( processid )
         var newversion = new Number( programversion ) + 1;
         var newsize = new Number( programsize ) + getProgramSize( programtype, 1 );
 
-        $("#program-" + progid + "-version").html( newversion );
-        $("#program-" + progid + "-size").html( newsize );
-
-        tempCache( "program-" + progid + "-version", programversion );
-        tempCache( "program-" + progid + "-size", programsize );
+        tempCache( "program-" + progid + "-version", newversion, true );
+        tempCache( "program-" + progid + "-size", newsize, true );
     });
 }

@@ -151,7 +151,7 @@ function getTempCache( ind )
     return ret;
 }
 
-function tempCache( ind, val )
+function tempCache( ind, val, updateScreen )
 {
     if( this.values == undefined )
     {
@@ -159,6 +159,26 @@ function tempCache( ind, val )
     }
     var old = this.values[ ind ];
     this.values[ ind ] = val;
+
+    if( updateScreen )
+    {
+        var obj = $("#" + ind);
+        if( obj.length )
+        {
+            if( typeof updateScreen === "function" )
+            {
+                updateScreen( obj, val );
+            }
+            else
+            {
+                obj.html( val );
+            }
+        }
+        else
+        {
+            alert( this.values.toString() );
+        }
+    }
     return old;
 }
 
