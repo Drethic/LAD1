@@ -19,7 +19,7 @@ class Users extends MySQLObject
 
     function getColumns( )
     {
-        return array( "ID", "NICK", "PASSWORD", "EMAIL" );
+        return array( "ID", "NICK", "PASSWORD", "EMAIL", "FLAGS" );
     }
 
     function getIndex( )
