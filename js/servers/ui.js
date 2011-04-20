@@ -245,6 +245,10 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
       .append( "<div id='processdiv'></div>" );
 
     tempCache( "currentserver", id );
+    tempCache( "currentcpu", cpu );
+    tempCache( "currentram", ram );
+    tempCache( "currenthdd", hdd );
+    tempCache( "currentbw", bw );
 }
 
 function noServerPrograms()
@@ -323,9 +327,12 @@ function addServerProgram( id, serverid, type, size, version )
     $('#programtable').append( tempOut );
 
     $('#research-' + id).click(function( evt ){
-        doAjax( "startresearch", {
-            PROGRAM_ID: id
-        });
+        if( $(this).hasClass( "doableOperation" ) )
+        {
+            doAjax( "startresearch", {
+                PROGRAM_ID: id
+            });
+        }
     });
 
     tempCache( "program-" + id + "-server", serverid );
@@ -441,18 +448,44 @@ function updateProgramOperations( )
         }
     }
 
+    var totalhdd = getTempCache( "currenthdd" );
+    var usedhdd = 0;
+
+    for( i = 0; i < programs.length; i++ )
+    {
+        usedhdd += getTempCache( "program-" + programs[ i ] + "-size" );
+    }
+
+    var freehdd = totalhdd - usedhdd;
+    if( freehdd < 0 )
+    {
+        freehdd = 0;
+    }
+
     for( i = 0; i < programs.length; i++ )
     {
         var programid = programs[ i ];
+        var programtype = getTempCache( "program-" + programid + "-type" );
+        var hddavail = getProgramSize( programtype, 1 ) < freehdd;
+        var researchobj = $('#research-' + programid);
         if( cantResearch.indexOf( programid ) != -1 )
         {
-            $('#research-' + programid).addClass( 'disabledOperation' );
-            $('#research-' + programid).removeClass( 'doableOperation' );
+            researchobj.addClass( 'disabledOperation' );
+            researchobj.removeClass( 'doableOperation' );
+            researchobj.attr( "title", "Can't research because program is " +
+                                       "already being deleted." );
+        }
+        else if( !hddavail )
+        {
+            researchobj.addClass( 'disabledOperation' );
+            researchobj.removeClass( 'doableOperation' );
+            researchobj.attr( "title", "Can't research because there is not " +
+                                       "enough HDD space available." );
         }
         else
         {
-            $('#research-' + programid).addClass( 'doableOperation' );
-            $('#research-' + programid).removeClass( 'disabledOperation' );
+            researchobj.addClass( 'doableOperation' );
+            researchobj.removeClass( 'disabledOperation' );
         }
     }
 }
