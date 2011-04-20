@@ -30,16 +30,20 @@ function validLogin( id )
         " ui-icon-arrowrefresh-1-s'></span></div>" +
         "<div class='min_popup' title='Minimize'><span class='ui-icon" +
         " ui-icon-minus'></span></div>" +
-        "<div class='max_popup' title='Maximize'><span>□</span></div>" +
+        "<div class='max_popup' title='Maximize'><span>\u25a1</span></div>" +
         "<div class='close_popup' title='Close'><span class='ui-icon" +
         " ui-icon-close'></span></div></div>")
         .append("<div id='serverpu' class='popup_body'></div>")
         .toggle(function() {
 		$(this).removeClass('popup');
 	})
-        .css('display', 'none');
+        .css('display', 'none')
+        .resizable({alsoResize: "#serverpu"});
 
-    $('div.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move', 'containment': '#center'});
+    $('#serverpu').resizable();
+
+    $('div.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body',
+        'cursor': 'move', 'containment': '#center'});
 
     $('div.popup_body').css( "max-height", $("#center").css( "height" ) - 22 );
 
@@ -75,7 +79,8 @@ function validLogin( id )
             popupHeight( div );
         }
         else {
-            div.removeClass('popup_max');
+            div.removeClass('popup_max')
+            .removeAttr('style');
             div.find('.popup_body')
             .removeClass('popup_body_max')
             .removeAttr('style');
@@ -83,7 +88,7 @@ function validLogin( id )
             .addClass('max_popup')
             .removeClass('restore_popup')
             .empty()
-            .append("<span>□</span>");
+            .append("<span>\u25a1</span>");
         }
     });
 
@@ -123,7 +128,7 @@ function validLogin( id )
         var _id = $(this).attr('id');
 	if ($('div#'+_id).css('display') == 'none') {
             $('div#'+_id).fadeIn();
-            $("#serverpu").empty();
+            $("div#"+_id+"pu").empty();
             requestServers();
 	}
 	if (!$('div#'+_id).hasClass('popup')) {
@@ -145,8 +150,6 @@ function validLogin( id )
         if(divpbh != centerh-22 || divph != centerh)
         {
             if(divpb.hasClass('popup_body_max')){
-                divpb.removeAttr('style');
-                divp.removeAttr('style');
                 popupHeight( div );
             }
         }
@@ -154,18 +157,21 @@ function validLogin( id )
         {
             if(!divpb.hasClass('popup_body_max'))
             {
-                divpb.removeAttr('style');
-                divp.removeAttr('style');
-                divp.css('height', centerh);
-                divpb.css('height', centerh-22);
+                popupHeight( div );
             }
         }
-        else if(divpbh < centerh-22 || divph < centerh)
+        if(divpbh != divph-23)
         {
             if(!divpb.hasClass('popup_body_max'))
             {
-                divp.css('height', '');
-                divpb.css('height', '');
+                if(divpbh+20 > divph)
+                {
+                    divp.css('height', divpbh+20)
+                }
+                else if(divpbh+20 < divph)
+                {
+                    divpb.css('height', divph-20)
+                }
             }
         }
     });
@@ -174,6 +180,8 @@ function validLogin( id )
 function popupHeight( div )
 {
     var wheight = $('#center').height();
+    div.find('.popup').removeAttr('style');
+    div.find('.popup_body').removeAttr('style');
     div.find('.popup').css('height',wheight);
     div.find('.popup_body').css('height',wheight-22);
 }
@@ -190,8 +198,8 @@ function noOwnedServers()
 
 function ownedServers( list )
 {
-    $('#serverpu').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
-                       "<td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
+    $('#serverpu').html( "<table id='servertable'><thead><td>IP</td><td>" +
+        "CPU</td><td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
 
     var serverids = new Array();
     for( var i = 0; i < list.length; i++ )
@@ -243,7 +251,7 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 
     $('#serverpu').append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
-
+   
     tempCache( "currentserver", id );
     tempCache( "currentcpu", cpu );
     tempCache( "currentram", ram );

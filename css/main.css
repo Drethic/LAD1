@@ -84,7 +84,8 @@ html, body {
 div.popup {
     background-color:#456;
     width:384px;
-    min-height:203px;
+    min-height:200px;
+    min-width: 384px;
     position:relative;
 }
 div.popup_body {
@@ -92,8 +93,8 @@ div.popup_body {
     position:absolute;
     top: 20px;
     left:0;
-    width:380px;
     min-height:180px;
+    min-width: 382px;
     background-color:#DDD;
     overflow:auto;
 }
