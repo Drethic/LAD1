@@ -14,7 +14,7 @@
  *    finishresearch = User wants to finish a research that is running
  *
  * Session vars:
- *  id          = Sets the ID into session to help control authorization
+ *  ID          = Sets the ID into session to help control authorization
  *  username    = Sets the Username into session to send to newuser2 during
  *                creation of account.
  *  password    = Sets the Password into session to send to newuser2 during
@@ -55,7 +55,7 @@ require_once( 'private/processes.php' );
 if( $action == 'requestservers' )
 {
     // Setup some local variables
-    $id = $_SESSION[ 'id' ];
+    $id = $_SESSION[ 'ID' ];
     $servers = new Servers();
 
     // Now we simply need to get the 2D array from servers
@@ -68,7 +68,7 @@ if( $action == 'requestservers' )
 elseif( $action == 'requestfreeserver' )
 {
     // User wants their free server, check if they have one already
-    $id = $_SESSION[ 'id' ];
+    $id = $_SESSION[ 'ID' ];
     $servers = new Servers();
 
     $ownerServers = $servers->getServersByOwner( $id );
@@ -100,7 +100,7 @@ elseif( $action == 'viewserver' )
     $serverInfo = $servers->getServerByID( $id );
 
 /*********************************** STEP 3a **********************************/
-    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'id' ] )
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
     {
         ahdie( 'You don\'t own this server nutmeg.' );
     }
@@ -134,7 +134,7 @@ elseif( $action == 'freeprograms' )
     $programs = new Programs();
 
 /*********************************** STEP 4a **********************************/
-    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'id' ] )
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
     {
         ahdie( 'Getting free programs for somebody else?' );
     }
@@ -204,7 +204,7 @@ elseif( $action == 'startresearch' )
         $programs->getProgramOwnerAndServerByID( $programid );
 
 /*********************************** STEP 5a **********************************/
-    if( $userid != $_SESSION[ 'id' ] )
+    if( $userid != $_SESSION[ 'ID' ] )
     {
         ahdie( 'Researching for other people are we?' );
     }
@@ -279,7 +279,7 @@ elseif( $action == 'finishresearch' )
     $serverInfo = $servers->getServerByID( $serverid );
 
 /*********************************** STEP 6a **********************************/
-    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'id' ] )
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
     {
         ahdie( 'Finishing research for someone else = bad.' );
     }

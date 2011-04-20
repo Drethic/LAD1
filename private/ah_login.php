@@ -11,7 +11,7 @@
  *  login
  *
  * Session vars:
- *  id          = Sets the ID into session to help control authorization
+ *  ID          = Sets the ID into session to help control authorization
  *  username    = Sets the Username into session to send to newuser2 during
  *                creation of account.
  *  password    = Sets the Password into session to send to newuser2 during
@@ -74,7 +74,7 @@ if( $action == 'login' )
     else
     {
         $id = $result[0][ "ID" ];
-        $_SESSION['id'] = $id;
+        $_SESSION['ID'] = $id;
         $_SESSION['username'] = $rnick;
         echo "validLogin($id);";
     }
@@ -149,7 +149,7 @@ elseif( $action == 'newuser2' )
         else
         {
             $id = $user->addUser( $nick, $pass, $email );
-            $_SESSION['id'] = $id;
+            $_SESSION['ID'] = $id;
             echo "accountCreated($id)";
         }
     }

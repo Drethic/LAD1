@@ -15,7 +15,7 @@
  *     startresearch = User wants to start researching a program
  *
  * Session vars:
- *  id          = Sets the ID into session to help control authorization
+ *  ID          = Sets the ID into session to help control authorization
  *
  * 1.  Perform validation by only allowing specific actions when logged in
  *     Each action has it's own requirements plus the name of the file where it
@@ -63,7 +63,7 @@ if( isset( $_REQUEST['action'] ) )
         $requirements = $currReq[ 0 ];
         // If the user needs to be logged in they'll have the NEED_LOGIN bit
         // in the requirements and they *should* have the session ID set
-        if( $requirements & NEED_LOGIN && !isset( $_SESSION[ 'id' ] ) )
+        if( $requirements & NEED_LOGIN && !isset( $_SESSION[ 'ID' ] ) )
         {
             ahdie( 'Action requires login.' );
         }
