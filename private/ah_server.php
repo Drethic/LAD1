@@ -11,7 +11,7 @@
  *        viewserver = User wants to see all information about a server
  *      freeprograms = User is requesting their free programs
  *     startresearch = User wants to start researching a program
- *    finishresearch = User wants to finish a research that is running
+ *     finishprocess = User wants to finish a research that is running
  *
  * Session vars:
  *  ID          = Sets the ID into session to help control authorization
@@ -38,12 +38,15 @@
  * 5b. Do a quick check if there's enough space after that research
  * 5c. Also check to make sure there is enough space after all researches are
  *      done to hold this one as well
- * 6. User wants to finish a research
- * 6a. Make sure research belong to server user owns
- * 6b. Make sure it is actually a research process
- * 6c. Make sure no circumstances have happened to cause the server to not be
- *     able to hold the research
- * 6d. Finish up the research and grant the version
+ * 6. User wants to finish a process
+ * 6a. Make sure process belongs to server user owns
+ * 6b. Check if it is a research process
+ * 6b1. Make sure no circumstances have happened to cause the server to not be
+ *      able to hold the research
+ * 6b2. Finish up the research and grant the version
+ * 7. User wants to cancel a process
+ * 7a. Make sure process belongs to server user owns
+ * 7b. Cancel the process
  */
 
 require_once( 'private/users.php' );
@@ -263,7 +266,7 @@ elseif( $action == 'startresearch' )
     }
 }
 /*********************************** STEP 6 ***********************************/
-elseif( $action == 'finishresearch' )
+elseif( $action == 'finishprocess' )
 {
     if( !isset( $_REQUEST[ 'PROCESS_ID' ] ) )
     {
@@ -283,7 +286,7 @@ elseif( $action == 'finishresearch' )
 /*********************************** STEP 6a **********************************/
     if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
     {
-        ahdie( 'Finishing research for someone else = bad.' );
+        ahdie( 'Finishing a process for someone else = bad.' );
     }
 
     // Look up the current HDD usage
@@ -294,25 +297,56 @@ elseif( $action == 'finishresearch' )
     $maxHDD = $serverInfo[ 'HDD' ];
 
 /*********************************** STEP 6b **********************************/
-    if( $processInfo[ 'OPERATION' ] != PROCESS_OP_RESEARCH )
+    if( $processInfo[ 'OPERATION' ] == PROCESS_OP_RESEARCH )
     {
-        ahdie( 'Trying to research a non-research operation.' );
-    }
-    $programtype = $programInfo[ 'TYPE' ];
-    $fileSize = getProgramSize( $programtype );
+        $programtype = $programInfo[ 'TYPE' ];
+        $fileSize = getProgramSize( $programtype );
 
-/*********************************** STEP 6c **********************************/
-    if( $fileSize + $usedHDD > $maxHDD )
-    {
-        echo( 'notEnoughFileSpace();' );
+/*********************************** STEP 6b1 *********************************/
+        if( $fileSize + $usedHDD > $maxHDD )
+        {
+            echo( 'notEnoughFileSpace();' );
+        }
+        else
+        {
+/*********************************** STEP 6b2 *********************************/
+            $processes->deleteProcess( $processid );
+            $programs->upgradeProgram( $programid, $programtype );
+
+            echo "finishedResearch($processid);";
+        }
     }
     else
     {
-/*********************************** STEP 6d **********************************/
-        $processes->deleteProcess( $processid );
-        $programs->upgradeProgram( $programid, $programtype );
-
-        echo "finishedResearch($processid);";
+        ahdie( 'Unhandled operation...wtf...' );
     }
+}
+/*********************************** STEP 7 ***********************************/
+elseif( $action == 'cancelprocess' )
+{
+    if( !isset( $_REQUEST[ 'PROCESS_ID' ] ) )
+    {
+        ahdie( 'Cancelling...nothing...what...' );
+    }
+
+    // Get information about the process
+    $processid = $_REQUEST[ 'PROCESS_ID' ];
+    $processes = new Processes();
+    $processInfo = $processes->getProcessByID( $processid );
+
+    // Get information about the server owning the process
+    $serverid = $processInfo[ 'OWNING_SERVER' ];
+    $servers = new Servers();
+    $serverInfo = $servers->getServerByID( $serverid );
+
+/*********************************** STEP 7a **********************************/
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
+    {
+        ahdie( 'Cancelling a process for someone else = bad...for now.' );
+    }
+
+    $processes->deleteProcess( $processid );
+
+    echo "cancelledProcess($processid);";
 }
 ?>

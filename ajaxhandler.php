@@ -13,6 +13,8 @@
  *        viewserver = User wants to see all information about a server
  *      freeprograms = User is requesting their free programs
  *     startresearch = User wants to start researching a program
+ *     finishprocess = User wants to complete a process
+ *     cancelprocess = User wants to cancel a process
  *
  * Session vars:
  *  ID          = Sets the ID into session to help control authorization
@@ -43,7 +45,8 @@ $actionRequirements =
          'viewserver' => array( NEED_LOGIN, 'ah_server' ),
          'freeprograms' => array( NEED_LOGIN, 'ah_server' ),
          'startresearch' => array( NEED_LOGIN, 'ah_server' ),
-         'finishresearch' => array( NEED_LOGIN, 'ah_server' ));
+         'finishprocess' => array( NEED_LOGIN, 'ah_server' ),
+         'cancelprocess' => array( NEED_LOGIN, 'ah_server' ));
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/

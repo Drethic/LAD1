@@ -384,7 +384,8 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempOut += "<td id='process-" + id + "-ram'></td>";
     tempOut += "<td id='process-" + id + "-bw'></td>";
     tempOut += "<td id='process-" + id + "-operation'></td>";
-    tempOut += "<td id='process-" + id + "-completetime'></td>";
+    tempOut += "<td><a href='#' id='cancelprocess-" + id + "'>Cancel</a>" +
+               "&nbsp;<span id='process-" + id + "-completetime'></span></td>";
     tempOut += "</tr>";
     processtable.append( tempOut );
 
@@ -401,9 +402,16 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     runTimeUpdater( "process-" + id + "-completetime", id, function(id,domEl) {
         domEl.html( "<a href='#'>Complete</a>" );
         domEl.children( "a" ).click(function(evt){
-            doAjax( "finishresearch", {
+            doAjax( "finishprocess", {
                 PROCESS_ID: id
             });
+        });
+    });
+
+    $("#cancelprocess-" + id).click(function(){
+        // Should add a confirmation here
+        doAjax( "cancelprocess", {
+            PROCESS_ID: id
         });
     });
 }
@@ -515,6 +523,10 @@ function removeProcess( id, callback )
         }
 
         $(this).remove();
+        if( $("#processtable").children().length == 0 )
+        {
+            noServerProcesses();
+        }
         
         tempCache( "process-" + id + "-target" );
         tempCache( "process-" + id + "-server" );
@@ -530,6 +542,7 @@ function removeProcess( id, callback )
 
 function finishedResearch( processid )
 {
+    $("#process-" + processid + "-row").addClass( "doableOperation" );
     removeProcess( processid, function(id){
         var progid = getTempCache( "process-" + id + "-target" );
         var programversion = getTempCache( "program-" + progid + "-version" );
@@ -542,4 +555,10 @@ function finishedResearch( processid )
         tempCache( "program-" + progid + "-version", newversion, true );
         tempCache( "program-" + progid + "-size", newsize, true );
     });
+}
+
+function cancelledProcess( processid )
+{
+    $("#process-" + processid + "-row").addClass( "disabledOperation" );
+    removeProcess( processid );
 }
