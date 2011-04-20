@@ -70,8 +70,8 @@ class Programs extends MySQLObject
     function getServerUsage( $serverid )
     {
         $ret = $this->get( array( 'SERVER_ID' => $serverid ), NULL, 0,
-                           'SUM(SIZE)' );
-        return $ret[ 0 ][ 0 ];
+                           array( 'SUM(SIZE) AS TOTAL_SIZE' ) );
+        return $ret[ 0 ][ 'TOTAL_SIZE' ];
     }
 
     // Returns 2D array [ userID, serverID, programInfo... ]

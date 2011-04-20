@@ -200,8 +200,10 @@ elseif( $action == 'startresearch' )
 
     $programs = new Programs();
     $servers = new Servers();
-    list( $userid, $serverid, $a, $a, $programtype ) =
-        $programs->getProgramOwnerAndServerByID( $programid );
+    $programInfo = $programs->getProgramOwnerAndServerByID( $programid );
+    $userid = $programInfo[ 'USER_ID' ];
+    $serverid = $programInfo[ 'SERVER_ID' ];
+    $programtype = $programInfo[ 'TYPE' ];
 
 /*********************************** STEP 5a **********************************/
     if( $userid != $_SESSION[ 'ID' ] )
