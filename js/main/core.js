@@ -176,7 +176,7 @@ function tempCache( ind, val, updateScreen )
         }
         else
         {
-            alert( this.values.toString() );
+            //alert( this.values.toString() );
         }
     }
     return old;
