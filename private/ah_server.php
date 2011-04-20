@@ -100,7 +100,7 @@ elseif( $action == 'viewserver' )
     $serverInfo = $servers->getServerByID( $id );
 
 /*********************************** STEP 3a **********************************/
-    if( $serverInfo[ 1 ] != $_SESSION[ 'id' ] )
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'id' ] )
     {
         ahdie( 'You don\'t own this server nutmeg.' );
     }
@@ -134,7 +134,7 @@ elseif( $action == 'freeprograms' )
     $programs = new Programs();
 
 /*********************************** STEP 4a **********************************/
-    if( $serverInfo[ 1 ] != $_SESSION[ 'id' ] )
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'id' ] )
     {
         ahdie( 'Getting free programs for somebody else?' );
     }
@@ -152,7 +152,7 @@ elseif( $action == 'freeprograms' )
         $hasPWB = false;
         foreach( $serverPrograms as $serverProgram )
         {
-            switch( $serverProgram[ 2 ] )
+            switch( $serverProgram[ 'TYPE' ] )
             {
                 case PROGRAM_TYPE_FIREWALL:
                     $hasFWD = true;
@@ -211,7 +211,7 @@ elseif( $action == 'startresearch' )
 
     $serverInfo = $servers->getServerByID( $serverid );
 
-    $maxHDD = $serverInfo[ 5 ];
+    $maxHDD = $serverInfo[ 'HDD' ];
 
     $usedHDD = $programs->getServerUsage( $serverid );
 
@@ -230,14 +230,14 @@ elseif( $action == 'startresearch' )
                  $processes->getHDDConsumersByServer( $serverid ) );
         foreach( $consumers as $consumer )
         {
-            switch( $consumer[ 8 ] )
+            switch( $consumer[ 'OPERATION' ] )
             {
                 case PROCESS_OP_COPY:
                 case PROCESS_OP_TRANSFER:
-                    $usedHDD += $consumer[ 0 ];
+                    $usedHDD += $consumer[ 'SIZE' ];
                     break;
                 case PROCESS_OP_RESEARCH:
-                    $usedHDD += getProgramSize( $consumer[ 1 ] );
+                    $usedHDD += getProgramSize( $consumer[ 'TYPE' ] );
                     break;
             }
         }
@@ -255,7 +255,7 @@ elseif( $action == 'startresearch' )
                     DEFAULT_RESEARCH_CPU, DEFAULT_RESEARCH_RAM, 0,
                     PROCESS_OP_RESEARCH, "NOW()+$t" );
             $result = $processes->getProcessByID( $researchid );
-            $etic = $result[ 7 ];
+            $etic = $result[ 'COMPLETION_TIME' ];
             echo( "startedResearch($programid,$researchid,$etic);" );
         }
     }
@@ -274,29 +274,29 @@ elseif( $action == 'finishresearch' )
     $processInfo = $processes->getProcessByID( $processid );
 
     // Get information about the server owning the process
-    $serverid = $processInfo[ 2 ];
+    $serverid = $processInfo[ 'OWNING_SERVER' ];
     $servers = new Servers();
     $serverInfo = $servers->getServerByID( $serverid );
 
 /*********************************** STEP 6a **********************************/
-    if( $serverInfo[ 1 ] != $_SESSION[ 'id' ] )
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'id' ] )
     {
         ahdie( 'Finishing research for someone else = bad.' );
     }
 
     // Look up the current HDD usage
-    $programid = $processInfo[ 1 ];
+    $programid = $processInfo[ 'TARGET_PROGRAM' ];
     $programs = new Programs();
     $programInfo = $programs->getProgramByID( $programid );
     $usedHDD = $programs->getServerUsage( $serverid );
-    $maxHDD = $serverInfo[ 5 ];
+    $maxHDD = $serverInfo[ 'HDD' ];
 
 /*********************************** STEP 6b **********************************/
-    if( $processInfo[ 6 ] != PROCESS_OP_RESEARCH )
+    if( $processInfo[ 'OPERATION' ] != PROCESS_OP_RESEARCH )
     {
         ahdie( 'Trying to research a non-research operation.' );
     }
-    $programtype = $programInfo[ 2 ];
+    $programtype = $programInfo[ 'TYPE' ];
     $fileSize = getProgramSize( $programtype );
 
 /*********************************** STEP 6c **********************************/

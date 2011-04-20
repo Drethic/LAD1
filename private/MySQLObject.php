@@ -90,7 +90,7 @@ abstract class MySQLObject
        }
 
        $ret = array();
-       while( $row = mysql_fetch_row( $result ) )
+       while( $row = mysql_fetch_array( $result ) )
        {
            $ret[] = $row;
        }
@@ -208,7 +208,7 @@ abstract class MySQLObject
        }
 
        $ret = array();
-       while( $row = mysql_fetch_row( $result ) )
+       while( $row = mysql_fetch_array( $result ) )
        {
            $ret[] = $row[ 0 ];
        }
@@ -226,7 +226,7 @@ abstract class MySQLObject
        }
 
        $ret = array();
-       while( $row = mysql_fetch_row( $result ) )
+       while( $row = mysql_fetch_array( $result ) )
        {
            if( count( $row ) == 1 )
            {

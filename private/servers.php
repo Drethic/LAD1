@@ -77,7 +77,7 @@ class Servers extends MySQLObject
         $row = $this->getServerByIP( $ip );
         if( is_array( $row ) )
         {
-            return $row[ 0 ];
+            return $row[ "ID" ];
         }
         return false;
     }

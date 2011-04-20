@@ -73,7 +73,7 @@ if( $action == 'login' )
 /*********************************** STEP 1b **********************************/
     else
     {
-        $id = $result[0][0];
+        $id = $result[0][ "ID" ];
         $_SESSION['id'] = $id;
         $_SESSION['username'] = $rnick;
         echo "validLogin($id);";
@@ -104,7 +104,7 @@ elseif( $action == 'newuser1' )
     $user = new Users();
     $result = $user->checkUsernameExists( $nick );
 /*********************************** STEP 2a **********************************/
-    if ($result !=0)
+    if( $result != 0 )
     {
         echo "usernameTaken()";
     }
@@ -127,12 +127,12 @@ elseif( $action == 'newuser2' )
     $nick = $_SESSION[ 'username' ];
     $pass = $_SESSION['password'];
     $email = $_REQUEST['email'];
-    if (!isValidEmail($email))
+    if( !isValidEmail( $email ) )
     {
         ahdie('Stupid muppet!  Your email isn\'t formatted right!');
     }
     $cpass = $_REQUEST['cpassword'];
-    if ($pass != $cpass)
+    if( $pass != $cpass )
     {
         echo "cpasswordInvalid()";
     }
@@ -141,16 +141,16 @@ elseif( $action == 'newuser2' )
         $user = new Users();
         $result = $user->checkEmailExists( $email );
 /*********************************** STEP 3a **********************************/
-        if ($result != 0)
+        if( $result != 0 )
         {
             echo "emailTaken()";
         }
 /*********************************** STEP 3b **********************************/
         else
         {
-            $id = $user->addUser($nick, $pass, $email);
+            $id = $user->addUser( $nick, $pass, $email );
             $_SESSION['id'] = $id;
-            echo "accountCreated(" . $id .  ")";
+            echo "accountCreated($id)";
         }
     }
 }

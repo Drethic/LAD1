@@ -64,7 +64,7 @@ class Programs extends MySQLObject
     function getProgramOwnerByID( $programid )
     {
         $temp = $this->getProgramOwnerAndServerByID( $programid );
-        return $temp[ 0 ];
+        return $temp[ "USER_ID" ];
     }
 
     function getServerUsage( $serverid )
@@ -78,8 +78,9 @@ class Programs extends MySQLObject
     function getProgramOwnerAndServerByID( $programid )
     {
         $programid = intval( $programid );
-        return $this->getCustom( "SELECT U.ID, S.ID, P.* FROM PROGRAMS AS P " .
-                                 "INNER JOIN SERVERS AS S ON " .
+        return $this->getCustom( "SELECT U.ID AS USER_ID, S.ID AS SERVER_ID," .
+                                 "P.* FROM PROGRAMS AS P INNER JOIN SERVERS " .
+                                 "AS S ON " .
                                  "P.SERVER_ID=S.ID INNER JOIN USERS AS U ON " .
                                  "U.ID=S.OWNER_ID WHERE P.ID=$programid" );
     }
