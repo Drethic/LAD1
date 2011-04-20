@@ -19,7 +19,7 @@ class Users extends MySQLObject
 
     function getColumns( )
     {
-        return array( "ID", "NICK", "PASSWORD", "EMAIL", "FLAGS" );
+        return array( 'ID', 'NICK', 'PASSWORD', 'EMAIL', 'FLAGS' );
     }
 
     function getIndex( )
@@ -29,7 +29,7 @@ class Users extends MySQLObject
 
     function getTableName( )
     {
-        return "USERS";
+        return 'USERS';
     }
 
     function addUser( $nick, $pass, $email )
@@ -37,7 +37,7 @@ class Users extends MySQLObject
         $nick = $this->escapifyString( $nick );
         $pass = $this->escapifyString( $pass );
         $email = $this->escapifyString( $email );
-        return $this->insert( array( "NULL", $nick, $pass, $email, 0 ) );
+        return $this->insert( array( 'NULL', $nick, $pass, $email, 0 ) );
     }
 
     function checkCombo( $nick, $pass )
@@ -55,14 +55,14 @@ class Users extends MySQLObject
     function checkUsernameExists( $nick )
     {
         $nick = $this->escapifyString( $nick );
-        $val = $this->get( array( "LOWER(NICK)" =>  "LOWER(" . $nick . ")" ) );
+        $val = $this->get( array( 'LOWER(NICK)' =>  "LOWER($nick)" ) );
         return count( $val );
     }
 
     function checkEmailExists( $email )
     {
         $email = $this->escapifyString( $email );
-        $val = $this->get( array( "LOWER(EMAIL)" => "LOWER(" . $email . ")" ) );
+        $val = $this->get( array( 'LOWER(EMAIL)' => "LOWER($email)" ) );
         return count( $val );
     }
 

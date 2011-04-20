@@ -13,8 +13,8 @@ class Servers extends MySQLObject
 {
     function getColumns( )
     {
-        return array( "ID", "OWNER_ID", "IP", "CPU", "RAM", "HDD",
-                      "BANDWIDTH" );
+        return array( 'ID', 'OWNER_ID', 'IP', 'CPU', 'RAM', 'HDD',
+                      'BANDWIDTH' );
     }
 
     function getIndex( )
@@ -24,7 +24,7 @@ class Servers extends MySQLObject
 
     function getTableName( )
     {
-        return "SERVERS";
+        return 'SERVERS';
     }
 
     function getAvailableIP( )
@@ -47,7 +47,7 @@ class Servers extends MySQLObject
     function addServer( $ownerid )
     {
         $randomIP = $this->getAvailableIP();
-        return $this->insert( array( "NULL", $ownerid, $randomIP, DEFAULT_CPU,
+        return $this->insert( array( 'NULL', $ownerid, $randomIP, DEFAULT_CPU,
                                      DEFAULT_RAM, DEFAULT_HDD, DEFAULT_BW ) );
     }
 
@@ -77,7 +77,7 @@ class Servers extends MySQLObject
         $row = $this->getServerByIP( $ip );
         if( is_array( $row ) )
         {
-            return $row[ "ID" ];
+            return $row[ 'ID' ];
         }
         return false;
     }

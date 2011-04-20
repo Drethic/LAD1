@@ -13,7 +13,7 @@ class Programs extends MySQLObject
 {
     function getColumns( )
     {
-        return array( "ID", "SERVER_ID", "TYPE", "SIZE", "VERSION" );
+        return array( 'ID', 'SERVER_ID', 'TYPE', 'SIZE', 'VERSION' );
     }
 
     function getIndex( )
@@ -23,12 +23,12 @@ class Programs extends MySQLObject
 
     function getTableName( )
     {
-        return "PROGRAMS";
+        return 'PROGRAMS';
     }
 
     function addProgram( $serverid, $type, $size, $version )
     {
-        return $this->insert( array( "NULL", $serverid, $type, $size,
+        return $this->insert( array( 'NULL', $serverid, $type, $size,
                                      $version ) );
     }
 
@@ -64,13 +64,13 @@ class Programs extends MySQLObject
     function getProgramOwnerByID( $programid )
     {
         $temp = $this->getProgramOwnerAndServerByID( $programid );
-        return $temp[ "USER_ID" ];
+        return $temp[ 'USER_ID' ];
     }
 
     function getServerUsage( $serverid )
     {
         $ret = $this->get( array( 'SERVER_ID' => $serverid ), NULL, 0,
-                           "SUM(SIZE)" );
+                           'SUM(SIZE)' );
         return $ret[ 0 ][ 0 ];
     }
 
@@ -78,10 +78,10 @@ class Programs extends MySQLObject
     function getProgramOwnerAndServerByID( $programid )
     {
         $programid = intval( $programid );
-        return $this->getCustom( "SELECT U.ID AS USER_ID, S.ID AS SERVER_ID," .
-                                 "P.* FROM PROGRAMS AS P INNER JOIN SERVERS " .
-                                 "AS S ON " .
-                                 "P.SERVER_ID=S.ID INNER JOIN USERS AS U ON " .
+        return $this->getCustom( 'SELECT U.ID AS USER_ID, S.ID AS SERVER_ID,' .
+                                 'P.* FROM PROGRAMS AS P INNER JOIN SERVERS ' .
+                                 'AS S ON ' .
+                                 'P.SERVER_ID=S.ID INNER JOIN USERS AS U ON ' .
                                  "U.ID=S.OWNER_ID WHERE P.ID=$programid" );
     }
 }

@@ -13,9 +13,9 @@ class Processes extends MySQLObject
 {
     function getColumns( )
     {
-        return array( "ID", "TARGET_PROGRAM", "OWNING_SERVER", "CPU_USAGE",
-                      "RAM_USAGE", "BW_USAGE", "OPERATION", "COMPLETION_TIME",
-                      "LINKED_ID" );
+        return array( 'ID', 'TARGET_PROGRAM', 'OWNING_SERVER', 'CPU_USAGE',
+                      'RAM_USAGE', 'BW_USAGE', 'OPERATION', 'COMPLETION_TIME',
+                      'LINKED_ID' );
     }
 
     function getIndex( )
@@ -25,13 +25,13 @@ class Processes extends MySQLObject
 
     function getTableName( )
     {
-        return "PROCESSES";
+        return 'PROCESSES';
     }
 
     function addProcess( $target, $owningServer, $cpu, $ram, $bw, $operation,
                          $completion )
     {
-        return $this->insert( array( "NULL", $target, $owningServer, $cpu,
+        return $this->insert( array( 'NULL', $target, $owningServer, $cpu,
                                      $ram, $bw, $operation, $completion, 0 ) );
     }
 
@@ -39,10 +39,10 @@ class Processes extends MySQLObject
                                $targetCPU, $ownerRAM, $targetRAM, $bw,
                                $operation, $completion )
     {
-        $id1 = $this->insert( array( "NULL", $target, $ownerServer, $ownerCPU,
+        $id1 = $this->insert( array( 'NULL', $target, $ownerServer, $ownerCPU,
                                     $ownerRAM, $bw, $operation, $completion,
                                     0 ) );
-        $id2 = $this->insert( array( "NULL", $target, $targetServer, $targetCPU,
+        $id2 = $this->insert( array( 'NULL', $target, $targetServer, $targetCPU,
                                      $targetRAM, $bw, $operation, $completion,
                                      $id1 ) );
         $this->update( array( 'LINKED_ID' => $id2), array( 'ID' => $id1 ) );
