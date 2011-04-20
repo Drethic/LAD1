@@ -68,6 +68,8 @@ $version[ 10 ] = "ALTER TABLE PROCESSES ADD COLUMN `LINKED_ID` int(10) " .
                  "unsigned NOT NULL AFTER `COMPLETION_TIME`";
 $version[ 11 ] = "ALTER TABLE PROCESSES MODIFY COLUMN `COMPLETION_TIME` " .
                  "bigint unsigned NOT NULL";
+$version[ 12 ] = "ALTER TABLE USERS ADD COLUMN `FLAGS` bigint unsigned " .
+                 "NOT NULL DEFAULT 0 AFTER `EMAIL`";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);
