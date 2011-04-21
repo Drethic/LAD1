@@ -113,12 +113,8 @@ function validLogin( id )
     });
 
     $("#menu").append("<button id='logout'>Logout</button>")
-      .append( "<br><button id='servers'>Servers</button>" )
-      .append( "<br><button id='tempbutton'>Dump</button>" );
+      .append( "<br><button id='servers'>Servers</button>" );
 
-    $("#tempbutton").click(function( evt ){
-        alert( getTempCache( "processes" ) );
-    });
     $("#logout").click(function( evt ){
         window.location = '';
         doLogin();
