@@ -52,7 +52,7 @@ $actionRequirements =
          'startresearch' => array( 0, 'ah_server', array( 'PROGRAM_ID' ) ),
          'finishprocess' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ),
          'cancelprocess' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ),
-         'startdelete' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ) );
+         'startdelete' => array( 0, 'ah_server', array( 'PROGRAM_ID' ) ) );
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/

@@ -284,11 +284,6 @@ function checkFreePrograms()
         return;
     }
 
-    if( $('#freeprogramdiv').length )
-    {
-        return;
-    }
-
     // If any of these are not true at the end of the program listing,
     // then the user can opt to instantly get a L1 of each for free
     var hasFWD = false;
@@ -298,9 +293,11 @@ function checkFreePrograms()
     for( var i = 0; i < programs.length; i++ )
     {
         var progid = programs[ i ];
+        var type = new Number( getTempCache( "program-" + progid + "-type" ) )
+                   .valueOf();
 
         // Check if this type is accounted for
-        switch( getTempCache( "program-" + progid + "-type" ) )
+        switch( type )
         {
             case 1:
                 hasFWD = true;
@@ -317,7 +314,11 @@ function checkFreePrograms()
     }
 
     // Check if the user is missing one of the basics
-    if( !hasFWD || !hasFWB || !hasPWD || !hasPWB )
+    if( hasFWD && hasFWB && hasPWD && hasPWB )
+    {
+        $('#freeprogramdiv').remove();
+    }
+    else
     {
         enableFreePrograms();
     }
@@ -325,6 +326,7 @@ function checkFreePrograms()
 
 function enableFreePrograms()
 {
+    $('#freeprogramdiv').remove();
     $('#programdiv').prepend( "<div id='freeprogramdiv'>You are missing " +
        "critical programs that may be loaded from CD.  <a href='#' " +
        "id='loadfreeprogram'>Load Now</a></div>" );
@@ -490,6 +492,8 @@ function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
     addServerProgram( fwbid, serverid, 2, getProgramSize( 2, 1 ), 1 );
     addServerProgram( pwdid, serverid, 3, getProgramSize( 3, 1 ), 1 );
     addServerProgram( pwbid, serverid, 4, getProgramSize( 4, 1 ), 1 );
+
+    updateProgramOperations();
 }
 
 function updateProgramOperations( )
@@ -668,7 +672,7 @@ function finishedDeletion( processid )
 {
     $("#process-" + processid + "-row").addClass( "doableOperation" );
 
-    var progid = getTempCache( "process-" + id + "-target" );
+    var progid = getTempCache( "process-" + processid + "-target" );
     removeServerProgram( progid );
     removeProcess( processid );
 }
