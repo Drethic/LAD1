@@ -36,7 +36,7 @@ html, body {
 }
 
 #center {
-    position: fixed;
+    position: relative;
     background: url(images/w-bg-vista.png);
     background-size: 100% 100%;
 }
@@ -84,7 +84,9 @@ html, body {
 div.popup {
     background-color:#456;
     width:384px;
-    min-height:203px;
+    height: 200px;
+    min-height:200px;
+    min-width: 384px;
     position:relative;
 }
 div.popup_body {
@@ -92,24 +94,27 @@ div.popup_body {
     position:absolute;
     top: 20px;
     left:0;
-    width:380px;
+    height: 180px;
+    width: 382px;
     min-height:180px;
+    min-width: 382px;
     background-color:#DDD;
     overflow:auto;
 }
 div.popup_max {
     top: 0px !important;
     left: 0px !important;
-    width: auto;
+    /*width: 100%;*/
 }
 div.popup_body_max {
-    width: auto;
+    /*width: 100%;*/
     position: relative;
 }
 div.popup_header {
     position:absolute;
     top:1px;
     width:100%;
+    min-width: 384px;
     height:20px;
 }
 div.popup_title {
@@ -203,6 +208,7 @@ div.refresh_popup {
     width:100%;
     height: inherit;
     overflow:hidden;
+    float: left;
 }
 .jTaskBar-Bottom {
     position: fixed;

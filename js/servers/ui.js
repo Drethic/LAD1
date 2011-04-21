@@ -30,27 +30,34 @@ function validLogin( id )
         " ui-icon-arrowrefresh-1-s'></span></div>" +
         "<div class='min_popup' title='Minimize'><span class='ui-icon" +
         " ui-icon-minus'></span></div>" +
-        "<div class='max_popup' title='Maximize'><span>□</span></div>" +
+        "<div class='max_popup' title='Maximize'><span>\u25a1</span></div>" +
         "<div class='close_popup' title='Close'><span class='ui-icon" +
         " ui-icon-close'></span></div></div>")
         .append("<div id='serverpu' class='popup_body'></div>")
         .toggle(function() {
 		$(this).removeClass('popup');
 	})
-        .css('display', 'none');
+        .css('display', 'none')
+        .resizable({alsoResize: "#serverpu"});
 
-    $('div.popup').draggable({'opacity': '0.7', 'cancel': '.popup_body', 'cursor': 'move', 'containment': '#center'});
+    $('#serverpu').resizable();
 
-    $('div.popup_body').css( "max-height", $("#center").css( "height" ) - 22 );
+    $('div.popup')
+        .css( "max-height", $("#center").height() )
+        .css( "max-width", $("#center").width() )
+        .draggable({'opacity': '0.7', 'cancel': '.popup_body',
+        'cursor': 'move', 'containment': '#center'});
+    $('div.popup_body')
+        .css( "max-height", $("#center").height() - 20 )
+        .css( "max-width", $("#center").width() );
 
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
         .append("<div id='menu' class='inner'>Start Menu INW</div>");
+
     $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
-
-    $('#jTaskBar').css('float', 'left');
 
     $('#jTaskBar').find('div#servers').remove();
 
@@ -64,26 +71,36 @@ function validLogin( id )
     $('.max_popup').click( function() {
         var div = $(this).parents('.popup');
         if(!div.hasClass('popup_max')) {
-            div.addClass('popup_max');
+            div.addClass('popup_max')
+            .removeAttr('style')
+            .css( "height", $("#center").height() )
+            .css( "width", $("#center").width() );
             div.find('.popup_body')
-            .addClass('popup_body_max');
+            .addClass('popup_body_max')
+            .removeAttr('style')
+            .css( "height", $("#center").height() - 20 )
+            .css( "width", $("#center").width() - 2 );
             div.find('.max_popup').attr('title', 'Restore')
             .addClass('restore_popup')
             .removeClass('max_popup')
             .empty()
             .append("<span class='ui-icon ui-icon-newwin'></span>");
-            popupHeight( div );
         }
         else {
-            div.removeClass('popup_max');
+            div.removeClass('popup_max')
+            .removeAttr('style')
+            .css( "max-height", $("#center").height() )
+            .css( "max-width", $("#center").width() );
             div.find('.popup_body')
             .removeClass('popup_body_max')
-            .removeAttr('style');
+            .removeAttr('style')
+            .css( "max-height", $("#center").height() - 20 )
+            .css( "max-width", $("#center").width() );
             div.find('.restore_popup').attr('title', 'Maximize')
             .addClass('max_popup')
             .removeClass('restore_popup')
             .empty()
-            .append("<span>□</span>");
+            .append("<span>\u25a1</span>");
         }
     });
 
@@ -123,7 +140,7 @@ function validLogin( id )
         var _id = $(this).attr('id');
 	if ($('div#'+_id).css('display') == 'none') {
             $('div#'+_id).fadeIn();
-            $("#serverpu").empty();
+            $("div#"+_id+"pu").empty();
             requestServers();
 	}
 	if (!$('div#'+_id).hasClass('popup')) {
@@ -135,47 +152,14 @@ function validLogin( id )
         }
         $('#start').click();
     });
-    $(document).mousemove(function() {
-        var div = $('#center');
-        var divpb = div.find('.popup_body');
-        var divp = div.find('.popup');
-        var centerh = div.height();
-        var divpbh = divpb.height();
-        var divph = divp.height();
-        if(divpbh != centerh-22 || divph != centerh)
-        {
-            if(divpb.hasClass('popup_body_max')){
-                divpb.removeAttr('style');
-                divp.removeAttr('style');
-                popupHeight( div );
-            }
-        }
-        if(divpbh > centerh-22 || divph > centerh)
-        {
-            if(!divpb.hasClass('popup_body_max'))
-            {
-                divpb.removeAttr('style');
-                divp.removeAttr('style');
-                divp.css('height', centerh);
-                divpb.css('height', centerh-22);
-            }
-        }
-        else if(divpbh < centerh-22 || divph < centerh)
-        {
-            if(!divpb.hasClass('popup_body_max'))
-            {
-                divp.css('height', '');
-                divpb.css('height', '');
-            }
-        }
+    $(document).resize(function() {
+        $('div.popup')
+            .css( "max-height", $("#center").height() )
+            .css( "max-width", $("#center").width() );
+        $('div.popup_body')
+            .css( "max-height", $("#center").height() - 22 )
+            .css( "max-width", $("#center").width() );
     });
-}
-
-function popupHeight( div )
-{
-    var wheight = $('#center').height();
-    div.find('.popup').css('height',wheight);
-    div.find('.popup_body').css('height',wheight-22);
 }
 
 function noOwnedServers()
@@ -190,8 +174,8 @@ function noOwnedServers()
 
 function ownedServers( list )
 {
-    $('#serverpu').html( "<table id='servertable'><thead><td>IP</td><td>CPU</td>" +
-                       "<td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
+    $('#serverpu').html( "<table id='servertable'><thead><td>IP</td><td>" +
+        "CPU</td><td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
 
     var serverids = new Array();
     for( var i = 0; i < list.length; i++ )
@@ -243,7 +227,7 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 
     $('#serverpu').append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
-
+   
     tempCache( "currentserver", id );
     tempCache( "currentcpu", cpu );
     tempCache( "currentram", ram );
