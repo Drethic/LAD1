@@ -267,18 +267,44 @@ function serverPrograms( list )
                            "</td><td>Size (MB)</td><td>Version</td><td>" +
                            "Operations</td></thead></table>" );
 
+    for( var i = 0; i < list.length; i++ )
+    {
+        var pro = list[ i ];
+        addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ] );
+    }
+}
+
+function checkFreePrograms()
+{
+    var programstring = getTempCache( "programs" ).toString();
+    var programs = new Array();
+    if( programstring != "" )
+    {
+        programs = programstring.split( "," );
+    }
+    else
+    {
+        enableFreePrograms();
+        return;
+    }
+
+    if( $('#freeprogramdiv').length )
+    {
+        return;
+    }
+
     // If any of these are not true at the end of the program listing,
     // then the user can opt to instantly get a L1 of each for free
     var hasFWD = false;
     var hasFWB = false;
     var hasPWD = false;
     var hasPWB = false;
-    var programids = new Array();
-    for( var i = 0; i < list.length; i++ )
+    for( var i = 0; i < programs.length; i++ )
     {
-        var pro = list[ i ];
+        var progid = programs[ i ];
+
         // Check if this type is accounted for
-        switch( pro[ 2 ] )
+        switch( getTempCache( "program-" + progid + "-type" ) )
         {
             case 1:
                 hasFWD = true;
@@ -292,9 +318,6 @@ function serverPrograms( list )
             case 4:
                 hasPWB = true;
         }
-        addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ] );
-
-        programids[ i ] = pro[ 0 ];
     }
 
     // Check if the user is missing one of the basics
@@ -302,8 +325,6 @@ function serverPrograms( list )
     {
         enableFreePrograms();
     }
-
-    tempCache( "programs", programids.join(",") );
 }
 
 function enableFreePrograms()
@@ -355,6 +376,35 @@ function addServerProgram( id, serverid, type, size, version )
     });
     tempCache( "program-" + id + "-size", size, true );
     tempCache( "program-" + id + "-version", version, true );
+
+    addTempCacheList( "programs", id );
+    checkFreePrograms();
+}
+
+function removeServerProgram( id, callback )
+{
+    var row = $( "#program-" + id + "-row" );
+    row.hide(1000, function(){
+        if( callback != undefined )
+        {
+            callback( id );
+        }
+
+        $(this).remove();
+
+        tempCache( "program-" + id + "-server" );
+        tempCache( "program-" + id + "-type" );
+        tempCache( "program-" + id + "-size" );
+        tempCache( "program-" + id + "-version" );
+
+        removeTempCacheList( "programs", id );
+
+        if( getTempCache( "programs" ) == "" )
+        {
+            noServerPrograms();
+        }
+        checkFreePrograms();
+    });
 }
 
 function noServerProcesses()
@@ -453,6 +503,10 @@ function updateProgramOperations( )
     if( programstring != "" )
     {
         programs = programstring.split( "," );
+    }
+    else
+    {
+        return;
     }
 
     var processstring = getTempCache( "processes" ).toString();
@@ -612,4 +666,13 @@ function startedDeletion( programid, processid, completiontime )
                       getDefault( "DELETE_RAM" ), 0,
                       getDefault( "OP_DELETE" ), completiontime );
     updateProgramOperations();
+}
+
+function finishedDeletion( processid )
+{
+    $("#process-" + processid + "-row").addClass( "doableOperation" );
+
+    var progid = getTempCache( "process-" + id + "-target" );
+    removeServerProgram( progid );
+    removeProcess( processid );
 }

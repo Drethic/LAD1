@@ -31,6 +31,7 @@ require_once( 'private/defs.php' );
 
 function ahdie( $reason )
 {
+    //TODO Handle ajax handler deaths
     die( 'forceRefresh();' );
 }
 

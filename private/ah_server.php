@@ -310,6 +310,12 @@ elseif( $action == 'finishprocess' )
             echo "finishedResearch($processid);";
         }
     }
+    elseif( $processInfo[ 'OPERATION' ] == PROCESS_OP_DELETE )
+    {
+        $processes->deleteProcess( $processid );
+        $programs->deleteProgram( $programid );
+        echo "finishedDeletion($processid);";
+    }
     else
     {
         ahdie( 'Unhandled operation...wtf...' );
