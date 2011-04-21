@@ -449,11 +449,18 @@ function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
 function updateProgramOperations( )
 {
     var programstring = getTempCache( "programs" ).toString();
-    var programs = programstring.split( "," );
+    var programs = new Array();
+    if( programstring != "" )
+    {
+        programs = programstring.split( "," );
+    }
 
     var processstring = getTempCache( "processes" ).toString();
-    var processes = processstring.split( "," );
-
+    var processes = new Array();
+    if( processstring != "" )
+    {
+        processes = processstring.split( "," );
+    }
     var i;
     var cantResearch = new Array();
     var cantDelete = new Array();
