@@ -99,11 +99,6 @@ elseif( $action == 'requestfreeserver' )
 /*********************************** STEP 3 ***********************************/
 elseif( $action == 'viewserver' )
 {
-    if( !isset( $_REQUEST[ 'SERVER_ID' ] ) )
-    {
-        ahdie( 'No server ID to view...makes sense.' );
-    }
-
     $id = $_REQUEST[ 'SERVER_ID' ];
     $servers = new Servers();
     $serverInfo = $servers->getServerByID( $id );
@@ -131,11 +126,6 @@ elseif( $action == 'viewserver' )
 /*********************************** STEP 4 ***********************************/
 elseif( $action == 'freeprograms' )
 {
-    if( !isset( $_REQUEST[ 'SERVER_ID' ] ) )
-    {
-        ahdie( 'No server to get free programs for.' );
-    }
-
     $serverid = $_REQUEST[ 'SERVER_ID' ];
     $servers = new Servers();
     $serverInfo = $servers->getServerByID( $serverid );
@@ -200,11 +190,6 @@ elseif( $action == 'freeprograms' )
 /*********************************** STEP 5 ***********************************/
 elseif( $action == 'startresearch' )
 {
-    if( !isset( $_REQUEST[ 'PROGRAM_ID' ] ) )
-    {
-        ahdie( 'Research with no program ID?' );
-    }
-
     $programid = $_REQUEST[ 'PROGRAM_ID' ];
 
     $programs = new Programs();
@@ -282,11 +267,6 @@ elseif( $action == 'startresearch' )
 /*********************************** STEP 6 ***********************************/
 elseif( $action == 'finishprocess' )
 {
-    if( !isset( $_REQUEST[ 'PROCESS_ID' ] ) )
-    {
-        ahdie( 'Finishing...nothing...what...' );
-    }
-
     // Get information about the process
     $processid = $_REQUEST[ 'PROCESS_ID' ];
     $processes = new Processes();
@@ -338,11 +318,6 @@ elseif( $action == 'finishprocess' )
 /*********************************** STEP 7 ***********************************/
 elseif( $action == 'cancelprocess' )
 {
-    if( !isset( $_REQUEST[ 'PROCESS_ID' ] ) )
-    {
-        ahdie( 'Cancelling...nothing...what...' );
-    }
-
     // Get information about the process
     $processid = $_REQUEST[ 'PROCESS_ID' ];
     $processes = new Processes();
@@ -366,11 +341,6 @@ elseif( $action == 'cancelprocess' )
 /*********************************** STEP 8 ***********************************/
 elseif( $action == 'startdelete' )
 {
-    if( !isset( $_REQUEST[ 'PROGRAM_ID' ] ) )
-    {
-        ahdie( 'Deleting...nothing...what...' );
-    }
-
     $programid = $_REQUEST[ 'PROGRAM_ID' ];
     $programs = new Programs();
     $programInfo = $programs->getProgramByID( $programid );

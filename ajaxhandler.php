@@ -35,20 +35,23 @@ function ahdie( $reason )
 }
 
 /*********************************** STEP 1 ***********************************/
-define( 'NEED_LOGIN', 1 );
+define( 'NO_LOGIN', 1 );
 
 $actionRequirements =
-  array( 'login' => array( 0, 'ah_login' ),
-         'newuser1' => array( 0, 'ah_login' ),
-         'newuser2' => array( 0, 'ah_login' ),
-         'requestservers' => array( NEED_LOGIN, 'ah_server' ),
-         'requestfreeserver' => array( NEED_LOGIN, 'ah_server' ),
-         'viewserver' => array( NEED_LOGIN, 'ah_server' ),
-         'freeprograms' => array( NEED_LOGIN, 'ah_server' ),
-         'startresearch' => array( NEED_LOGIN, 'ah_server' ),
-         'finishprocess' => array( NEED_LOGIN, 'ah_server' ),
-         'cancelprocess' => array( NEED_LOGIN, 'ah_server' ),
-         'startdelete' => array( NEED_LOGIN, 'ah_server' ));
+  array( 'login' => array( NO_LOGIN, 'ah_login',
+                    array( 'username', 'password' ) ),
+         'newuser1' => array( NO_LOGIN, 'ah_login',
+                       array( 'username', 'password' ) ),
+         'newuser2' => array( NO_LOGIN, 'ah_login',
+                       array( 'email', 'cpassword' ) ),
+         'requestservers' => array( 0, 'ah_server', array() ),
+         'requestfreeserver' => array( 0, 'ah_server', array() ),
+         'viewserver' => array( 0, 'ah_server', array( 'SERVER_ID' ) ),
+         'freeprograms' => array( 0, 'ah_server', array( 'SERVER_ID' ) ),
+         'startresearch' => array( 0, 'ah_server', array( 'PROGRAM_ID' ) ),
+         'finishprocess' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ),
+         'cancelprocess' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ),
+         'startdelete' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ) );
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
@@ -66,11 +69,22 @@ if( isset( $_REQUEST['action'] ) )
         $currReq = $actionRequirements[ $action ];
         // It's in the list, now we need to perform more checks
         $requirements = $currReq[ 0 ];
-        // If the user needs to be logged in they'll have the NEED_LOGIN bit
+        // If the user needs to be logged in they won't have the NO_LOGIN bit
         // in the requirements and they *should* have the session ID set
-        if( $requirements & NEED_LOGIN && !isset( $_SESSION[ 'ID' ] ) )
+        if( !( $requirements & NO_LOGIN ) && !isset( $_SESSION[ 'ID' ] ) )
         {
             ahdie( 'Action requires login.' );
+        }
+
+        // Now we check if there are bad parameters. The third column of the
+        // requirements is an array of required parameters.  Check make sure
+        // each exists
+        foreach( $currReq[ 2 ] as $parameter )
+        {
+            if( !isset( $_REQUEST[ $parameter ] ) )
+            {
+                ahdie( "Missing request parameter $parameter." );
+            }
         }
 
         // Include the sub-file
