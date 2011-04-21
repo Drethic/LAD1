@@ -50,7 +50,8 @@ function intToIP( val )
 
 function intToProcessOperation( val )
 {
-    switch( val )
+    var nval = new Number( val ).valueOf();
+    switch( nval )
     {
         case 1:
             return "Transfer";
@@ -69,12 +70,14 @@ function intToProcessOperation( val )
         case 8:
             return "Uninstall";
     }
+    alert( "Invalid process operation {" + val + "} with type " + typeof val );
     return "";
 }
 
 function intToProgramType( val )
 {
-    switch( val )
+    var nval = new Number( val ).valueOf();
+    switch( nval )
     {
         case 1:
             return "Firewall";
@@ -91,6 +94,7 @@ function intToProgramType( val )
         case 7:
             return "Malware";
     }
+    alert( "Invalid program type {" + val + "} with type " + typeof val );
     return "";
 }
 
@@ -117,15 +121,22 @@ function getProgramSize( type, version )
 
 function addTempCacheList( ind, val )
 {
-    var curr = tempCache( ind );
-    curr = curr + "," + val;
-    tempCache( ind, val );
+    var curr = getTempCache( ind );
+    if( curr == "" )
+    {
+        tempCache( ind, val );
+        return;
+    }
+    var currList = curr.toString().split( "," );
+    currList.push( val );
+    var joined = currList.join( "," );
+    tempCache( ind, joined );
 }
 
 function removeTempCacheList( ind, val )
 {
     var curr = getTempCache( ind );
-    if( curr == undefined || curr != curr.toString() )
+    if( curr == "" )
     {
         return;
     }
@@ -153,13 +164,24 @@ function getTempCache( ind )
 
 function tempCache( ind, val, updateScreen )
 {
-    if( this.values == undefined )
+    if( ind == undefined )
     {
-        this.values = new Array();
+        alert( "Undefined index for temp cache." );
+        return 0;
     }
-    var old = this.values[ ind ];
-    this.values[ ind ] = val;
-
+    if( this.prototype == undefined )
+    {
+        this.prototype = {
+            values: new Array()
+        };
+    }
+    ind = ind.toString();
+    if( val != undefined )
+    {
+        val = val.toString();
+    }
+    var old = this.prototype.values[ ind ];
+    this.prototype.values[ ind ] = val;
     if( updateScreen )
     {
         var obj = $("#" + ind);

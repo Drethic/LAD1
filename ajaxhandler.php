@@ -15,6 +15,7 @@
  *     startresearch = User wants to start researching a program
  *     finishprocess = User wants to complete a process
  *     cancelprocess = User wants to cancel a process
+ *       startdelete = User wants to delete a file
  *
  * Session vars:
  *  ID          = Sets the ID into session to help control authorization
@@ -46,7 +47,8 @@ $actionRequirements =
          'freeprograms' => array( NEED_LOGIN, 'ah_server' ),
          'startresearch' => array( NEED_LOGIN, 'ah_server' ),
          'finishprocess' => array( NEED_LOGIN, 'ah_server' ),
-         'cancelprocess' => array( NEED_LOGIN, 'ah_server' ));
+         'cancelprocess' => array( NEED_LOGIN, 'ah_server' ),
+         'startdelete' => array( NEED_LOGIN, 'ah_server' ));
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/

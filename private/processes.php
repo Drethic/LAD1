@@ -60,6 +60,12 @@ class Processes extends MySQLObject
                            array( 'ID' => 'ASC' ) );
     }
 
+    function getProcessesByProgram( $programid )
+    {
+        return $this->get( array( 'TARGET_PROGRAM' => $programid ),
+                           array( 'ID' => 'ASC' ) );
+    }
+
     function getAllProcesses( )
     {
         return $this->get( NULL, array( 'ID' => 'ASC' ) );

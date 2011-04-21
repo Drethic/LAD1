@@ -113,8 +113,12 @@ function validLogin( id )
     });
 
     $("#menu").append("<button id='logout'>Logout</button>")
-      .append( "<br><button id='servers'>Servers</button>" );
+      .append( "<br><button id='servers'>Servers</button>" )
+      .append( "<br><button id='tempbutton'>Dump</button>" );
 
+    $("#tempbutton").click(function( evt ){
+        alert( getTempCache( "processes" ) );
+    });
     $("#logout").click(function( evt ){
         window.location = '';
         doLogin();
@@ -322,7 +326,8 @@ function addServerProgram( id, serverid, type, size, version )
     tempOut += "<td id='program-" + id + "-size' name='size'></td>";
     tempOut += "<td id='program-" + id + "-version' name='version'></td>";
     tempOut += "<td><span id='research-" + id + "'><a href='#research-" +
-               id + "'>Research</a></span></td>";
+               id + "'>Research</a></span><span id='delete-" + id +
+               "'><a href='#'>Delete</a></span></td>";
     tempOut += "</tr>";
     $('#programtable').append( tempOut );
 
@@ -330,6 +335,15 @@ function addServerProgram( id, serverid, type, size, version )
         if( $(this).hasClass( "doableOperation" ) )
         {
             doAjax( "startresearch", {
+                PROGRAM_ID: id
+            });
+        }
+    });
+
+    $('#delete-' + id).click(function( evt ){
+        if( $(this).hasClass( "doableOperation" ) )
+        {
+            doAjax( "startdelete", {
                 PROGRAM_ID: id
             });
         }
@@ -351,17 +365,13 @@ function noServerProcesses()
 
 function serverProcesses( list )
 {
-    var processes = new Array();
     for( var i = 0; i < list.length; i++ )
     {
         var pro = list[ i ];
         addServerProcess( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ],
                           pro[ 5 ], pro[ 6 ], pro[ 7 ] );
-
-        processes[ i ] = pro[ 0 ];
     }
 
-    tempCache( "processes", processes.join(",") );
     updateProgramOperations();
 }
 
@@ -398,6 +408,8 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
         $(elem).html( intToProcessOperation( val ) );
     });
     tempCache( "process-" + id + "-completetime", completiontime );
+
+    addTempCacheList( "processes", id );
 
     runTimeUpdater( "process-" + id + "-completetime", id, function(id,domEl) {
         domEl.html( "<a href='#'>Complete</a>" );
@@ -444,16 +456,20 @@ function updateProgramOperations( )
 
     var i;
     var cantResearch = new Array();
+    var cantDelete = new Array();
     // If a process is being deleted, it can't be researched
     for( i = 0; i < processes.length; i++ )
     {
         var processid = processes[ i ];
         var operation = getTempCache( "process-" + processid + "-operation" );
+        var program = getTempCache( "process-" + processid + "-target" );
         var opstring = intToProcessOperation( operation );
         if( opstring == "Delete" )
         {
-            cantResearch[ cantResearch.length ] = processid;
+            cantResearch.push( program );
         }
+        // Can't delete if already doing something
+        cantDelete.push( program );
     }
 
     var totalhdd = getTempCache( "currenthdd" );
@@ -476,6 +492,8 @@ function updateProgramOperations( )
         var programtype = getTempCache( "program-" + programid + "-type" );
         var hddavail = getProgramSize( programtype, 1 ) < freehdd;
         var researchobj = $('#research-' + programid);
+        var deleteobj = $('#delete-' + programid);
+        // Update the research button accordingly
         if( cantResearch.indexOf( programid ) != -1 )
         {
             researchobj.addClass( 'disabledOperation' );
@@ -494,6 +512,21 @@ function updateProgramOperations( )
         {
             researchobj.addClass( 'doableOperation' );
             researchobj.removeClass( 'disabledOperation' );
+            researchobj.attr( "title", "" );
+        }
+        // Update the delete button accordingly
+        if( cantDelete.indexOf( programid ) != -1 )
+        {
+            deleteobj.addClass( 'disabledOperation' );
+            deleteobj.removeClass( 'doableOperation' );
+            deleteobj.attr( "title", "Can't delete because another operation " +
+                                     "is already being performed." );
+        }
+        else
+        {
+            deleteobj.addClass( 'doableOperation' );
+            deleteobj.removeClass( 'disabledOperation' );
+            deleteobj.attr( "title", "" );
         }
     }
 }
@@ -507,10 +540,9 @@ function startedResearch( programid, processid, completiontime )
 {
     addServerProcess( processid, programid, getTempCache("currentserver"),
                       getDefault( "RESEARCH_CPU" ),
-                      getDefault( "RESEARCH_RAM" ), 0, 2, completiontime );
+                      getDefault( "RESEARCH_RAM" ), 0,
+                      getDefault( "OP_RESEARCH" ), completiontime );
     updateProgramOperations();
-
-    addTempCacheList( "processes", processid );
 }
 
 function removeProcess( id, callback )
@@ -523,10 +555,6 @@ function removeProcess( id, callback )
         }
 
         $(this).remove();
-        if( $("#processtable").children().length == 0 )
-        {
-            noServerProcesses();
-        }
         
         tempCache( "process-" + id + "-target" );
         tempCache( "process-" + id + "-server" );
@@ -537,6 +565,13 @@ function removeProcess( id, callback )
         tempCache( "process-" + id + "-completetime" );
 
         removeTempCacheList( "processes", id );
+
+        if( getTempCache( "processes" ) == "" )
+        {
+            noServerProcesses();
+        }
+        
+        updateProgramOperations();
     });
 }
 
@@ -561,4 +596,13 @@ function cancelledProcess( processid )
 {
     $("#process-" + processid + "-row").addClass( "disabledOperation" );
     removeProcess( processid );
+}
+
+function startedDeletion( programid, processid, completiontime )
+{
+    addServerProcess( processid, programid, getTempCache("currentserver"),
+                      getDefault( "DELETE_CPU" ),
+                      getDefault( "DELETE_RAM" ), 0,
+                      getDefault( "OP_DELETE" ), completiontime );
+    updateProgramOperations();
 }

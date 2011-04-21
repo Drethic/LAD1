@@ -12,6 +12,7 @@
  *      freeprograms = User is requesting their free programs
  *     startresearch = User wants to start researching a program
  *     finishprocess = User wants to finish a research that is running
+ *       startdelete = User wants to delete a file
  *
  * Session vars:
  *  ID          = Sets the ID into session to help control authorization
@@ -38,6 +39,7 @@
  * 5b. Do a quick check if there's enough space after that research
  * 5c. Also check to make sure there is enough space after all researches are
  *      done to hold this one as well
+ * 5d. Make sure it isn't being deleted
  * 6. User wants to finish a process
  * 6a. Make sure process belongs to server user owns
  * 6b. Check if it is a research process
@@ -47,6 +49,10 @@
  * 7. User wants to cancel a process
  * 7a. Make sure process belongs to server user owns
  * 7b. Cancel the process
+ * 8. User wants to delete a file
+ * 8a. Make sure file belongs to user
+ * 8b. Make sure no other operations are being performed
+ * 8c. Start process
  */
 
 require_once( 'private/users.php' );
@@ -254,6 +260,14 @@ elseif( $action == 'startresearch' )
         }
         else
         {
+            $programProcesses = $processes->getProcessesByProgram( $programid );
+            foreach( $programProcesses as $pp )
+            {
+                if( $pp[ 'OPERATION' ] == PROCESS_OP_DELETE )
+                {
+                    ahdie( 'No researching a deleting program, duh!' );
+                }
+            }
             // Alright, the user can research it
             $t = DEFAULT_RESEARCH_TIME;
             $researchid = $processes->addProcess( $programid, $serverid,
@@ -349,4 +363,45 @@ elseif( $action == 'cancelprocess' )
 
     echo "cancelledProcess($processid);";
 }
+/*********************************** STEP 8 ***********************************/
+elseif( $action == 'startdelete' )
+{
+    if( !isset( $_REQUEST[ 'PROGRAM_ID' ] ) )
+    {
+        ahdie( 'Deleting...nothing...what...' );
+    }
+
+    $programid = $_REQUEST[ 'PROGRAM_ID' ];
+    $programs = new Programs();
+    $programInfo = $programs->getProgramByID( $programid );
+    $serverid = $programInfo[ 'SERVER_ID' ];
+
+    $servers = new Servers();
+    $serverInfo = $servers->getServerByID( $serverid );
+    $serverOwner = $serverInfo[ 'OWNER_ID' ];
+/*********************************** STEP 8a **********************************/
+    if( $serverOwner != $_SESSION[ 'ID' ] )
+    {
+        ahdie( 'Can\'t delete stuff for other people yet.' );
+    }
+
+    $processes = new Processes();
+    $serverProcesses = $processes->getProcessesByProgram( $programid );
+/*********************************** STEP 8b **********************************/
+    if( !empty( $serverProcesses ) )
+    {
+        ahdie( 'Can\'t delete stuff that has processes running against it.' );
+    }
+
+/*********************************** STEP 8c **********************************/
+    $completionTime = $programInfo[ 'SIZE' ];
+    $processid = $processes->addProcess( $programid, $serverid,
+            DEFAULT_DELETION_CPU, DEFAULT_DELETION_RAM, 0, PROCESS_OP_DELETE,
+            "NOW()+$completionTime" );
+
+    $result = $processes->getProcessByID( $processid );
+    $etic = $result[ 'COMPLETION_TIME' ];
+    echo "startedDeletion($programid,$processid,$etic);";
+}
+
 ?>

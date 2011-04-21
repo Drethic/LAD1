@@ -40,6 +40,10 @@ define('DEFAULT_RESEARCH_CPU', 100);
 define('DEFAULT_RESEARCH_RAM', 10);
 define('DEFAULT_RESEARCH_TIME', 300);
 
+// Some deletion related stuff
+define('DEFAULT_DELETION_CPU', 25);
+define('DEFAULT_DELETION_RAM', 5);
+
 // Basic operations that processes can perform
 define('PROCESS_OP_TRANSFER', 1);
 define('PROCESS_OP_RESEARCH', 2);
@@ -93,7 +97,17 @@ function getClientSideDefines()
     return array(
         'RESEARCH_CPU' => DEFAULT_RESEARCH_CPU,
         'RESEARCH_RAM' => DEFAULT_RESEARCH_RAM,
-        'RESEARCH_TIME' => DEFAULT_RESEARCH_TIME
+        'RESEARCH_TIME' => DEFAULT_RESEARCH_TIME,
+        'DELETE_CPU' => DEFAULT_DELETION_CPU,
+        'DELETE_RAM' => DEFAULT_DELETION_RAM,
+        'OP_TRANSFER' => PROCESS_OP_TRANSFER,
+        'OP_RESEARCH' => PROCESS_OP_RESEARCH,
+        'OP_ENCRYPT' => PROCESS_OP_ENCRYPT,
+        'OP_DECRYPT' => PROCESS_OP_DECRYPT,
+        'OP_DELETE' => PROCESS_OP_DELETE,
+        'OP_COPY' => PROCESS_OP_COPY,
+        'OP_INSTALL' => PROCESS_OP_INSTALL,
+        'OP_UNINSTALL' => PROCESS_OP_UNINSTALL
     );
 }
 
