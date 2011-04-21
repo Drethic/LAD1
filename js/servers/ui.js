@@ -295,8 +295,7 @@ function checkFreePrograms()
     for( var i = 0; i < programs.length; i++ )
     {
         var progid = programs[ i ];
-        var type = new Number( getTempCache( "program-" + progid + "-type" ) )
-                   .valueOf();
+        var type = toNumber( getTempCache( "program-" + progid + "-type" ) );
 
         // Check if this type is accounted for
         switch( type )
@@ -535,12 +534,13 @@ function updateProgramOperations( )
         cantDelete.push( program );
     }
 
-    var totalhdd = getTempCache( "currenthdd" );
+    var totalhdd = toNumber( getTempCache( "currenthdd" ) );
     var usedhdd = 0;
 
     for( i = 0; i < programs.length; i++ )
     {
-        usedhdd += getTempCache( "program-" + programs[ i ] + "-size" );
+        usedhdd += toNumber( getTempCache( "program-" + programs[ i ] +
+                                           "-size" ) );
     }
 
     var freehdd = totalhdd - usedhdd;
@@ -647,8 +647,8 @@ function finishedResearch( processid )
         var programsize = getTempCache( "program-" + progid + "-size" );
         var programtype = getTempCache( "program-" + progid + "-type" );
 
-        var newversion = new Number( programversion ) + 1;
-        var newsize = new Number( programsize ) + getProgramSize( programtype, 1 );
+        var newversion = toNumber( programversion )+ 1;
+        var newsize = toNumber( programsize ) + getProgramSize( programtype, 1 );
 
         tempCache( "program-" + progid + "-version", newversion, true );
         tempCache( "program-" + progid + "-size", newsize, true );

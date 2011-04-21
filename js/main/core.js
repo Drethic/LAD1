@@ -30,7 +30,7 @@ function doAjax( actionPara, outData )
 
 function intToIP( val )
 {
-    val = new Number( val );
+    val = toNumber( val );
     var ret = "";
     var median = val & 255;
     ret += median.toString();
@@ -50,7 +50,7 @@ function intToIP( val )
 
 function intToProcessOperation( val )
 {
-    var nval = new Number( val ).valueOf();
+    var nval = toNumber( val );
     switch( nval )
     {
         case 1:
@@ -76,7 +76,7 @@ function intToProcessOperation( val )
 
 function intToProgramType( val )
 {
-    var nval = new Number( val ).valueOf();
+    var nval = toNumber( val );
     switch( nval )
     {
         case 1:
@@ -100,7 +100,7 @@ function intToProgramType( val )
 
 function getProgramSize( type, version )
 {
-    switch( type )
+    switch( toNumber( type ) )
     {
         case 1:
             return version * 5;
@@ -358,4 +358,9 @@ function runTimeUpdater( object, id, callback )
 function forceRefresh()
 {
     window.location.reload();
+}
+
+function toNumber( val )
+{
+    return new Number( val ).valueOf();
 }
