@@ -249,6 +249,8 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
     tempCache( "currentram", ram );
     tempCache( "currenthdd", hdd );
     tempCache( "currentbw", bw );
+    tempCache( "processes" );
+    tempCache( "programs" );
 }
 
 function noServerPrograms()
