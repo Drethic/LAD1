@@ -472,10 +472,22 @@ function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
 
     var serverid = $('#currentserver').html();
 
-    addServerProgram( fwdid, serverid, 1, getProgramSize( 1, 1 ), 1 );
-    addServerProgram( fwbid, serverid, 2, getProgramSize( 2, 1 ), 1 );
-    addServerProgram( pwdid, serverid, 3, getProgramSize( 3, 1 ), 1 );
-    addServerProgram( pwbid, serverid, 4, getProgramSize( 4, 1 ), 1 );
+    if( fwdid != 0 )
+    {
+        addServerProgram( fwdid, serverid, 1, getProgramSize( 1, 1 ), 1 );
+    }
+    if( fwbid != 0 )
+    {
+        addServerProgram( fwbid, serverid, 2, getProgramSize( 2, 1 ), 1 );
+    }
+    if( pwdid != 0 )
+    {
+        addServerProgram( pwdid, serverid, 3, getProgramSize( 3, 1 ), 1 );
+    }
+    if( pwbid != 0 )
+    {
+        addServerProgram( pwbid, serverid, 4, getProgramSize( 4, 1 ), 1 );
+    }
 
     updateProgramOperations();
 }

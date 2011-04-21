@@ -141,48 +141,71 @@ elseif( $action == 'freeprograms' )
     $serverPrograms = $programs->getProgramsByServer( $serverid );
 
 /*********************************** STEP 4b **********************************/
-    // Cool trick here, since there's 4 critical programs we can handle both
-    // no programs and less than 4 at same time
-    if( count( $serverPrograms ) > 4 )
+    $hasFWD = false;
+    $hasFWB = false;
+    $hasPWD = false;
+    $hasPWB = false;
+    foreach( $serverPrograms as $serverProgram )
     {
-        $hasFWD = false;
-        $hasFWB = false;
-        $hasPWD = false;
-        $hasPWB = false;
-        foreach( $serverPrograms as $serverProgram )
+        switch( $serverProgram[ 'TYPE' ] )
         {
-            switch( $serverProgram[ 'TYPE' ] )
-            {
-                case PROGRAM_TYPE_FIREWALL:
-                    $hasFWD = true;
-                    break;
-                case PROGRAM_TYPE_FIREWALLBREAKER:
-                    $hasFWB = true;
-                    break;
-                case PROGRAM_TYPE_PASSWORD:
-                    $hasPWD = true;
-                    break;
-                case PROGRAM_TYPE_PASSWORDBREAKER:
-                    $hasPWB = true;
-                    break;
-                default:
-            }
+            case PROGRAM_TYPE_FIREWALL:
+                $hasFWD = true;
+                break;
+            case PROGRAM_TYPE_FIREWALLBREAKER:
+                $hasFWB = true;
+                break;
+            case PROGRAM_TYPE_PASSWORD:
+                $hasPWD = true;
+                break;
+            case PROGRAM_TYPE_PASSWORDBREAKER:
+                $hasPWB = true;
+                break;
+            default:
         }
-        if( $hasFWD && $hasFWB && $hasPWD && $hasPWB )
-        {
-            ahdie( 'Stupid people trying to get what they already have!' );
-        }
+    }
+    if( $hasFWD && $hasFWB && $hasPWD && $hasPWB )
+    {
+        ahdie( 'Stupid people trying to get what they already have!' );
     }
 
     // Alright, the person is eligible!
-    $id1 = $programs->addProgram( $serverid, PROGRAM_TYPE_FIREWALL,
-                                  FIREWALL_SIZE, 1 );
-    $id2 = $programs->addProgram( $serverid, PROGRAM_TYPE_FIREWALLBREAKER,
-                                  FIREWALLBREAKER_SIZE, 1 );
-    $id3 = $programs->addProgram( $serverid, PROGRAM_TYPE_PASSWORD,
-                                  PASSWORD_SIZE, 1 );
-    $id4 = $programs->addProgram( $serverid, PROGRAM_TYPE_PASSWORDBREAKER,
-                                  PASSWORDBREAKER_SIZE, 1 );
+    if( $hasFWD )
+    {
+        $id1 = 0;
+    }
+    else
+    {
+        $id1 = $programs->addProgram( $serverid, PROGRAM_TYPE_FIREWALL,
+                                      FIREWALL_SIZE, 1 );
+    }
+    if( $hasFWB )
+    {
+        $id2 = 0;
+    }
+    else
+    {
+        $id2 = $programs->addProgram( $serverid, PROGRAM_TYPE_FIREWALLBREAKER,
+                                      FIREWALLBREAKER_SIZE, 1 );
+    }
+    if( $hasPWD )
+    {
+        $id3 = 0;
+    }
+    else
+    {
+        $id3 = $programs->addProgram( $serverid, PROGRAM_TYPE_PASSWORD,
+                                      PASSWORD_SIZE, 1 );
+    }
+    if( $hasPWB )
+    {
+        $id4 = 0;
+    }
+    else
+    {
+        $id4 = $programs->addProgram( $serverid, PROGRAM_TYPE_PASSWORDBREAKER,
+                                      PASSWORDBREAKER_SIZE, 1 );
+    }
 
     // And now we tell the user
     echo "grantedFreePrograms($id1,$id2,$id3,$id4);";
