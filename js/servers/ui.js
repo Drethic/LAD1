@@ -464,15 +464,14 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
         domEl.html( "<a href='#'>Complete</a>" );
         domEl.children( "a" ).click(function(evt){
             doAjax( "finishprocess", {
-                PROCESS_ID: id
+                PROCESS_ID: getSimpleID( $(this).parent() )
             });
         });
     });
-
     $("#cancelprocess-" + id).click(function(){
         // Should add a confirmation here
         doAjax( "cancelprocess", {
-            PROCESS_ID: id
+            PROCESS_ID: getSimpleID( $(this) )
         });
     });
 }

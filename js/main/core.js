@@ -364,3 +364,10 @@ function toNumber( val )
 {
     return new Number( val ).valueOf();
 }
+
+function getSimpleID( obj )
+{
+    var longid = obj.attr( "id" ).toString();
+    var arr = longid.split( "-" );
+    return arr[ 1 ];
+}
