@@ -46,7 +46,11 @@ function validLogin( id )
         .css( "max-height", $("#center").height() )
         .css( "max-width", $("#center").width() )
         .draggable({'opacity': '0.7', 'cancel': '.popup_body',
-        'cursor': 'move', 'containment': '#center'});
+        'cursor': 'move', 'containment': '#center'})
+        .resize( function() {
+            moveResizeVert($('div.popup_body'));
+            moveResizeHor($('div.popup_body'));
+        });
     $('div.popup_body')
         .css( "max-height", $("#center").height() - 20 )
         .css( "max-width", $("#center").width() );
@@ -152,14 +156,84 @@ function validLogin( id )
         }
         $('#start').click();
     });
-    $(document).resize(function() {
+    $(window).resize(function() {
         $('div.popup')
             .css( "max-height", $("#center").height() )
             .css( "max-width", $("#center").width() );
         $('div.popup_body')
             .css( "max-height", $("#center").height() - 22 )
             .css( "max-width", $("#center").width() );
+        resizeHeight($('div.popup_body'));
+        resizeWidth($('div.popup_body'));
     });
+}
+
+function hasVertScrollBar( element ) {
+        return element.get(0).scrollHeight > element.height();
+}
+
+function hasHorScrollBar( element ) {
+        return element.get(0).scrollWidth > element.width();
+}
+
+function moveResizeVert( element ) {
+    if(hasVertScrollBar(element) == true) {
+        $('div.ui-resizable-se').css('right', '20px');
+    } else {
+        $('div.ui-resizable-se').css('right', '1px');
+    }
+}
+
+function moveResizeHor( element ) {
+    if(hasHorScrollBar(element) == true) {
+        $('div.ui-resizable-se').css('bottom', '20px');
+    } else {
+        $('div.ui-resizable-se').css('bottom', '1px');
+    }
+}
+
+function resizeHeight( element ) {
+    var elemsh = element.get(0).scrollHeight;
+    var elemh = element.height();
+    var centerh = $('#center').height();
+    var newHeight = '0';
+    if(element.hasClass('popup_body_max')) {
+        newHeight = centerh;
+    } else {
+        if(elemsh > centerh) {
+            newHeight = centerh;
+        } else if(elemsh > elemh) {
+            newHeight = elemsh;
+        }
+    }
+    if(newHeight > elemh) {
+        element.parents('.popup').css('height', newHeight + 22);
+        element.css('height', newHeight);
+    }
+    moveResizeVert( element );
+    moveResizeHor( element );
+}
+
+function resizeWidth( element ) {
+    var elemsw = element.get(0).scrollWidth;
+    var elemw = element.width();
+    var centerw = $('#center').width();
+    var newWidth = '0';
+    if(element.hasClass('popup_body_max')) {
+        newWidth = centerw;
+    } else {
+        if(elemsw > centerw) {
+            newWidth = centerw;
+        } else {
+            newWidth = elemsw;
+        }
+    }
+    if(newWidth > elemw) {
+        element.parents('.popup').css('height', newWidth + 22);
+        element.css('height', newWidth);
+    }
+    moveResizeVert( element );
+    moveResizeHor( element );
 }
 
 function noOwnedServers()
@@ -227,7 +301,10 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 
     $('#serverpu').append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
-   
+    resizeHeight($('#serverpu'));
+    resizeWidth($('#serverpu'));
+    moveResizeVert($('#serverpu'));
+    moveResizeHor($('#serverpu'));
     tempCache( "currentserver", id );
     tempCache( "currentcpu", cpu );
     tempCache( "currentram", ram );
@@ -254,6 +331,10 @@ function serverPrograms( list )
         var pro = list[ i ];
         addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ] );
     }
+    resizeHeight($('#serverpu'));
+    resizeWidth($('#serverpu'));
+    moveResizeVert($('#serverpu'));
+    moveResizeHor($('#serverpu'));
 }
 
 function checkFreePrograms()
@@ -393,6 +474,7 @@ function removeServerProgram( id, callback )
 function noServerProcesses()
 {
     $('#processdiv').html( "This server has no processes!" );
+    //resizeHeight($('#serverpu'));
     updateProgramOperations();
 }
 
@@ -458,6 +540,7 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
             PROCESS_ID: getSimpleID( $(this) )
         });
     });
+    resizeHeight($('#serverpu'));
 }
 
 function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
@@ -575,6 +658,7 @@ function updateProgramOperations( )
             deleteobj.attr( "title", "" );
         }
     }
+    resizeHeight($('#serverpu'));
 }
 
 function notEnoughFileSpace()
