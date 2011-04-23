@@ -83,10 +83,10 @@ html, body {
 
 div.popup {
     background-color:#456;
-    width:384px;
+    width:415px;
     height: 200px;
     min-height:200px;
-    min-width: 384px;
+    min-width: 415px;
     position:relative;
 }
 div.popup_body {
@@ -95,10 +95,10 @@ div.popup_body {
     top: 20px;
     left:0;
     height: 180px;
-    width: 382px;
+    width: 413px;
     min-height:180px;
-    min-width: 382px;
-    background-color:#DDD;
+    min-width: 413px;
+    background-color:#FFF;
     overflow:auto;
 }
 div.popup_max {
