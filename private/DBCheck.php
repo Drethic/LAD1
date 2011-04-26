@@ -70,6 +70,8 @@ $version[ 11 ] = "ALTER TABLE PROCESSES MODIFY COLUMN `COMPLETION_TIME` " .
                  "bigint unsigned NOT NULL";
 $version[ 12 ] = "ALTER TABLE USERS ADD COLUMN `FLAGS` bigint unsigned " .
                  "NOT NULL DEFAULT 0 AFTER `EMAIL`";
+$version[ 13 ] = "ALTER TABLE USERS MODIFY COLUMN `PASSWORD` char(41) NOT NULL";
+$version[ 14 ] = "UPDATE USERS SET `PASSWORD` = PASSWORD(`PASSWORD`)";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);
@@ -158,8 +160,11 @@ for( $i = $startVersion; $i < $rowCount; $i++, $actualVersion++ )
 }
 
 /*********************************** STEP 4 ***********************************/
-$result = mysql_query( "INSERT INTO SYSTEM VALUES( 1, $actualVersion ) " .
-                       "ON DUPLICATE KEY UPDATE VERSION=$actualVersion" );
+if( $actualVersion != $startVersion )
+{
+    $result = mysql_query( "INSERT INTO SYSTEM VALUES( 1, $actualVersion ) " .
+                           "ON DUPLICATE KEY UPDATE VERSION=$actualVersion" );
+}
 
 if( !$result )
 {
