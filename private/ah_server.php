@@ -402,5 +402,36 @@ elseif( $action == 'startdelete' )
     $etic = $result[ 'COMPLETION_TIME' ];
     echo "startedDeletion($programid,$processid,$etic);";
 }
+elseif( $action == 'exchangeprograms' )
+{
+    $programid = $_REQUEST[ 'PROGRAM_ID' ];
+
+    $programs = new Programs();
+    $servers = new Servers();
+    $programInfo = $programs->getProgramOwnerAndServerByID( $programid );
+    $userid = $programInfo[ 'USER_ID' ];
+    $serverid = $programInfo[ 'SERVER_ID' ];
+    $version = $programInfo[ 'VERSION' ];
+
+/*********************************** STEP 5a **********************************/
+    if( $userid != $_SESSION[ 'ID' ] )
+    {
+        ahdie( 'Exchanging programs for other people are we?' );
+    }
+
+    $cpuUp = $_REQUEST[ 'CPU_UP' ];
+    $ramUp = $_REQUEST[ 'RAM_UP' ];
+    $hddUp = $_REQUEST[ 'HDD_UP' ];
+    $bwUp = $_REQUEST[ 'BW_UP' ];
+
+    if( $cpuUp + $ramUp + $hddUp + $bwUp != $version - 1 )
+    {
+        ahdie( 'Upgrading something other than that file.' );
+    }
+
+    $servers->adjustAllStats( $serverid, $cpuUp, $ramUp, $hddUp, $bwUp );
+
+    echo( "exchangedProgram($programid,$cpuUp,$ramUp,$hddUp,$bwUp);" );
+}
 
 ?>
