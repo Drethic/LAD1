@@ -442,7 +442,7 @@ function addServerProgram( id, serverid, type, size, version )
         {
             // TODO: Fill in exchange client side stuff
         }
-    })
+    });
 
     tempCache( "program-" + id + "-server", serverid );
     tempCache( "program-" + id + "-type", type, function(elem,val){
