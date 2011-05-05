@@ -197,7 +197,7 @@ function hasHorScrollBar( element )
 function moveResizeVert( element ) {
     if( hasVertScrollBar(element) == true )
     {
-        $('div.ui-resizable-se').css('left', '20px');
+        $('div.ui-resizable-se').css('right', '20px');
     }
     else
     {
