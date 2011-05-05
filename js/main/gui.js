@@ -19,12 +19,15 @@ function validLogin( id )
         ,   resizable: false
         }}).sizePane("south", 44);
 
+    createWindow( "Explorer" );
     createWindow( "Servers" );
-
+    createWindow( "Options" );
+    createWindow( "Admin" );
+    
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
-        .append("<div id='menu' class='inner'>Start Menu INW</div>");
+        .append("<div id='menu' class='inner'></div>");
 
     $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
@@ -48,12 +51,30 @@ function validLogin( id )
         }
     });
 
-    $("#menu").append("<button id='logout'>Logout</button>")
-      .append( "<br><button id='Servers'>Servers</button>" );
+    $("#menu")
+        .append( "<button id='Explorer'>Explorer</button>" )
+        .append( "<button id='Servers'>Servers</button>" )
+        .append( "<button id='Options'>Options</button>" )
+        .append( "<button id='Admin'>Admin</button>" )
+        .append( "<button id='logout'>Logout</button>" );
+
+    $("#Explorer").button({icons: {primary: "ui-icon-locked"}});
+    $("#Servers").button({icons: {primary: "ui-icon-image"}});
+    $("#Options").button({icons: {primary: "ui-icon-gear"}});
+    $("#Admin").button({icons: {primary: "ui-icon-star"}});
+    $("#logout").button({icons: {primary: "ui-icon-power"}});
 
     $("#logout").click(function( evt ){
         window.location = '';
         doLogin();
+    });
+    $("#Options").click(function( evt ){
+        alert('Options INW');
+        $('#start').click();
+    });
+    $("#Admin").click(function( evt ){
+        alert('Admin INW');
+        $('#start').click();
     });
     $("button#Servers").click(function( evt ){
         var _id = $(this).attr('id');
@@ -61,6 +82,21 @@ function validLogin( id )
             $('div#'+_id).fadeIn();
             $("div#"+_id+"pu").empty();
             requestServers();
+	}
+	if (!$('div#'+_id).hasClass('popup')) {
+            $('div#'+_id).addClass('popup');
+	}
+        if ($('#jTaskBar').find('div#'+_id).hasClass('jTask-hidden')){
+            $('#jTaskBar').find('div#'+_id).removeClass('jTask-hidden');
+            $('div#'+_id).fadeIn();
+        }
+        $('#start').click();
+    });
+    $("button#Explorer").click(function( evt ){
+        var _id = $(this).attr('id');
+	if ($('div#'+_id).css('display') == 'none') {
+            $('div#'+_id).fadeIn();
+            $("div#"+_id+"pu").empty();
 	}
 	if (!$('div#'+_id).hasClass('popup')) {
             $('div#'+_id).addClass('popup');
@@ -184,7 +220,6 @@ function createWindow( name )
         )
         .append(
             $("<div id='" + name + "pu' class='popup_body'></div>")
-                //.resizable()
                 .css( {
                     "max-height": $("#center").height() - 20,
                     "max-width": $("#center").width()
@@ -202,8 +237,8 @@ function createWindow( name )
             moveResizeElement($('#' + name + ' .popup_body'));
         })
         .resizable({
-            'alsoResize': "#" + name + "pu",
-            'containment': '#center'
+            'containment': '#center',
+            'alsoResize': "#" + name + "pu"
         })
         .draggable({
             'opacity': '0.7',
