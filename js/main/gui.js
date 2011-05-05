@@ -109,6 +109,14 @@ function createWindow( name )
                     var div = $(this).parents('.popup');
                     if( !div.hasClass('popup_max') )
                     {
+                        tempCache ( "puheight" + div.attr("id"), div.height() );
+                        tempCache ( "pubheight" +
+                            div.find('.popup_body').attr("id"),
+                            div.find('.popup_body').height() );
+                        tempCache ( "puwidth" + div.attr("id"), div.width() );
+                        tempCache ( "pubwidth" + 
+                            div.find('.popup_body').attr("id"),
+                            div.find('.popup_body').width() );
                         div.addClass('popup_max')
                             .removeAttr('style')
                             .css( "height", $("#center").height() )
@@ -127,11 +135,19 @@ function createWindow( name )
                     {
                         div.removeClass('popup_max')
                             .removeAttr('style')
+                            .css( "height", getTempCache( "puheight" +
+                            div.attr("id")) )
+                            .css( "width", getTempCache( "puwidth" +
+                            div.attr("id")) )
                             .css( "max-height", $("#center").height() )
                             .css( "max-width", $("#center").width() );
                         div.find('.popup_body')
                             .removeClass('popup_body_max')
                             .removeAttr('style')
+                            .css( "height", getTempCache( "pubheight" +
+                            div.find('.popup_body').attr("id")) )
+                            .css( "width", getTempCache( "pubwidth" +
+                            div.find('.popup_body').attr("id")) )
                             .css( "max-height", $("#center").height() - 20 )
                             .css( "max-width", $("#center").width() );
                         div.find('.restore_popup').attr('title', 'Maximize')
