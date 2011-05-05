@@ -1,18 +1,14 @@
 function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 {
-    $('#serverpu').html( "Server #" + id );
-    $('#serverpu').append( "<p id='serverip'>IP: " + intToIP( ip ) + "</p>" )
+    getPopupContext( "Servers" ).html( "Server #" + id )
+      .append( "<p id='serverip'>IP: " + intToIP( ip ) + "</p>" )
       .append( "<p id='servercpu'>CPU: " + cpu + "</p>" )
       .append( "<p id='serverram'>RAM: " + ram + "</p>" )
       .append( "<p id='serverhdd'>HDD: " + hdd + "</p>" )
-      .append( "<p id='serverbw'>BW: " + bw + "</p>" );
-
-    $('#serverpu').append( "<div id='programdiv'></div>" )
+      .append( "<p id='serverbw'>BW: " + bw + "</p>" )
+      .append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
-    resizeHeight($('#serverpu'));
-    resizeWidth($('#serverpu'));
-    moveResizeVert($('#serverpu'));
-    moveResizeHor($('#serverpu'));
+
     tempCache( "currentserver", id );
     tempCache( "serverowner", owner );
     tempCache( "serverip", ip );
@@ -22,6 +18,11 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
     tempCache( "serverbw", bw );
     tempCache( "processes" );
     tempCache( "programs" );
+}
+
+function endServerView()
+{
+    resizePopup( "Servers" );
 }
 
 function noServerPrograms()
@@ -41,10 +42,7 @@ function serverPrograms( list )
         var pro = list[ i ];
         addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ] );
     }
-    resizeHeight($('#serverpu'));
-    resizeWidth($('#serverpu'));
-    moveResizeVert($('#serverpu'));
-    moveResizeHor($('#serverpu'));
+    resizePopup( "Servers" );
 }
 
 function checkFreePrograms()
@@ -316,7 +314,6 @@ function updateProgramOperations( )
             deleteobj.attr( "title", "" );
         }
     }
-    resizeHeight($('#serverpu'));
 }
 
 function notEnoughFileSpace()
@@ -395,6 +392,7 @@ function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
         noServerProcesses();
     }
 
+    endServerView();
     removeServerProgram( programid );
 
     var prefix = "<div class='positivemodifier'>+";

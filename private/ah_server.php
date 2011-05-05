@@ -122,6 +122,8 @@ elseif( $action == 'viewserver' )
     $allProcesses = $processes->getProcessesByServer( $id );
 
     echo2DArray( 'serverProcesses', 'noServerProcesses', $allProcesses );
+
+    echo( 'endServerView();' );
 }
 /*********************************** STEP 4 ***********************************/
 elseif( $action == 'freeprograms' )

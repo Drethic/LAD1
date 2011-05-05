@@ -1,16 +1,19 @@
 function noOwnedServers()
 {
-    $('#serverpu').html( "You don't have any servers!" )
+    getPopupContext( "Servers" ).html( "You don't have any servers!" )
       .append( "<button id='requestfree'>Request a Free One</button>");
 
     $('#requestfree').click(function( evt ){
         doAjax( "requestfreeserver" );
     });
+
+    resizePopup( "Servers" );
 }
 
 function ownedServers( list )
 {
-    $('#serverpu').html( "<table id='servertable'><thead><td>IP</td><td>" +
+    getPopupContext( "Servers" ).html(
+        "<table id='servertable'><thead><td>IP</td><td>" +
         "CPU</td><td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
 
     var serverids = new Array();
@@ -45,6 +48,8 @@ function ownedServers( list )
     });
 
     tempCache( "servers", serverids.join(",") );
+
+    resizePopup( "Servers" );
 }
 
 function requestServers()
