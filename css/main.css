@@ -49,10 +49,29 @@ html, body {
     left: 0;
     bottom: 44px;
     width: 150px;
-    height: 72px;
+    min-height: 72px;
     padding: 6px;
-    background-color: #4c5;
-    color: #333;
+    /*background-color: #000;*/
+    color: #000;
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0.16, #000000),
+        color-stop(0.90, #918E91)
+    );
+    background-image: -moz-linear-gradient(
+        center bottom,
+        #000000 16%,
+        #918E91 90%
+    );
+}
+
+button#logout, button#Servers, button#Explorer, button#Admin, button#Options {
+    width: 150px;
+    height: 26px;
+    font-size: 12px;
+    text-align: left;
 }
 
 #taskbar {
@@ -104,10 +123,8 @@ div.popup_body {
 div.popup_max {
     top: 0px !important;
     left: 0px !important;
-    /*width: 100%;*/
 }
 div.popup_body_max {
-    /*width: 100%;*/
     position: relative;
 }
 div.popup_header {
