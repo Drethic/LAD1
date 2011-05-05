@@ -109,6 +109,9 @@ function createWindow( name )
                     var div = $(this).parents('.popup');
                     if( !div.hasClass('popup_max') )
                     {
+                        div.draggable( "destroy" );
+                        div.resizable( "destroy" );
+                        div.find('.popup_header').css( "cursor", "default" );
                         tempCache ( "puheight" + div.attr("id"), div.height() );
                         tempCache ( "pubheight" +
                             div.find('.popup_body').attr("id"),
@@ -133,6 +136,17 @@ function createWindow( name )
                     }
                     else
                     {
+                        div.draggable({
+                            'opacity': '0.7',
+                            'cancel': '.popup_body',
+                            'cursor': 'move',
+                            'containment': '#center'
+                        });
+                        div.resizable({
+                            'alsoResize': "#" + name + "pu",
+                            'containment': '#center'
+                        });
+                        div.find('.popup_header').css( "cursor", "move" );
                         div.removeClass('popup_max')
                             .removeAttr('style')
                             .css( "height", getTempCache( "puheight" +
