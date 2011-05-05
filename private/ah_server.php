@@ -53,6 +53,9 @@
  * 8a. Make sure file belongs to user
  * 8b. Make sure no other operations are being performed
  * 8c. Start process
+ *
+ * @TODO: Enforce RAM management for starting processes
+ * @TODO: Reorganize process structure for CPU distribution, then enforce
  */
 
 require_once( 'private/users.php' );
