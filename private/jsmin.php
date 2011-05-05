@@ -269,7 +269,7 @@ class JSMin {
       }
     }
 
-    return str_replace( "\n", '', $this->output );
+    return $this->output;
   }
 
   /* next -- get the next character, excluding comments. peek() is used to see

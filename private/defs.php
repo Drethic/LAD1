@@ -399,6 +399,7 @@ function clientfile_cache( $type, $base )
     if( $type == 'J' && !in_array( $base, $GLOBALS['JQUERY_FILES'] ) )
     {
         $outBuffer = JSMin::minify( $outBuffer );
+        $outBuffer = str_replace( "\n", '', $outBuffer );
     }
     file_put_contents( $cacheFileName, $outBuffer );
 }
