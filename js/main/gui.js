@@ -200,9 +200,9 @@ function createWindow( name )
                             .css( "width", getTempCache( "puwidth" +
                             div.attr("id")) )
                             .css( "top", getTempCache ( "putop" +
-                            div.attr("id")) )
+                            div.attr("id")) - 1 )
                             .css( "left", getTempCache ( "puleft" +
-                            div.attr("id")) )
+                            div.attr("id")) - 1 )
                             .css( "max-height", $("#center").height() )
                             .css( "max-width", $("#center").width() );
                         div.find('.popup_body')
