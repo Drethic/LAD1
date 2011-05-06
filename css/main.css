@@ -52,19 +52,20 @@ html, body {
     min-height: 72px;
     padding: 6px;
     /*background-color: #000;*/
-    color: #000;
+    color: #FFF;
     background-image: -webkit-gradient(
         linear,
         left bottom,
         left top,
-        color-stop(0.16, #000000),
+        color-stop(0.10, #000000),
         color-stop(0.90, #918E91)
     );
     background-image: -moz-linear-gradient(
         center bottom,
-        #000000 16%,
+        #000000 10%,
         #918E91 90%
     );
+    text-align: center;
 }
 
 button#logout, button#Servers, button#Explorer, button#Admin, button#Options {
@@ -106,7 +107,7 @@ div.popup {
     height: 200px;
     min-height:200px;
     min-width: 415px;
-    position:relative;
+    position:absolute;
 }
 div.popup_body {
     border:solid 1px;
