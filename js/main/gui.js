@@ -25,14 +25,17 @@ function validLogin( id )
     createWindow( "Admin" );
     
     $("#taskbar")
-        .addClass("slide")
-        .append("<div id='start' class='start-menu-button'></div>")
-        .append("<div id='menu' class='inner'></div>");
-
-    $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
 
     $('#jTaskBar').find('div#Servers').remove();
+    $('#jTaskBar').find('div#Explorer').remove();
+    $('#jTaskBar').find('div#Options').remove();
+    $('#jTaskBar').find('div#Admin').remove();
+
+    $("#taskbar")
+        .addClass("slide")
+        .append("<div id='start' class='start-menu-button'></div>")
+        .append("<div id='menu' class='inner'>LAD Task Menu</div>");
 
     $("#menu").css({"display" : "none"});
 
@@ -50,10 +53,10 @@ function validLogin( id )
             $("#menu").slideToggle();
         }
     });
-
+    
     $("#menu")
-        .append( "<button id='Explorer'>Explorer</button>" )
         .append( "<button id='Servers'>Servers</button>" )
+        .append( "<button id='Explorer'>Explorer</button>" )
         .append( "<button id='Options'>Options</button>" )
         .append( "<button id='Admin'>Admin</button>" )
         .append( "<button id='logout'>Logout</button>" );
@@ -64,15 +67,17 @@ function validLogin( id )
     $("#Admin").button({icons: {primary: "ui-icon-star"}});
     $("#logout").button({icons: {primary: "ui-icon-power"}});
 
-    $("#logout").click(function( evt ){
+    $("button#logout").click(function( evt ){
         window.location = '';
         doLogin();
     });
-    $("#Options").click(function( evt ){
+    $("button#Options").click(function( evt ){
+        var _id = $(this).attr('id');
         alert('Options INW');
         $('#start').click();
     });
-    $("#Admin").click(function( evt ){
+    $("button#Admin").click(function( evt ){
+        var _id = $(this).attr('id');
         alert('Admin INW');
         $('#start').click();
     });
@@ -143,11 +148,14 @@ function createWindow( name )
             .append($("<div class='max_popup' title='Maximize'><span>\u25a1</span></div>")
                 .click( function() {
                     var div = $(this).parents('.popup');
+                    var offset = div.offset();
                     if( !div.hasClass('popup_max') )
                     {
                         div.draggable( "destroy" );
                         div.resizable( "destroy" );
                         div.find('.popup_header').css( "cursor", "default" );
+                        tempCache ( "putop" + div.attr("id"), offset.top );
+                        tempCache ( "puleft" + div.attr("id"), offset.left );
                         tempCache ( "puheight" + div.attr("id"), div.height() );
                         tempCache ( "pubheight" +
                             div.find('.popup_body').attr("id"),
@@ -158,6 +166,7 @@ function createWindow( name )
                             div.find('.popup_body').width() );
                         div.addClass('popup_max')
                             .removeAttr('style')
+                            .css("z-index", "10010")
                             .css( "height", $("#center").height() )
                             .css( "width", $("#center").width() );
                         div.find('.popup_body')
@@ -185,9 +194,14 @@ function createWindow( name )
                         div.find('.popup_header').css( "cursor", "move" );
                         div.removeClass('popup_max')
                             .removeAttr('style')
+                            .css("z-index", "10009")
                             .css( "height", getTempCache( "puheight" +
                             div.attr("id")) )
                             .css( "width", getTempCache( "puwidth" +
+                            div.attr("id")) )
+                            .css( "top", getTempCache ( "putop" +
+                            div.attr("id")) )
+                            .css( "left", getTempCache ( "puleft" +
                             div.attr("id")) )
                             .css( "max-height", $("#center").height() )
                             .css( "max-width", $("#center").width() );
