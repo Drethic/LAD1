@@ -19,33 +19,29 @@ function ownedServers( list )
     var serverids = new Array();
     for( var i = 0; i < list.length; i++ )
     {
+        var obj = list[ i ];
         var tempOut = "<tr>";
-        tempOut += "<td><a href='#server-" + list[ i ][ 0 ] + "' " +
-                   "title='View Server'>" + intToIP( list[ i ][ 2 ] ) +
-                   "</a></td>";
-        for( var j = 3; j < list[ i ].length; j++ )
+        tempOut += "<td><button href='#server-" + obj[ 0 ] + "' " +
+                   "title='View Server' id='server-" + obj[ 0 ] + "-link'>" +
+                   intToIP( obj[ 2 ] ) + "</button></td>";
+        for( var j = 3; j < obj.length; j++ )
         {
-            tempOut += "<td>" + list[ i ][ j ] + "</td>";
+            tempOut += "<td>" + obj[ j ] + "</td>";
         }
         tempOut += "</tr>";
-        serverids[ i ] = list[ i ][ 0 ];
+        serverids[ i ] = obj[ 0 ];
         $('#servertable').append( tempOut );
-        tempCache( "server-" + list[ i ][ 0 ] + "-ip", list[ i ][ 2 ] );
-        tempCache( "server-" + list[ i ][ 0 ] + "-cpu", list[ i ][ 3 ] );
-        tempCache( "server-" + list[ i ][ 0 ] + "-ram", list[ i ][ 4 ] );
-        tempCache( "server-" + list[ i ][ 0 ] + "-hdd", list[ i ][ 5 ] );
-        tempCache( "server-" + list[ i ][ 0 ] + "-bw", list[ i ][ 6 ] );
+        tempCache( "server-" + obj[ 0 ] + "-ip", obj[ 2 ] );
+        tempCache( "server-" + obj[ 0 ] + "-cpu", obj[ 3 ] );
+        tempCache( "server-" + obj[ 0 ] + "-ram", obj[ 4 ] );
+        tempCache( "server-" + obj[ 0 ] + "-hdd", obj[ 5 ] );
+        tempCache( "server-" + obj[ 0 ] + "-bw", obj[ 6 ] );
+        $('#server-' + obj[ 0 ] + "-link").click(function(){
+            doAjax( "viewserver", {
+                SERVER_ID: obj[ 0 ]
+            }, "Servers" );
+        });
     }
-    $('#servertable a').click(function( evt ){
-       var t = $(this);
-       var href = t.attr( 'href' );
-       if( href.indexOf( 'server-' ) == 1 )
-       {
-           doAjax( "viewserver", {
-               SERVER_ID: href.slice( 8 )
-           });
-       }
-    });
 
     tempCache( "servers", serverids.join(",") );
 
@@ -54,5 +50,5 @@ function ownedServers( list )
 
 function requestServers()
 {
-    doAjax( "requestservers" );
+    doAjax( "requestservers", undefined, "Servers" );
 }

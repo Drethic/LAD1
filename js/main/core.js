@@ -11,9 +11,42 @@ function restoreForm(frm)
       .attr( "readonly", false );
 }
 
-function doAjax( actionPara, outData )
+function prepareThis()
 {
-    if( outData == undefined )
+    if( this.prototype == undefined )
+    {
+        this.prototype = {
+            popupdata: new Array(),
+            cacheValues: new Array()
+        }
+    }
+}
+
+function doAjax( actionPara, outData, popup )
+{
+    prepareThis();
+    if( popup != undefined )
+    {
+        if( this.prototype == undefined )
+        {
+            this.prototype = {
+                popupdata: new Array()
+            };
+        }
+        var request = "window-" + popup + "-request";
+        var paras = "window-" + popup + "parameters";
+        if( actionPara == undefined && outData == undefined )
+        {
+            actionPara = this.prototype.popupdata[ request ];
+            outData = this.prototype.popupdata[ paras ];
+        }
+        else
+        {
+            this.prototype.popupdata[ request ] = actionPara;
+            this.prototype.popupdata[ paras ] = outData;
+        }
+    }
+    if( outData == undefined || outData == "" )
     {
         outData = {action: actionPara};
     }
@@ -164,24 +197,19 @@ function getTempCache( ind )
 
 function tempCache( ind, val, updateScreen )
 {
+    prepareThis();
     if( ind == undefined )
     {
         alert( "Undefined index for temp cache." );
         return 0;
-    }
-    if( this.prototype == undefined )
-    {
-        this.prototype = {
-            values: new Array()
-        };
     }
     ind = ind.toString();
     if( val != undefined )
     {
         val = val.toString();
     }
-    var old = this.prototype.values[ ind ];
-    this.prototype.values[ ind ] = val;
+    var old = this.prototype.cacheValues[ ind ];
+    this.prototype.cacheValues[ ind ] = val;
     if( updateScreen )
     {
         var obj = $("#" + ind);

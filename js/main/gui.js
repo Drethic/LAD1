@@ -144,7 +144,7 @@ function createWindow( name )
                       "<span class='ui-icon ui-icon-arrowrefresh-1-s'>" +
                       "</span></div>")
                 .click( function() {
-                    refreshCurrent();
+                    refreshCurrent( name );
                 })
             )
             .append($("<div class='min_popup' title='Minimize'><span class='ui-icon " +
@@ -380,4 +380,9 @@ function resizeWidth( element )
 function getPopupContext( name )
 {
     return $('#' + name + 'pu');
+}
+
+function refreshCurrent( name )
+{
+    doAjax( undefined, undefined, name );
 }
