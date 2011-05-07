@@ -196,10 +196,6 @@ function tempCache( ind, val, updateScreen )
                 obj.html( val );
             }
         }
-        else
-        {
-            //alert( this.values.toString() );
-        }
     }
     return old;
 }

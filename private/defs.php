@@ -345,11 +345,22 @@ function clientfile_cache( $type, $base )
 
         }
 
-        $lineArray = preg_split( "[\\r\\n]", $longString );
+        $lineArray = preg_split( "/[\\r\\n]+/", $longString );
     }
     $outBuffer = '';
+    $adminOnly = false;
     foreach( $lineArray as $line )
     {
+        // Skip everything between a pair of '// !ADMIN!'
+        if( strpos( $line, "// !ADMIN!" ) !== false &&
+            !(isset( $_SESSION[ 'isAdmin' ] ) && $_SESSION[ 'isAdmin' ] ) )
+        {
+            $adminOnly = !$adminOnly;
+        }
+        if( $adminOnly )
+        {
+            continue;
+        }
         // URL's are not correct so...let's fix em
         // We need to extract the image name out of the url()
         // and then replace it with a string that we build
@@ -357,7 +368,7 @@ function clientfile_cache( $type, $base )
         if( $urlIndex === false )
         {
             // No URL, just echo out
-            $outBuffer .= $line;
+            $outBuffer .= "$line\n";
         }
         else
         {
@@ -401,7 +412,11 @@ function clientfile_cache( $type, $base )
         $outBuffer = JSMin::minify( $outBuffer );
         $outBuffer = str_replace( "\n", '', $outBuffer );
     }
-    file_put_contents( $cacheFileName, $outBuffer );
+    $modifiedTime = filemtime( $actualFileName );
+    $modifiedTiem = date( DateTime::RFC2822, $modifiedTime );
+    
+    $timeString = "/* File Last Modified: $modifiedTime */\n";
+    file_put_contents( $cacheFileName, $timeString . $outBuffer );
 }
 
 /*************** END OF FUNCTIONS - BEGIN INIT ********************************/

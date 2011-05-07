@@ -22,16 +22,18 @@ function validLogin( id )
     createWindow( "Explorer" );
     createWindow( "Servers" );
     createWindow( "Options" );
+    // !ADMIN!
     createWindow( "Admin" );
-    
+    // !ADMIN!
     $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
 
     $('#jTaskBar').find('div#Servers').remove();
     $('#jTaskBar').find('div#Explorer').remove();
     $('#jTaskBar').find('div#Options').remove();
+    // !ADMIN!
     $('#jTaskBar').find('div#Admin').remove();
-
+    // !ADMIN!
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
@@ -58,13 +60,17 @@ function validLogin( id )
         .append( "<button id='Servers'>Servers</button>" )
         .append( "<button id='Explorer'>Explorer</button>" )
         .append( "<button id='Options'>Options</button>" )
+        // !ADMIN!
         .append( "<button id='Admin'>Admin</button>" )
+        // !ADMIN!
         .append( "<button id='logout'>Logout</button>" );
 
     $("#Explorer").button({icons: {primary: "ui-icon-locked"}});
     $("#Servers").button({icons: {primary: "ui-icon-image"}});
     $("#Options").button({icons: {primary: "ui-icon-gear"}});
+    // !ADMIN!
     $("#Admin").button({icons: {primary: "ui-icon-star"}});
+    // !ADMIN!
     $("#logout").button({icons: {primary: "ui-icon-power"}});
 
     $("button#logout").click(function( evt ){
@@ -76,11 +82,13 @@ function validLogin( id )
         alert('Options INW');
         $('#start').click();
     });
+    // !ADMIN!
     $("button#Admin").click(function( evt ){
         var _id = $(this).attr('id');
         alert('Admin INW');
         $('#start').click();
     });
+    // !ADMIN!
     $("button#Servers").click(function( evt ){
         var _id = $(this).attr('id');
 	if ($('div#'+_id).css('display') == 'none') {
