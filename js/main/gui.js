@@ -28,8 +28,6 @@ function validLogin( id )
     $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
 
-    $('#jTaskBar').empty();
-
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
@@ -103,7 +101,10 @@ function addMenuButton( name, icon, fn )
             // Show the window
             if( obj.css('display') == 'none' )
             {
-                obj.fadeIn();
+                obj.fadeIn().queue(function(){
+                    $(this).updatejTaskBar();
+                    $(this).dequeue();
+                });
                 getPopupContext( id ).empty();
                 fn();
             }
@@ -116,7 +117,10 @@ function addMenuButton( name, icon, fn )
             if( $('#jTaskBar').find('div#'+id).hasClass('jTask-hidden') )
             {
                 $('#jTaskBar').find('div#'+id).removeClass('jTask-hidden');
-                obj.fadeIn();
+                obj.fadeIn().queue(function(){
+                    $(this).updatejTaskBar();
+                    $(this).dequeue();
+                });
             }
         }
     }
@@ -138,19 +142,19 @@ function createWindow( name )
                       "<span class='ui-icon ui-icon-arrowrefresh-1-s'>" +
                       "</span></div>")
                 .click( function() {
-                    refreshCurrent( name );
-                    var div = $(this).parents('.popup');
-                    var centerh = $('#center').height();
-                    var divoff = div.offset().top;
-                    var seoff = div.find('.ui-resizable-se').offset().top;
-                    alert('Center Height: ' + centerh + ', Div Top Offset: ' + divoff + ', SE Top Offset: ' + seoff);
+                    //refreshCurrent( name );
+                    resizeElement($(this).parents('.popup').attr('id'));
                 })
             )
             .append($("<div class='min_popup' title='Minimize'><span class='ui-icon " +
                       "ui-icon-minus'></span></div>")
-                  .click( function() {
-                      $(this).parents('.popup').fadeOut('fast');
-                  })
+                .click( function() {
+                    var popup = $(this).parents('.popup');
+                    popup.fadeOut('fast').queue(function(){
+                            $(this).updatejTaskBar();
+                            $(this).dequeue();
+                    });
+                })
             )
             .append($("<div class='max_popup' title='Maximize'><span>\u25a1</span></div>")
                 .click( function() {
@@ -198,6 +202,9 @@ function createWindow( name )
                             'alsoResize': "#" + name + "pu",
                             'containment': '#center'
                         });
+                        div.bind('dragstop', function(event, ui) {
+                            resizeElement($(this).attr('id'));
+                        });
                         div.find('.popup_header').css( "cursor", "move" );
                         div.removeClass('popup_max')
                             .removeAttr('style')
@@ -231,10 +238,13 @@ function createWindow( name )
             .append($("<div class='close_popup' title='Close'>" +
                       "<span class='ui-icon ui-icon-close'></span></div></div>")
                 .click( function() {
-                    $(this).parents('.popup').fadeOut('fast', function() {
+                    $(this).parents('.popup').fadeOut('fast').queue(function(){
                         $(this).removeClass('popup');
+                        $(this).updatejTaskBar();
+                        $(this).dequeue();
                     });
                     window.location.hash = '';
+                    $(this).updatejTaskBar();
                 })
             )
             .css( "cursor", "move" )
@@ -267,7 +277,33 @@ function createWindow( name )
             'cursor': 'move',
             'containment': '#center'
         })
+        .bind('dragstop', function(event, ui) {
+            resizeElement($(this).attr('id'));
+        })
         .appendTo($('#center'));
+}
+
+function resizeElement( element )
+{
+    //var div = $('#center #' + element);
+    if(element == undefined) {
+        var div = $(this);
+    } else {
+        div = $('#center #' + element);
+    }
+    var divpu = div.find('.popup_body');
+    var divtop = div.offset().top;
+    var centerh = $('#center').height();
+    var divminh = centerh - 200;
+    var divheight = centerh - divtop;
+    var sebottom = div.find('.ui-resizable-se').offset().top + 12;
+    if(sebottom > centerh) {
+        if(divtop > divminh) {
+            div.css('top', divminh);
+        }
+    div.css('height', divheight);
+    divpu.css('height', divheight-20);
+    }
 }
 
 function hasVertScrollBar( element )

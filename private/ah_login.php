@@ -73,9 +73,10 @@ if( $action == 'login' )
 /*********************************** STEP 1b **********************************/
     else
     {
-        $id = $result[0][ "ID" ];
+        $id = $result[ 'ID' ];
         $_SESSION['ID'] = $id;
-        $_SESSION['username'] = $rnick;
+        $_SESSION['username'] = $result[ 'NICK' ];
+        $_SESSION['isAdmin'] = $user->isUserDataAdmin( $result );
         echo "validLogin($id);";
     }
 }
