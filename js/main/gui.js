@@ -28,12 +28,8 @@ function validLogin( id )
     $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
 
-    $('#jTaskBar').find('div#Servers').remove();
-    $('#jTaskBar').find('div#Explorer').remove();
-    $('#jTaskBar').find('div#Options').remove();
-    // !ADMIN!
-    $('#jTaskBar').find('div#Admin').remove();
-    // !ADMIN!
+    $('#jTaskBar').empty();
+
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
@@ -56,69 +52,15 @@ function validLogin( id )
         }
     });
     
-    $("#menu")
-        .append( "<button id='Servers'>Servers</button>" )
-        .append( "<button id='Explorer'>Explorer</button>" )
-        .append( "<button id='Options'>Options</button>" )
-        // !ADMIN!
-        .append( "<button id='Admin'>Admin</button>" )
-        // !ADMIN!
-        .append( "<button id='logout'>Logout</button>" );
-
-    $("#Explorer").button({icons: {primary: "ui-icon-locked"}});
-    $("#Servers").button({icons: {primary: "ui-icon-image"}});
-    $("#Options").button({icons: {primary: "ui-icon-gear"}});
+    addMenuButton( "Servers", "ui-icon-image", requestServers);
+    addMenuButton( "Explorer", "ui-icon-locked", function(){} );
+    addMenuButton( "Options", "ui-icon-gear" );
     // !ADMIN!
-    $("#Admin").button({icons: {primary: "ui-icon-star"}});
+    addMenuButton( "Admin", "ui-icon-star" );
     // !ADMIN!
-    $("#logout").button({icons: {primary: "ui-icon-power"}});
-
-    $("button#logout").click(function( evt ){
+    addMenuButton( "Logout", "ui-icon-power", function(){
         window.location = '';
         doLogin();
-    });
-    $("button#Options").click(function( evt ){
-        var _id = $(this).attr('id');
-        alert('Options INW');
-        $('#start').click();
-    });
-    // !ADMIN!
-    $("button#Admin").click(function( evt ){
-        var _id = $(this).attr('id');
-        alert('Admin INW');
-        $('#start').click();
-    });
-    // !ADMIN!
-    $("button#Servers").click(function( evt ){
-        var _id = $(this).attr('id');
-	if ($('div#'+_id).css('display') == 'none') {
-            $('div#'+_id).fadeIn();
-            $("div#"+_id+"pu").empty();
-            requestServers();
-	}
-	if (!$('div#'+_id).hasClass('popup')) {
-            $('div#'+_id).addClass('popup');
-	}
-        if ($('#jTaskBar').find('div#'+_id).hasClass('jTask-hidden')){
-            $('#jTaskBar').find('div#'+_id).removeClass('jTask-hidden');
-            $('div#'+_id).fadeIn();
-        }
-        $('#start').click();
-    });
-    $("button#Explorer").click(function( evt ){
-        var _id = $(this).attr('id');
-	if ($('div#'+_id).css('display') == 'none') {
-            $('div#'+_id).fadeIn();
-            $("div#"+_id+"pu").empty();
-	}
-	if (!$('div#'+_id).hasClass('popup')) {
-            $('div#'+_id).addClass('popup');
-	}
-        if ($('#jTaskBar').find('div#'+_id).hasClass('jTask-hidden')){
-            $('#jTaskBar').find('div#'+_id).removeClass('jTask-hidden');
-            $('div#'+_id).fadeIn();
-        }
-        $('#start').click();
     });
     $(window).resize(function() {
         $('div.popup')
@@ -129,6 +71,58 @@ function validLogin( id )
             .css( "max-width", $("#center").width() );
         resizeHeight($('div.popup_body'));
         resizeWidth($('div.popup_body'));
+    });
+}
+
+function addMenuButton( name, icon, fn )
+{
+    $("#menu").append( "<button id='" + name + "'>" + name + "</button>" );
+
+    var menuobj = $("button#" + name);
+    if( icon != undefined )
+    {
+        menuobj.button({icons: {primary: icon}});
+    }
+    var enclosedfn;
+    if( fn == undefined )
+    {
+        enclosedfn = function(){
+            alert( name + "INW" );
+        };
+    }
+    else
+    {
+        enclosedfn = function( id ){
+            var obj = $('div#' + id);
+            // Call function if there is no window
+            if( obj.length == 0 )
+            {
+                fn();
+                return;
+            }
+            // Show the window
+            if( obj.css('display') == 'none' )
+            {
+                obj.fadeIn();
+                getPopupContext( id ).empty();
+                fn();
+            }
+            // Make sure it's a popup
+            if( !obj.hasClass( "popup" ) )
+            {
+                obj.addClass('popup');
+            }
+            // Fade in the taskbar entry
+            if( $('#jTaskBar').find('div#'+id).hasClass('jTask-hidden') )
+            {
+                $('#jTaskBar').find('div#'+id).removeClass('jTask-hidden');
+                obj.fadeIn();
+            }
+        }
+    }
+    menuobj.click(function(){
+        $('#start').click();
+        enclosedfn( name );
     });
 }
 
