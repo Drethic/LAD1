@@ -23,7 +23,6 @@
  */
 
 require_once( 'private/defs.php' );
-require_once( 'private/jsmin.php' );
 
 // Setup admin only files
 $adminOnlyFiles = array();
