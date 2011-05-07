@@ -16,6 +16,7 @@ require_once( 'MySqlObject.php' );
 
 class Users extends MySQLObject
 {
+    const ADMIN_FLAG = 0x000000000000001;
 
     function getColumns( )
     {
@@ -71,6 +72,21 @@ class Users extends MySQLObject
     function lookupUserDetails( $id )
     {
         return $this->getSingle( $id );
+    }
+
+    function isUserAdmin( $id )
+    {
+        return $this->isUserDataAdmin( $this->lookupUserDetails( $id ) );
+    }
+
+    function isUserDataAdmin( $array )
+    {
+        if( !isset( $array[ 'FLAGS' ] ) )
+        {
+            die( 'Improper use of isUserDataAdmin. Fix your shit.' );
+        }
+
+        return $array[ 'FLAGS' ] & self::ADMIN_FLAG;
     }
 }
 
