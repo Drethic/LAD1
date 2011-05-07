@@ -103,6 +103,7 @@ function addMenuButton( name, icon, fn )
             {
                 obj.fadeIn().queue(function(){
                     $(this).updatejTaskBar();
+                    obj.trigger( 'mousedown' );
                     $(this).dequeue();
                 });
                 getPopupContext( id ).empty();
