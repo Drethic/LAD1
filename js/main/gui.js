@@ -28,8 +28,6 @@ function validLogin( id )
     $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
 
-    $('#jTaskBar').empty();
-
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
@@ -103,7 +101,10 @@ function addMenuButton( name, icon, fn )
             // Show the window
             if( obj.css('display') == 'none' )
             {
-                obj.fadeIn();
+                obj.fadeIn().queue(function(){
+                    $(this).updatejTaskBar();
+                    $(this).dequeue();
+                });
                 getPopupContext( id ).empty();
                 fn();
             }
@@ -116,7 +117,10 @@ function addMenuButton( name, icon, fn )
             if( $('#jTaskBar').find('div#'+id).hasClass('jTask-hidden') )
             {
                 $('#jTaskBar').find('div#'+id).removeClass('jTask-hidden');
-                obj.fadeIn();
+                obj.fadeIn().queue(function(){
+                    $(this).updatejTaskBar();
+                    $(this).dequeue();
+                });
             }
         }
     }
@@ -143,9 +147,13 @@ function createWindow( name )
             )
             .append($("<div class='min_popup' title='Minimize'><span class='ui-icon " +
                       "ui-icon-minus'></span></div>")
-                  .click( function() {
-                      $(this).parents('.popup').fadeOut('fast');
-                  })
+                .click( function() {
+                    var popup = $(this).parents('.popup');
+                    popup.fadeOut('fast').queue(function(){
+                            $(this).updatejTaskBar();
+                            $(this).dequeue();
+                    });
+                })
             )
             .append($("<div class='max_popup' title='Maximize'><span>\u25a1</span></div>")
                 .click( function() {
@@ -226,10 +234,13 @@ function createWindow( name )
             .append($("<div class='close_popup' title='Close'>" +
                       "<span class='ui-icon ui-icon-close'></span></div></div>")
                 .click( function() {
-                    $(this).parents('.popup').fadeOut('fast', function() {
+                    $(this).parents('.popup').fadeOut('fast').queue(function(){
                         $(this).removeClass('popup');
+                        $(this).updatejTaskBar();
+                        $(this).dequeue();
                     });
                     window.location.hash = '';
+                    $(this).updatejTaskBar();
                 })
             )
             .css( "cursor", "move" )

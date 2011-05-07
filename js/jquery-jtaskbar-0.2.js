@@ -2,28 +2,31 @@
 // Released under the MIT license:
 // http://www.opensource.org/licenses/mit-license.php
 // Version 0.1 (14-Feb-2011)
+// Modified by: Michael Flowers, 2011
 
 jQuery.fn.jTaskBar = function (prop) {
 	// Some default variables:
 	$wrapper = $(this);
         $cwrapper = $("#center");
 	// Set default properties:
-	if (!prop.winClass) { prop.winClass = '.window' }
-	if (!prop.attach) { prop.attach = 'bottom' }
-	if (!prop.autoHide) { prop.autoHide = false }
+	if (!prop.winClass) {prop.winClass = '.window'}
+	if (!prop.attach) {prop.attach = 'bottom'}
+	if (!prop.autoHide) {prop.autoHide = false}
 	// Set attachment class:
 	var jTaskBarClass;
-	if (prop.attach == 'top') { jTaskBarClass = 'jTaskBar-Top' }
-	else if (prop.attach == 'bottom') { jTaskBarClass = 'jTaskBar-Bottom' }
-	else { jTaskBarClass = 'jTaskBar-Bottom' }
+	if (prop.attach == 'top') {jTaskBarClass = 'jTaskBar-Top'}
+	else if (prop.attach == 'bottom') {jTaskBarClass = 'jTaskBar-Bottom'}
+	else {jTaskBarClass = 'jTaskBar-Bottom'}
 	// Append the jTaskBar to the wrapper element.
 	$wrapper.append('<div id="jTaskBar" class="'+jTaskBarClass+'"></div>');
 	$jTaskBar = $wrapper.find('#jTaskBar');
 	// Populate the jTaskBar:
+        /*
 	$cwrapper.children(prop.winClass).each( function() {
 		var _title = $(this).attr('id').replace('_', ' ');
 		$jTaskBar.append('<div id="'+$(this).attr('id')+'" class="jTask"><span>'+_title+'</span></div>');		
 	});
+        */
 	// If 'autoHide' is true, then the jTaskBar will start hidden:
 	if (prop.autoHide) {
 		$jTaskBar.hide();
@@ -57,6 +60,7 @@ jQuery.fn.jTaskBar = function (prop) {
 		$(this).css("z-index", "10001");
 		$jTaskBar.children('.jTask#'+$(this).attr("id")).addClass('jTask-current');
 	});
+        /*
 	$(document).mousemove( function() {
 		// Check which 'windows' are open (visible) and set their class accordingly:
 		$jTaskBar.find('.jTask').each( function() {
@@ -81,11 +85,12 @@ jQuery.fn.jTaskBar = function (prop) {
 			$cwrapper.children(prop.winClass).each( function() {
 				if (!$jTaskBar.find('.jTask#'+$(this).attr('id')).length) { // If there is no jTask that fits this window, add a new jTask to jTaskBar:
 					var _title = $(this).attr('id').replace('_', ' ');
-					$jTaskBar.append('<div id="'+$(this).attr('id')+'" class="jTask"><span>'+_title+'</span></div>');		
+					$jTaskBar.append('<div id="'+$(this).attr('id')+'" class="jTask"><span>'+_title+'</span></div>');
 				}
-			});			
+			});
 		});
 	});
+        */
 	// Trigger the 'mousemove' event handler when clicking on the document.
 	$(document).click( function() {
 		$('body').trigger('mousemove');
@@ -98,14 +103,55 @@ jQuery.fn.jTaskBar = function (prop) {
 		$(this).removeClass('jTask-click');
 		$win = $cwrapper.children('#'+$(this).attr('id')+prop.winClass); // The 'window' that corresponds with this jTask
 		if ($win.css('display') == 'none') {
-			$(this).addClass('jTask-current'); // Set this task to be 'current'
-			$win.fadeIn('fast'); // If this task is minimized, then expand it.
-			$win.trigger('mousedown');
+                    $(this).addClass('jTask-current'); // Set this task to be 'current'
+                    $win.fadeIn('fast').queue(function(){
+                        $(this).updatejTaskBar();
+                        $(this).dequeue();
+                    }); // If this task is minimized, then expand it.
+                    $win.trigger('mousedown');
 		} else if ($(this).hasClass('jTask-current')) {
-			$(this).removeClass('jTask-current'); // This task cannot be 'current' since it is now minimized.
-			$win.fadeOut('fast'); // Minimize task.
+                    $(this).removeClass('jTask-current'); // This task cannot be 'current' since it is now minimized.
+                    $win.fadeOut('fast').queue(function(){
+                        $(this).updatejTaskBar();
+                        $(this).dequeue();
+                    }); // Minimize task.
 		} else {
-			$win.trigger('mousedown'); // If this jTask is neither 'current' nor 'shown', than it must be visible in the background. In this case, clicking on the jTask is just as clicking on the window itself.
+                    $win.trigger('mousedown'); // If this jTask is neither 'current' nor 'shown', than it must be visible in the background. In this case, clicking on the jTask is just as clicking on the window itself.
 		}
 	});
-}
+};
+
+jQuery.fn.updatejTaskBar = function() {
+    $wrapper = $(this);
+    $cwrapper = $("#center");
+    $jTaskBar.find('.jTask').each( function() {
+        $this = $cwrapper.find('.popup#'+$(this).attr('id'));
+        if ($this.css('display') == "none") {
+            $jTaskBar.find('.jTask#'+$(this).attr('id')).addClass('jTask-hidden');
+            $jTaskBar.find('.jTask#'+$(this).attr('id')).removeClass('jTask-current');
+        } else {
+            $jTaskBar.find('.jTask#'+$(this).attr('id')).removeClass('jTask-hidden');
+        }
+    });
+    // Check which jTasks has been closed, and remove those jTasks from the jTaskBar:
+    $jTaskBar.children('.jTask').each( function() {
+        $win = $cwrapper.children('#'+$(this).attr('id')); // The 'window' that corresponds with this jTask
+        if (!$win.hasClass('popup')) {
+            $(this).remove();
+        }
+    });
+    // Check if there are windows with winClass but with no corresponding jTask:
+    $cwrapper.children('.popup').each( function() {
+        var popups = $cwrapper.children('.popup');
+        popups.each( function() {
+            if (!$jTaskBar.find('.jTask#'+$(this).attr('id')).length) { // If there is no jTask that fits this window, add a new jTask to jTaskBar:
+                var _title = $(this).attr('id').replace('_', ' ');
+                $jTaskBar.append('<div id="'+$(this).attr('id')+'" class="jTask"><span>'+_title+'</span></div>');
+                if( popups.length == 1 )
+                {
+                    $jTaskBar.find( '.jTask#' + $(this).attr('id') ).addClass( "jTask-current" );
+                }
+            }
+        });
+    });
+};
