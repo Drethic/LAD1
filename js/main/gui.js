@@ -137,7 +137,8 @@ function createWindow( name )
                       "<span class='ui-icon ui-icon-arrowrefresh-1-s'>" +
                       "</span></div>")
                 .click( function() {
-                    refreshCurrent( name );
+                    //refreshCurrent( name );
+                    resizeElement($(this).parents('.popup').attr('id'));
                 })
             )
             .append($("<div class='min_popup' title='Minimize'><span class='ui-icon " +
@@ -196,6 +197,9 @@ function createWindow( name )
                             'alsoResize': "#" + name + "pu",
                             'containment': '#center'
                         });
+                        div.bind('dragstop', function(event, ui) {
+                            resizeElement($(this).attr('id'));
+                        });
                         div.find('.popup_header').css( "cursor", "move" );
                         div.removeClass('popup_max')
                             .removeAttr('style')
@@ -205,9 +209,9 @@ function createWindow( name )
                             .css( "width", getTempCache( "puwidth" +
                             div.attr("id")) )
                             .css( "top", getTempCache ( "putop" +
-                            div.attr("id")) )
+                            div.attr("id")) - 1 )
                             .css( "left", getTempCache ( "puleft" +
-                            div.attr("id")) )
+                            div.attr("id")) - 1 )
                             .css( "max-height", $("#center").height() )
                             .css( "max-width", $("#center").width() );
                         div.find('.popup_body')
@@ -268,7 +272,33 @@ function createWindow( name )
             'cursor': 'move',
             'containment': '#center'
         })
+        .bind('dragstop', function(event, ui) {
+            resizeElement($(this).attr('id'));
+        })
         .appendTo($('#center'));
+}
+
+function resizeElement( element )
+{
+    //var div = $('#center #' + element);
+    if(element == undefined) {
+        var div = $(this);
+    } else {
+        div = $('#center #' + element);
+    }
+    var divpu = div.find('.popup_body');
+    var divtop = div.offset().top;
+    var centerh = $('#center').height();
+    var divminh = centerh - 200;
+    var divheight = centerh - divtop;
+    var sebottom = div.find('.ui-resizable-se').offset().top + 12;
+    if(sebottom > centerh) {
+        if(divtop > divminh) {
+            div.css('top', divminh);
+        }
+    div.css('height', divheight);
+    divpu.css('height', divheight-20);
+    }
 }
 
 function hasVertScrollBar( element )
@@ -342,8 +372,7 @@ function resizeHeight( element ) {
     {
         element.parents('.popup').css('top', centerh + centertop - elemh);
     }
-    moveResizeVert( element );
-    moveResizeHor( element );
+    moveResizeElement( element );
 }
 
 function resizeWidth( element )
@@ -373,8 +402,7 @@ function resizeWidth( element )
         element.parents('.popup').css('left', centerw + centerleft - elemw);
     }
 
-    moveResizeVert( element );
-    moveResizeHor( element );
+    moveResizeElement( element );
 }
 
 function getPopupContext( name )

@@ -458,6 +458,6 @@ function startExchangeProgram( id )
             }, "Servers" );
         })
     ).append(
-        //zomg...
+        // wait
     );
 }

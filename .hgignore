@@ -1,2 +1,6 @@
 ^nbproject/project\.properties$
 ^nbproject/project\.xml$
+^js/cache$
+^css/cache$
+^clearcache\.bat$
+^js/jquery-ui-1\.8\.10\.custom\.min\.bak$
