@@ -27,12 +27,6 @@ function doAjax( actionPara, outData, popup )
     prepareThis();
     if( popup != undefined )
     {
-        if( this.prototype == undefined )
-        {
-            this.prototype = {
-                popupdata: new Array()
-            };
-        }
         var request = "window-" + popup + "-request";
         var paras = "window-" + popup + "parameters";
         if( actionPara == undefined && outData == undefined )
