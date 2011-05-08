@@ -16,7 +16,6 @@
  *
  * Abstracts:
  *       getColumns() : Return an array with column names in the values
- *         getIndex() : Return an int with the column that is the index
  *     getTableName() : Return the table name
  *
  * Todo:
@@ -26,7 +25,6 @@
 abstract class MySQLObject
 {
    abstract protected function getColumns();
-   abstract protected function getIndex();
    abstract protected function getTableName();
 
    // Filters = key/value for columnName/columnValue
@@ -161,8 +159,7 @@ abstract class MySQLObject
    public function getSingle( $value )
    {
        $columns = $this->getColumns();
-       $index = $this->getIndex();
-       $columnStr = $columns[ $index ];
+       $columnStr = $columns[ 0 ];
        $ret = $this->get( array( $columnStr => $value ), NULL, 1 );
        if( count( $ret ) == 0 )
        {
@@ -216,7 +213,7 @@ abstract class MySQLObject
        return $ret;
    }
 
-   protected function getCustom( $sql )
+   protected static function getCustom( $sql )
    {
        $result = mysql_query( $sql );
 
@@ -278,10 +275,51 @@ abstract class MySQLObject
    protected function adjustSingleByID( $id, $field, $amount )
    {
        $columns = $this->getColumns();
-       $index = $this->getIndex();
-       $indexStr = $columns[ $index ];
+       $indexStr = $columns[ 0 ];
        return $this->update( array( $field => "$field+$amount" ),
                              array( $indexStr => $id ) );
+   }
+   
+   public static function getAll( $tableName )
+   {
+       return MySQLObject::getCustom( "SELECT * FROM `$tableName`" );
+   }
+   
+   public static function getAllAsJS( $tableName )
+   {
+       $arr = MySQLObject::getAll( $tableName );
+       $ret = '[';
+       $rcount = count( $arr );
+       for( $r = 0; $r < $rcount; $r++ )
+       {
+           $row = $arr[ $r ];
+           $ret .= '[';
+           $ccount = count( $row );
+           $keys = array_keys( $row );
+           for( $c = 0; $c < $ccount; $c++ )
+           {
+               $column = $row[ $keys[ $c ] ];
+               if( is_string( $column ) )
+               {
+                   $ret .= "'$column'";
+               }
+               else
+               {
+                   $ret .= $column;
+               }
+               if( $c < $ccount - 1 )
+               {
+                   $ret .= ',';
+               }
+           }
+           $ret .= ']';
+           if( $r < $rcount - 1 )
+           {
+               $ret .= ',';
+           }
+       }
+       $ret .= ']';
+       return $ret;
    }
 }
 

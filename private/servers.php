@@ -17,17 +17,12 @@ class Servers extends MySQLObject
                       'BANDWIDTH' );
     }
 
-    function getIndex( )
-    {
-        return 0;
-    }
-
     function getTableName( )
     {
         return 'SERVERS';
     }
 
-    function getAvailableIP( )
+    static function getAvailableIP( )
     {
         // Get what IPs are already taken
         $takenIPs = $this->getOnlyColumn( 'IP' );

@@ -16,11 +16,6 @@ class Programs extends MySQLObject
         return array( 'ID', 'SERVER_ID', 'TYPE', 'SIZE', 'VERSION' );
     }
 
-    function getIndex( )
-    {
-        return 0;
-    }
-
     function getTableName( )
     {
         return 'PROGRAMS';

@@ -18,11 +18,6 @@ class Processes extends MySQLObject
                       'LINKED_ID' );
     }
 
-    function getIndex( )
-    {
-        return 0;
-    }
-
     function getTableName( )
     {
         return 'PROCESSES';

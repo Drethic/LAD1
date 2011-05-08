@@ -23,11 +23,6 @@ class Users extends MySQLObject
         return array( 'ID', 'NICK', 'PASSWORD', 'EMAIL', 'FLAGS' );
     }
 
-    function getIndex( )
-    {
-        return 0;
-    }
-
     function getTableName( )
     {
         return 'USERS';
