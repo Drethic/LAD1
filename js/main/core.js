@@ -395,3 +395,20 @@ function getSimpleID( obj )
     var arr = longid.split( "-" );
     return arr[ 1 ];
 }
+
+function addScriptElement( url, callback )
+{
+    //var script = document.createElement( 'script' );
+    //script.type = 'text/javascript';
+    //script.src = url;
+    var script = $("<script>");
+    script.attr( 'type', 'text/javascript' );
+    script.attr( 'src', url );
+    script.load( function(){
+        eval( callback );
+    });
+    $("head").append( script );
+    //var head = document.getElementsByTagName( "head" )[ 0 ];
+    //head.appendChild( script );
+    //$("body").append( script );
+}

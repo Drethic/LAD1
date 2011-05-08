@@ -22,9 +22,6 @@ function validLogin( id )
     createWindow( "Explorer" );
     createWindow( "Servers" );
     createWindow( "Options" );
-    // !ADMIN!
-    createWindow( "Admin" );
-    // !ADMIN!
     $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
 
@@ -53,9 +50,6 @@ function validLogin( id )
     addMenuButton( "Servers", "ui-icon-image", requestServers);
     addMenuButton( "Explorer", "ui-icon-locked", function(){} );
     addMenuButton( "Options", "ui-icon-gear" );
-    // !ADMIN!
-    addMenuButton( "Admin", "ui-icon-star" );
-    // !ADMIN!
     addMenuButton( "Logout", "ui-icon-power", function(){
         window.location = '';
         doLogin();

@@ -76,8 +76,13 @@ if( $action == 'login' )
         $id = $result[ 'ID' ];
         $_SESSION['ID'] = $id;
         $_SESSION['username'] = $result[ 'NICK' ];
-        $_SESSION['isAdmin'] = $user->isUserDataAdmin( $result );
+        $isAdmin = $_SESSION['isAdmin'] = $user->isUserDataAdmin( $result );
         echo "validLogin($id);";
+        if( $isAdmin )
+        {
+            echo 'addScriptElement("' .
+                 clientfile_buildRequest( 'J', 'admin' ) . '","initAdmin();");';
+        }
     }
 }
 /*********************************** STEP 2 ***********************************/
