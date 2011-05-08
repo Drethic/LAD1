@@ -146,7 +146,7 @@ function addServerProgram( id, serverid, type, size, version )
     $('#exchange-' + id).click(function( evt ){
         if( $(this).hasClass( "doableOperation" ) )
         {
-            // TODO: Fill in exchange client side stuff
+            startExchangeProgram( id );
         }
     });
 
@@ -278,6 +278,7 @@ function updateProgramOperations( )
         var hddavail = getProgramSize( programtype, 1 ) < freehdd;
         var researchobj = $('#research-' + programid);
         var deleteobj = $('#delete-' + programid);
+        var exchangeobj = $('#exchange-' + programid);
         // Update the research button accordingly
         if( cantResearch.indexOf( programid ) != -1 )
         {
@@ -300,18 +301,26 @@ function updateProgramOperations( )
             researchobj.attr( "title", "" );
         }
         // Update the delete button accordingly
+        // Also applies to exchange button
         if( cantDelete.indexOf( programid ) != -1 )
         {
             deleteobj.addClass( 'disabledOperation' );
             deleteobj.removeClass( 'doableOperation' );
             deleteobj.attr( "title", "Can't delete because another operation " +
                                      "is already being performed." );
+            exchangeobj.addClass( 'disabledOperation' );
+            exchangeobj.removeClass( 'doableOperation' );
+            exchangeobj.attr( "title", "Can't exchange because another " +
+                                     "operation is already being performed." );
         }
         else
         {
             deleteobj.addClass( 'doableOperation' );
             deleteobj.removeClass( 'disabledOperation' );
             deleteobj.attr( "title", "" );
+            exchangeobj.addClass( 'doableOperation' );
+            exchangeobj.removeClass( 'disabledOperation' );
+            exchangeobj.attr( "title", "" );
         }
     }
 }
@@ -437,5 +446,18 @@ function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
                 tempCache( "serverbw", bw + bwUp, true );
             });
     }
+}
 
+function startExchangeProgram( id )
+{
+    var context = getPopupContext( 'Servers' );
+    context.empty().append(
+        $("<a href='#'>Go Back</a>").click(function(){
+            doAjax( "viewserver", {
+                SERVER_ID: obj[ 0 ]
+            }, "Servers" );
+        })
+    ).append(
+        //zomg...
+    );
 }
