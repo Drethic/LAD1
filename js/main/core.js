@@ -211,7 +211,7 @@ function tempCache( ind, val, updateScreen )
         {
             if( typeof updateScreen === "function" )
             {
-                updateScreen( obj, val );
+                updateScreen( obj, val, old );
             }
             else
             {
