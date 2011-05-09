@@ -240,3 +240,8 @@ div.refresh_popup {
     left:50px;
     right:0;
 }
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}

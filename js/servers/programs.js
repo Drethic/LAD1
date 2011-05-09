@@ -447,17 +447,3 @@ function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
             });
     }
 }
-
-function startExchangeProgram( id )
-{
-    var context = getPopupContext( 'Servers' );
-    context.empty().append(
-        $("<a href='#'>Go Back</a>").click(function(){
-            doAjax( "viewserver", {
-                SERVER_ID: obj[ 0 ]
-            }, "Servers" );
-        })
-    ).append(
-        // wait
-    );
-}
