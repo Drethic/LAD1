@@ -2,7 +2,6 @@ function noServerProcesses()
 {
     $('#processdiv').html( "This server has no processes!" );
     //resizeHeight($('#serverpu'));
-    updateProgramOperations();
 }
 
 function serverProcesses( list )
@@ -13,8 +12,6 @@ function serverProcesses( list )
         addServerProcess( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ],
                           pro[ 5 ], pro[ 6 ], pro[ 7 ] );
     }
-
-    updateProgramOperations();
 }
 
 function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
@@ -67,7 +64,7 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
             PROCESS_ID: getSimpleID( $(this) )
         });
     });
-    resizeHeight($('#serverpu'));
+    //resizeHeight($('#serverpu'));
 }
 
 function startedResearch( programid, processid, completiontime )

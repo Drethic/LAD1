@@ -1,11 +1,11 @@
 function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 {
-    getPopupContext( "Servers" ).html( "Server #" + id )
-      .append( "<p id='serverip'>IP: " + intToIP( ip ) + "</p>" )
-      .append( "<p id='servercpu'>CPU: " + cpu + "</p>" )
-      .append( "<p id='serverram'>RAM: " + ram + "</p>" )
-      .append( "<p id='serverhdd'>HDD: " + hdd + "</p>" )
-      .append( "<p id='serverbw'>BW: " + bw + "</p>" )
+    getPopupContext( "Servers" ).html( "Server #" + id + "<br />" )
+      .append( "<div>IP: <span id='serverip'>" + intToIP( ip ) + "</span></div>" )
+      .append( "<div>CPU: <span id='servercpu'>" + cpu + "</span></div>" )
+      .append( "<div>RAM: <span id='serverram'>" + ram + "</span></div>" )
+      .append( "<div>HDD: <span id='serverhdd'>" + hdd + "</span></div>" )
+      .append( "<div>BW: <span id='serverbw'>" + bw + "</span></div>" )
       .append( "<div id='programdiv'></div>" )
       .append( "<div id='processdiv'></div>" );
 
@@ -23,6 +23,7 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 function endServerView()
 {
     resizePopup( "Servers" );
+    updateProgramOperations();
 }
 
 function noServerPrograms()
@@ -328,122 +329,4 @@ function updateProgramOperations( )
 function notEnoughFileSpace()
 {
     alert( 'Not enough file space!' );
-}
-
-function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
-{
-    // All our data is already cached, simply restore it
-    // TODO: Functionize when this needs to be duplicated
-    var id = toNumber( getTempCache( "currentserver" ) );
-    var owner = toNumber( getTempCache( "serverowner" ) );
-    var ip = toNumber( getTempCache( "serverip" ) );
-    var cpu = toNumber( getTempCache( "servercpu" ) );
-    var ram = toNumber( getTempCache( "serverram" ) );
-    var hdd = toNumber( getTempCache( "serverhdd" ) );
-    var bw = toNumber( getTempCache( "serverbw" ) );
-
-    // Our two big lists
-    var programs = getTempCache( "programs" );
-    var processes = getTempCache( "processes" );
-
-    var programsvalid = programs != "";
-    var processesvalid = processes != "";
-    var i;
-
-    // Build the programs array
-    if( programsvalid )
-    {
-        var programarray = new Array();
-        var programlist = programs.toString().split( "," );
-        for( i = 0; i < programlist.length; i++ )
-        {
-            var progid = programlist[ i ];
-            programarray.push( new Array( progid, id,
-                          getTempCache( "program-" + progid + "-type" ),
-                          getTempCache( "program-" + progid + "-size" ),
-                          getTempCache( "program-" + progid + "-version" )));
-        }
-    }
-
-    // Build the processes array
-    if( processesvalid )
-    {
-        var processarray = new Array();
-        var processlist = processes.toString().split( "," );
-        for( i = 0; i < processlist.length; i++ )
-        {
-            var procid = processlist[ i ];
-            processarray.push( new Array( procid,
-                      getTempCache( "process-" + procid + "-target" ),
-                      getTempCache( "process-" + procid + "-server" ),
-                      getTempCache( "process-" + procid + "-cpu" ),
-                      getTempCache( "process-" + procid + "-ram" ),
-                      getTempCache( "process-" + procid + "-bw" ),
-                      getTempCache( "process-" + procid + "-operation" ),
-                      getTempCache( "process-" + procid + "-completetime" )));
-        }
-    }
-    beginServerView( id, owner, ip, cpu, ram, hdd, bw );
-    if( programsvalid )
-    {
-        serverPrograms( programlist );
-    }
-    else
-    {
-        noServerPrograms();
-    }
-    if( processesvalid )
-    {
-        serverProcesses( processlist );
-    }
-    else
-    {
-        noServerProcesses();
-    }
-
-    endServerView();
-    removeServerProgram( programid );
-
-    var prefix = "<div class='positivemodifier'>+";
-    var postfix = "</div>";
-    if( cpuUp )
-    {
-        $(prefix + cpuUp + postfix)
-            .appendTo( $('#servercpu') )
-            .delay( 1000 )
-            .fadeOut( 500 )
-            .queue(function() {
-                tempCache( "servercpu", cpu + cpuUp, true );
-            });
-    }
-    if( ramUp )
-    {
-        $(prefix + ramUp + postfix)
-            .appendTo( $('#serverram') )
-            .delay( 1000 )
-            .fadeOut( 500 )
-            .queue(function() {
-                tempCache( "serverram", ram + ramUp, true );
-            });
-    }
-    if( hddUp )
-    {
-        $(prefix + hddUp + postfix)
-            .appendTo( $('#serverhdd') )
-            .delay( 1000 )
-            .fadeOut( 500 )
-            .queue(function() {
-                tempCache( "serverhdd", hdd + hddUp, true );
-            });
-    }
-    if( bwUp )
-    {
-        $(prefix + bwUp + postfix)
-            .appendTo( $('#serverbw') )
-            .delay( 1000 )
-            .fadeOut( 500 )
-            .queue(function() {
-                tempCache( "serverbw", bw + bwUp, true );
-            });
-    }
 }

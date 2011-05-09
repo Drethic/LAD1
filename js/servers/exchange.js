@@ -116,3 +116,104 @@ function createRow( name, minpoints, steppoints, availpoints )
     slider.attr( "id", name + "Slider" );
     return res;
 }
+
+function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
+{
+    // All our data is already cached, simply restore it
+    // TODO: Functionize when this needs to be duplicated
+    var id = toNumber( getTempCache( "currentserver" ) );
+    var owner = toNumber( getTempCache( "serverowner" ) );
+    var ip = toNumber( getTempCache( "serverip" ) );
+    var cpu = toNumber( getTempCache( "servercpu" ) );
+    var ram = toNumber( getTempCache( "serverram" ) );
+    var hdd = toNumber( getTempCache( "serverhdd" ) );
+    var bw = toNumber( getTempCache( "serverbw" ) );
+
+    // Our two big lists
+    var programs = getTempCache( "programs" );
+    var processes = getTempCache( "processes" );
+
+    var programsvalid = programs != "";
+    var processesvalid = processes != "";
+    var i;
+
+    // Build the programs array
+    if( programsvalid )
+    {
+        var programarray = new Array();
+        var programlist = programs.toString().split( "," );
+        for( i = 0; i < programlist.length; i++ )
+        {
+            var progid = programlist[ i ];
+            programarray.push( new Array( progid, id,
+                          getTempCache( "program-" + progid + "-type" ),
+                          getTempCache( "program-" + progid + "-size" ),
+                          getTempCache( "program-" + progid + "-version" )));
+        }
+    }
+
+    // Build the processes array
+    if( processesvalid )
+    {
+        var processarray = new Array();
+        var processlist = processes.toString().split( "," );
+        for( i = 0; i < processlist.length; i++ )
+        {
+            var procid = processlist[ i ];
+            processarray.push( new Array( procid,
+                      getTempCache( "process-" + procid + "-target" ),
+                      getTempCache( "process-" + procid + "-server" ),
+                      getTempCache( "process-" + procid + "-cpu" ),
+                      getTempCache( "process-" + procid + "-ram" ),
+                      getTempCache( "process-" + procid + "-bw" ),
+                      getTempCache( "process-" + procid + "-operation" ),
+                      getTempCache( "process-" + procid + "-completetime" )));
+        }
+    }
+    beginServerView( id, owner, ip, cpu, ram, hdd, bw );
+    if( programsvalid )
+    {
+        serverPrograms( programarray );
+    }
+    else
+    {
+        noServerPrograms();
+    }
+    if( processesvalid )
+    {
+        serverProcesses( processarray );
+    }
+    else
+    {
+        noServerProcesses();
+    }
+
+    endServerView();
+    removeServerProgram( programid );
+    applyExchangeAnimation( "servercpu", cpu, cpuUp );
+    applyExchangeAnimation( "serverram", ram, ramUp );
+    applyExchangeAnimation( "serverhdd", hdd, hddUp );
+    applyExchangeAnimation( "serverbw", bw, bwUp );
+}
+
+function applyExchangeAnimation( objectname, orig, up )
+{
+    if( up )
+    {
+        var prefix = "<span class='positivemodifier'>&nbsp;&nbsp;&nbsp;&nbsp;+";
+        var postfix = "</span>";
+        $(prefix + up + postfix)
+            .appendTo( $('#' + objectname) )
+            .delay( 1000 )
+            .fadeOut( 100 )
+            .fadeIn( 100 )
+            .fadeOut( 100 )
+            .fadeIn( 100 )
+            .delay( 1000 )
+            .fadeOut( 300 )
+            .queue(function() {
+                tempCache( "objectname", orig + up, true );
+            });
+    }
+    
+}

@@ -245,3 +245,8 @@ div.refresh_popup {
     margin-left: auto;
     margin-right: auto;
 }
+
+.positivemodifier {
+    color: green;
+    font-weight: bold;
+}
