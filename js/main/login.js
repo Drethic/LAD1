@@ -121,6 +121,8 @@ function doLogin()
             $("#loginform button").button( "disable" );
         }
     }).keyup();
+    
+    $("#username").focus();
 }
 
 function loginError( field, reason )
