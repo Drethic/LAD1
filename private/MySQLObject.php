@@ -33,6 +33,8 @@ abstract class MySQLObject
    // onlyColumns = value for each columnName
    // All except limit expect an array
    // Offset = integer
+   // Returns a 1D array if there are no results, a 2D array if limit = 1,
+   // and a 3D array normally
    public function get( $filters = NULL, $orders = NULL, $limit = 0,
                         $onlyColumns = NULL, $offset = 0 )
    {
@@ -91,6 +93,10 @@ abstract class MySQLObject
        while( $row = mysql_fetch_assoc( $result ) )
        {
            $ret[] = $row;
+       }
+       if( $limit == 1 && count( $ret ) == 1 )
+       {
+           return $ret[ 0 ];
        }
        return $ret;
    }

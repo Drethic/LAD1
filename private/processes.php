@@ -60,6 +60,14 @@ class Processes extends MySQLObject
         return $this->get( array( 'TARGET_PROGRAM' => $programid ),
                            array( 'ID' => 'ASC' ) );
     }
+    
+    function getConsumptionByServer( $serverid )
+    {
+        $ret = $this->get( array( 'OWNING_SERVER' => $serverid ), null, 1,
+                           array( 'SUM(RAM_USAGE) AS USED_RAM',
+                                  'SUM(CPU_USAGE) AS TOTAL_CPU' ) );
+        return $ret;
+    }
 
     function getAllProcesses( )
     {

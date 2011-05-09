@@ -52,3 +52,13 @@ function requestServers()
 {
     doAjax( "requestservers", undefined, "Servers" );
 }
+
+function notEnoughRAM()
+{
+    alert( "Not enough RAM" );
+}
+
+function notEnoughFileSpace()
+{
+    alert( 'Not enough file space!' );
+}

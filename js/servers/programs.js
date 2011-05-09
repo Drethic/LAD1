@@ -325,8 +325,3 @@ function updateProgramOperations( )
         }
     }
 }
-
-function notEnoughFileSpace()
-{
-    alert( 'Not enough file space!' );
-}

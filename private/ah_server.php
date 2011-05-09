@@ -222,6 +222,7 @@ elseif( $action == 'startresearch' )
 
     $programs = new Programs();
     $servers = new Servers();
+    $processes = new Processes();
     $programInfo = $programs->getProgramOwnerAndServerByID( $programid );
     $userid = $programInfo[ 'USER_ID' ];
     $serverid = $programInfo[ 'SERVER_ID' ];
@@ -234,11 +235,13 @@ elseif( $action == 'startresearch' )
     }
 
     $serverInfo = $servers->getServerByID( $serverid );
+    $serverConsumption = $processes->getConsumptionByServer( $serverid );
 
     $maxHDD = $serverInfo[ 'HDD' ];
+    $maxRAM = $serverInfo[ 'RAM' ];
 
     $usedHDD = $programs->getServerUsage( $serverid );
-
+    $usedRAM = $serverConsumption[ 'USED_RAM' ];
     $fileSize = getProgramSize( $programtype );
 
 /*********************************** STEP 5b **********************************/
@@ -246,10 +249,13 @@ elseif( $action == 'startresearch' )
     {
         echo( 'notEnoughFileSpace();' );
     }
+    elseif( DEFAULT_RESEARCH_RAM + $usedRAM > $maxRAM )
+    {
+        echo( 'notEnoughRAM();' );
+    }
     else
     {
         // Get all the processes that will increase the HDD usage on the server
-        $processes = new Processes();
         $consumers = force2DArray(
                  $processes->getHDDConsumersByServer( $serverid ) );
         foreach( $consumers as $consumer )
