@@ -107,7 +107,11 @@ function getClientSideDefines()
         'OP_DELETE' => PROCESS_OP_DELETE,
         'OP_COPY' => PROCESS_OP_COPY,
         'OP_INSTALL' => PROCESS_OP_INSTALL,
-        'OP_UNINSTALL' => PROCESS_OP_UNINSTALL
+        'OP_UNINSTALL' => PROCESS_OP_UNINSTALL,
+        'STEP_CPU' => STEP_CPU,
+        'STEP_RAM' => STEP_RAM,
+        'STEP_HDD' => STEP_HDD,
+        'STEP_BW' => STEP_BW
     );
 }
 
