@@ -212,7 +212,7 @@ function applyExchangeAnimation( objectname, orig, up )
             .delay( 1000 )
             .fadeOut( 300 )
             .queue(function() {
-                tempCache( "objectname", orig + up, true );
+                tempCache( objectname, orig + up, true );
             });
     }
     
