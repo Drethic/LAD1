@@ -94,7 +94,7 @@ class Servers extends MySQLObject
 
     function adjustBW( $server, $amount )
     {
-        return $this->adjustSingleByID( $server, 'BW', $amount );
+        return $this->adjustSingleByID( $server, 'BANDWIDTH', $amount );
     }
 
     function randomizeServerIP( $server )
@@ -108,19 +108,19 @@ class Servers extends MySQLObject
         $changes = array();
         if( $cpu != 0 )
         {
-            $changes[ 'CPU' ] = $cpu;
+            $changes[ 'CPU' ] = "CPU+$cpu";
         }
         if( $ram != 0 )
         {
-            $changes[ 'RAM' ] = $ram;
+            $changes[ 'RAM' ] = "RAM+$ram";
         }
         if( $hdd != 0 )
         {
-            $changes[ 'HDD' ] = $hdd;
+            $changes[ 'HDD' ] = "HDD+$hdd";
         }
         if( $bw != 0 )
         {
-            $changes[ 'BW' ] = $bw;
+            $changes[ 'BANDWIDTH' ] = "BANDWIDTH+$bw";
         }
         return $this->update( $changes, array( 'ID' => $server ) );
     }
