@@ -435,6 +435,7 @@ elseif( $action == 'exchangeprograms' )
     }
 
     $servers->adjustAllStats( $serverid, $cpuUp, $ramUp, $hddUp, $bwUp );
+    $programs->deleteProgram( $programid );
 
     echo( "exchangedProgram($programid,$cpuUp,$ramUp,$hddUp,$bwUp);" );
 }
