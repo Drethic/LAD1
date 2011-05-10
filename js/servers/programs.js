@@ -436,7 +436,7 @@ function updateProgramOperations( )
             setOperationEnabled( exchangeobj, "Can't exchange because another" +
                                  " operation is already being performed." );
         }
-        else if( getTempCache( "program-" + program + "-version" ) == "1" )
+        else if( getTempCache( "program-" + programid + "-version" ) == "1" )
         {
             setOperationEnabled( exchangeobj, "Can't exchange because this " +
                                  "program is only version 1." );
