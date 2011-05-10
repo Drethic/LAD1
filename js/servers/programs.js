@@ -357,22 +357,24 @@ function updateProgramOperations( )
     {
         processes = processstring.split( "," );
     }
-    var i;
+    var i, program;
     var cantResearch = new Array();
     var cantDelete = new Array();
+    var cantExchange = new Array();
     // If a process is being deleted, it can't be researched
     for( i = 0; i < processes.length; i++ )
     {
         var processid = processes[ i ];
         var operation = getTempCache( "process-" + processid + "-operation" );
-        var program = getTempCache( "process-" + processid + "-target" );
         var opstring = intToProcessOperation( operation );
+        program = getTempCache( "process-" + processid + "-target" );
         if( opstring == "Delete" )
         {
             cantResearch.push( program );
         }
         // Can't delete if already doing something
         cantDelete.push( program );
+        cantExchange.push( program );
     }
 
     var totalhdd = toNumber( getTempCache( "serverhdd" ) );
@@ -380,8 +382,8 @@ function updateProgramOperations( )
 
     for( i = 0; i < programs.length; i++ )
     {
-        usedhdd += toNumber( getTempCache( "program-" + programs[ i ] +
-                                           "-size" ) );
+        program = programs[ i ];
+        usedhdd += toNumber( getTempCache( "program-" + programs + "-size" ) );
     }
 
     var freehdd = totalhdd - usedhdd;
@@ -427,16 +429,29 @@ function updateProgramOperations( )
             deleteobj.removeClass( 'doableOperation' );
             deleteobj.attr( "title", "Can't delete because another operation " +
                                      "is already being performed." );
-            exchangeobj.addClass( 'disabledOperation' );
-            exchangeobj.removeClass( 'doableOperation' );
-            exchangeobj.attr( "title", "Can't exchange because another " +
-                                     "operation is already being performed." );
         }
         else
         {
             deleteobj.addClass( 'doableOperation' );
             deleteobj.removeClass( 'disabledOperation' );
             deleteobj.attr( "title", "" );
+        }
+        if( cantExchange.indexOf( programid ) != -1 )
+        {
+            exchangeobj.addClass( 'disabledOperation' );
+            exchangeobj.removeClass( 'doableOperation' );
+            exchangeobj.attr( "title", "Can't exchange because another " +
+                                     "operation is already being performed." );
+        }
+        else if( getTempCache( "program-" + program + "-version" ) == "1" )
+        {
+            exchangeobj.addClass( 'disabledOperation' );
+            exchangeobj.removeClass( 'doableOperation' );
+            exchangeobj.attr( "title", "Can't exchange because this program " +
+                                       "is only version 1." );
+        }
+        else
+        {
             exchangeobj.addClass( 'doableOperation' );
             exchangeobj.removeClass( 'disabledOperation' );
             exchangeobj.attr( "title", "" );
