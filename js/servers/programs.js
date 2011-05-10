@@ -87,13 +87,13 @@ function updateServerDetail( type, value, oldvalue )
     updateServerConsumption( type, value );
 }
 
-function generateServerDetailRow( type )
+function generateServerDetailRow( type, title )
 {
     type = type.toString();
     var caps = type.toUpperCase();
     var delimiter = type == "cpu" ? "=" : "/";
-    return "<tr><td style='text-align:center'>" + caps + ":</td>" +
-           "<td style='text-align:center'><span id='server" + type + 
+    return "<tr title='" + title + "'><td style='text-align:center'>" + caps +
+           ":</td><td style='text-align:center'><span id='server" + type + 
            "consumption'></span></td><td>" +delimiter + "</td>" +
            "<td style='text-align:center'><span id='server" + type + 
            "'></span></td></tr>";
@@ -107,10 +107,15 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
         .append( "<tr><th colspan=4>Server #" + id + "&nbsp;&nbsp;&nbsp;" +
                  "IP: <span id='serverip'></span></th></tr>")
         .append( "<tr><th>Region</th><th>Current</th><th></th><th>Total</th></tr>" )
-        .append( generateServerDetailRow( "cpu" ) )
-        .append( generateServerDetailRow( "ram" ) )
-        .append( generateServerDetailRow( "hdd" ) )
-        .append( generateServerDetailRow( "bw" ) )
+        .append( generateServerDetailRow( "cpu", "Distributed to each " +
+                 "running program.  Determines the rate at which processes " +
+                 "complete." ) )
+        .append( generateServerDetailRow( "ram", "Required to run programs.  " +
+                 "Cannot be exceeded." ) )
+        .append( generateServerDetailRow( "hdd", "Required for programs to " +
+                 "be stored/researched.  May not be exceeded." ) )
+        .append( generateServerDetailRow( "bw", "Determines rate at which " +
+                 "files are downloaded from external servers." ) )
     );
     context.append("<div id='programdiv'></div>");
     context.append("<div id='processdiv'></div>");
