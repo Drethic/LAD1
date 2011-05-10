@@ -66,7 +66,7 @@ class Processes extends MySQLObject
         $ret = $this->get( array( 'OWNING_SERVER' => $serverid ), null, 1,
                            array( 'SUM(RAM_USAGE) AS USED_RAM',
                                   'SUM(CPU_USAGE) AS TOTAL_CPU' ) );
-        return $ret;
+        return $ret[ 0 ];
     }
 
     function getAllProcesses( )

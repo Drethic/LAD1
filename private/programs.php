@@ -66,7 +66,7 @@ class Programs extends MySQLObject
     {
         $ret = $this->get( array( 'SERVER_ID' => $serverid ), NULL, 1,
                            array( 'SUM(SIZE) AS TOTAL_SIZE' ) );
-        return $ret[ 'TOTAL_SIZE' ];
+        return $ret[ 0 ][ 'TOTAL_SIZE' ];
     }
 
     // Returns 2D array [ userID, serverID, programInfo... ]
