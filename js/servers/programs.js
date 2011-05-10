@@ -403,58 +403,58 @@ function updateProgramOperations( )
         // Update the research button accordingly
         if( cantResearch.indexOf( programid ) != -1 )
         {
-            researchobj.addClass( 'disabledOperation' );
-            researchobj.removeClass( 'doableOperation' );
-            researchobj.attr( "title", "Can't research because program is " +
-                                       "already being deleted." );
+            setOperationEnabled( researchobj, "Can't research because " +
+                                 "program is already being deleted." );
         }
         else if( !hddavail )
         {
-            researchobj.addClass( 'disabledOperation' );
-            researchobj.removeClass( 'doableOperation' );
-            researchobj.attr( "title", "Can't research because there is not " +
-                                       "enough HDD space available." );
+            setOperationEnabled( researchobj, "Can't research because there " +
+                                 "is not enough HDD space available." );
         }
         else
         {
-            researchobj.addClass( 'doableOperation' );
-            researchobj.removeClass( 'disabledOperation' );
-            researchobj.attr( "title", "" );
+            setOperationEnabled( researchobj );
         }
-        // Update the delete button accordingly
-        // Also applies to exchange button
+        // And the delete one
         if( cantDelete.indexOf( programid ) != -1 )
         {
-            deleteobj.addClass( 'disabledOperation' );
-            deleteobj.removeClass( 'doableOperation' );
-            deleteobj.attr( "title", "Can't delete because another operation " +
-                                     "is already being performed." );
+            setOperationEnabled( deleteobj, "Can't delete because another " +
+                                 "operation is already being performed." );
         }
         else
         {
-            deleteobj.addClass( 'doableOperation' );
-            deleteobj.removeClass( 'disabledOperation' );
-            deleteobj.attr( "title", "" );
+            setOperationEnabled( deleteobj );
         }
+        // And also the exchange one
         if( cantExchange.indexOf( programid ) != -1 )
         {
-            exchangeobj.addClass( 'disabledOperation' );
-            exchangeobj.removeClass( 'doableOperation' );
-            exchangeobj.attr( "title", "Can't exchange because another " +
-                                     "operation is already being performed." );
+            setOperationEnabled( exchangeobj, "Can't exchange because another" +
+                                 " operation is already being performed." );
         }
         else if( getTempCache( "program-" + program + "-version" ) == "1" )
         {
-            exchangeobj.addClass( 'disabledOperation' );
-            exchangeobj.removeClass( 'doableOperation' );
-            exchangeobj.attr( "title", "Can't exchange because this program " +
-                                       "is only version 1." );
+            setOperationEnabled( exchangeobj, "Can't exchange because this " +
+                                 "program is only version 1." );
         }
         else
         {
-            exchangeobj.addClass( 'doableOperation' );
-            exchangeobj.removeClass( 'disabledOperation' );
-            exchangeobj.attr( "title", "" );
+            setOperationEnabled( exchangeobj );
         }
+    }
+}
+
+function setOperationEnabled( obj, title )
+{
+    if( title != undefined )
+    {
+        obj.addClass( 'disabledOperation' )
+           .removeClass( 'doableOperation' )
+           .attr( 'title', title );
+    }
+    else
+    {
+        obj.addClass( 'doableOperation' )
+           .removeClass( 'disabledOperation' )
+           .attr( 'title', '' );
     }
 }
