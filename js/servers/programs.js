@@ -1,17 +1,125 @@
+function updateServerConsumptionCPU( )
+{
+    var cpuSum = getServerDetailSum( "cpu" );
+    var total = toNumber( getTempCache( "servercpu" ) );
+    var ratio = Math.round( total / cpuSum * 100 ) / 100;
+    var oldSum = toNumber( getTempCache( "servercpuconsumption" ) );
+    var isGood = cpuSum < oldSum;
+    if( total == oldSum && $('#servercpuconsumption').html() != "" )
+    {
+        return;
+    }
+    if( ratio == Number.POSITIVE_INFINITY )
+    {
+        ratio = 0;
+    }
+    applyModificationToServerStat(
+        "servercpuconsumption",
+        cpuSum,
+        isGood,
+        cpuSum - oldSum,
+        function(elem,value){
+            $(elem).html(getProcessCount() + " @ " + ratio);
+        }
+    );
+}
+
+function updateServerConsumption( type, newtotal )
+{
+    if( type == "cpu" )
+    {
+        updateServerConsumptionCPU();
+        return;
+    }
+    var sum = getServerDetailSum( type );
+    var total = newtotal == undefined ? 
+        toNumber( getTempCache( "server" + type ) ) : newtotal;
+    var ratio = Math.round( sum / total * 10000 ) / 100;
+    var oldsum = toNumber( getTempCache( "server" + type + "consumption" ) );
+    var isGood = sum < oldsum;
+    if( sum == oldsum && $('#server' + type + 'consumption').html() != "" )
+    {
+        return;
+    }
+    if( ratio == Number.POSITIVE_INFINITY )
+    {
+        ratio = 0;
+    }
+    applyModificationToServerStat(
+        "server" + type + "consumption",
+        sum,
+        isGood,
+        sum - oldsum,
+        function(elem,value){
+            $(elem).html(sum + " (" + ratio + "%)");
+        }
+    );
+}
+
+function updateAllServerConsumptions( )
+{
+    updateProcessConsumptions();
+    updateServerConsumption( "hdd" );
+}
+
+function updateProcessConsumptions( )
+{
+    updateServerConsumptionCPU();
+    updateServerConsumption( "ram" );
+    updateServerConsumption( "bw" );
+}
+
+function updateServerDetail( type, value, oldvalue )
+{
+    if( oldvalue == undefined )
+    {
+        $("#server" + type).html( value );
+    }
+    else
+    {
+        applyModificationToServerStat(
+            "server" + type,
+            value,
+            value > oldvalue,
+            value - oldvalue
+        );
+    }
+    updateServerConsumption( type, value );
+}
+
+function generateServerDetailRow( type )
+{
+    type = type.toString();
+    var caps = type.toUpperCase();
+    var delimiter = type == "cpu" ? "=" : "/";
+    return "<tr><td style='text-align:center'>" + caps + ":</td>" +
+           "<td style='text-align:center'><span id='server" + type + 
+           "consumption'></span></td><td>" +delimiter + "</td>" +
+           "<td style='text-align:center'><span id='server" + type + 
+           "'></span></td></tr>";
+}
+
 function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
 {
-    getPopupContext( "Servers" ).html( "Server #" + id + "<br />" )
-      .append( "<div>IP: <span id='serverip'>" + intToIP( ip ) + "</span></div>" )
-      .append( "<div>CPU: <span id='servercpu'>" + cpu + "</span></div>" )
-      .append( "<div>RAM: <span id='serverram'>" + ram + "</span></div>" )
-      .append( "<div>HDD: <span id='serverhdd'>" + hdd + "</span></div>" )
-      .append( "<div>BW: <span id='serverbw'>" + bw + "</span></div>" )
-      .append( "<div id='programdiv'></div>" )
-      .append( "<div id='processdiv'></div>" );
+    var context = getPopupContext( "Servers" );
+    context.html( "" );
+    context.append( $("<table style='width:100%'></table>")
+        .append( "<tr><th colspan=4>Server #" + id + "&nbsp;&nbsp;&nbsp;" +
+                 "IP: <span id='serverip'></span></th></tr>")
+        .append( "<tr><th>Region</th><th>Current</th><th></th><th>Total</th></tr>" )
+        .append( generateServerDetailRow( "cpu" ) )
+        .append( generateServerDetailRow( "ram" ) )
+        .append( generateServerDetailRow( "hdd" ) )
+        .append( generateServerDetailRow( "bw" ) )
+    );
+    context.append("<div id='programdiv'></div>");
+    context.append("<div id='processdiv'></div>");
 
     tempCache( "currentserver", id );
     tempCache( "serverowner", owner );
-    tempCache( "serverip", ip );
+    tempCache( "serverip", ip, function(elem, val) {
+        $(elem).html( intToIP( val ) );
+    });
     tempCache( "servercpu", cpu );
     tempCache( "serverram", ram );
     tempCache( "serverhdd", hdd );
@@ -24,6 +132,10 @@ function endServerView()
 {
     resizePopup( "Servers" );
     updateProgramOperations();
+    updateServerDetail( "cpu", getTempCache( "servercpu" ) );
+    updateServerDetail( "ram", getTempCache( "serverram" ) );
+    updateServerDetail( "hdd", getTempCache( "serverhdd" ) );
+    updateServerDetail( "bw", getTempCache( "serverbw" ) );
 }
 
 function noServerPrograms()
@@ -162,7 +274,7 @@ function addServerProgram( id, serverid, type, size, version )
     checkFreePrograms();
 }
 
-function removeServerProgram( id, callback )
+function removeServerProgram( id, callback, postcallback )
 {
     var row = $( "#program-" + id + "-row" );
     row.hide(1000, function(){
@@ -179,6 +291,11 @@ function removeServerProgram( id, callback )
         tempCache( "program-" + id + "-version" );
 
         removeTempCacheList( "programs", id );
+        
+        if( postcallback != undefined )
+        {
+            postcallback( id );
+        }
 
         if( getTempCache( "programs" ) == "" )
         {
@@ -218,6 +335,7 @@ function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
     }
 
     updateProgramOperations();
+    updateServerConsumption( "hdd" );
 }
 
 function updateProgramOperations( )

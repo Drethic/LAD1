@@ -62,3 +62,36 @@ function notEnoughFileSpace()
 {
     alert( 'Not enough file space!' );
 }
+
+function applyModificationToServerStat( objname, newvalue, good, modification,
+                                        callback )
+{
+    if( callback == undefined )
+    {
+        callback = true;
+    }
+    if( $('#' + objname).html() == "" || newvalue == getTempCache( objname ) )
+    {
+        tempCache( objname, newvalue, callback );
+        return;
+    }
+    var style = good ? "positivemodifier" : "negativemodifier";
+    var prefix = "<span class='" + style + "'>&nbsp;&nbsp;&nbsp;&nbsp;";
+    if( modification > 0 )
+    {
+        prefix += "+";
+    }
+    var postfix = "</span>";
+    $(prefix + modification + postfix)
+        .appendTo( $('#' + objname) )
+        .delay( 1000 )
+        .fadeOut( 100 )
+        .fadeIn( 100 )
+        .fadeOut( 100 )
+        .fadeIn( 100 )
+        .delay( 1000 )
+        .fadeOut( 300 )
+        .queue(function() {
+            tempCache( objname, newvalue, callback );
+        });
+}

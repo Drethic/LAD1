@@ -189,31 +189,17 @@ function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
     }
 
     endServerView();
-    removeServerProgram( programid );
-    applyExchangeAnimation( "servercpu", cpu, cpuUp );
-    applyExchangeAnimation( "serverram", ram, ramUp );
-    applyExchangeAnimation( "serverhdd", hdd, hddUp );
-    applyExchangeAnimation( "serverbw", bw, bwUp );
+    removeServerProgram( programid, undefined, updateAllServerConsumptions );
+    applyExchangeAnimation( "cpu", cpu, cpuUp * getDefault( "STEP_CPU" ) );
+    applyExchangeAnimation( "ram", ram, ramUp * getDefault( "STEP_RAM" ) );
+    applyExchangeAnimation( "hdd", hdd, hddUp * getDefault( "STEP_HDD" ) );
+    applyExchangeAnimation( "bw", bw, bwUp * getDefault( "STEP_BW" ) );
 }
 
-function applyExchangeAnimation( objectname, orig, up )
+function applyExchangeAnimation( type, orig, up )
 {
     if( up )
     {
-        var prefix = "<span class='positivemodifier'>&nbsp;&nbsp;&nbsp;&nbsp;+";
-        var postfix = "</span>";
-        $(prefix + up + postfix)
-            .appendTo( $('#' + objectname) )
-            .delay( 1000 )
-            .fadeOut( 100 )
-            .fadeIn( 100 )
-            .fadeOut( 100 )
-            .fadeIn( 100 )
-            .delay( 1000 )
-            .fadeOut( 300 )
-            .queue(function() {
-                tempCache( objectname, orig + up, true );
-            });
+        updateServerDetail( type, orig + up, orig );
     }
-    
 }

@@ -146,6 +146,17 @@ function getProgramSize( type, version )
     }
 }
 
+function getTempCacheListLength( ind )
+{
+    var indstring = getTempCache( ind ).toString();
+    if( indstring == "" || indstring == undefined )
+    {
+        return 0;
+    }
+    var elems = indstring.split( "," );
+    return elems.length;
+}
+
 function addTempCacheList( ind, val )
 {
     var curr = getTempCache( ind );

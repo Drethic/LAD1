@@ -74,9 +74,10 @@ function startedResearch( programid, processid, completiontime )
                       getDefault( "RESEARCH_RAM" ), 0,
                       getDefault( "OP_RESEARCH" ), completiontime );
     updateProgramOperations();
+    updateProcessConsumptions();
 }
 
-function removeProcess( id, callback )
+function removeProcess( id, callback, postcallback )
 {
     var row = $( "#process-" + id + "-row" );
     row.hide(1000, function(){
@@ -96,6 +97,11 @@ function removeProcess( id, callback )
         tempCache( "process-" + id + "-completetime" );
 
         removeTempCacheList( "processes", id );
+        
+        if( postcallback != undefined )
+        {
+            postcallback( id );
+        }
 
         if( getTempCache( "processes" ) == "" )
         {
@@ -120,13 +126,14 @@ function finishedResearch( processid )
 
         tempCache( "program-" + progid + "-version", newversion, true );
         tempCache( "program-" + progid + "-size", newsize, true );
-    });
+    }, updateAllServerConsumptions);
 }
 
 function cancelledProcess( processid )
 {
     $("#process-" + processid + "-row").addClass( "disabledOperation" );
     removeProcess( processid );
+    updateProcessConsumptions();
 }
 
 function startedDeletion( programid, processid, completiontime )
@@ -136,6 +143,7 @@ function startedDeletion( programid, processid, completiontime )
                       getDefault( "DELETE_RAM" ), 0,
                       getDefault( "OP_DELETE" ), completiontime );
     updateProgramOperations();
+    updateProcessConsumptions();
 }
 
 function finishedDeletion( processid )
@@ -145,4 +153,5 @@ function finishedDeletion( processid )
     var progid = getTempCache( "process-" + processid + "-target" );
     removeServerProgram( progid );
     removeProcess( processid );
+    updateAllServerConsumptions();
 }

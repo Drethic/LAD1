@@ -250,3 +250,8 @@ div.refresh_popup {
     color: green;
     font-weight: bold;
 }
+
+.negativemodifier {
+    color: red;
+    font-weight: bold;
+}
