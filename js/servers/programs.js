@@ -242,12 +242,6 @@ function addServerProgram( id, serverid, type, size, version )
                "<option id='delete-" + id + "'>Delete</option>" +
                "<option id='exchange-" + id + "'>Exchange</option>" +
                "</select></td>";
-    /*
-    tempOut += "<td><span id='research-" + id + "'><a href='#research-" +
-               id + "'>Research</a></span><span id='delete-" + id +
-               "'><a href='#'>Delete</a></span><span id='exchange-" + id +
-               "'><a href='#'>Exchange</a></span></td>";
-    */
     tempOut += "</tr>";
     $('#programtable').append( tempOut );
     
@@ -259,13 +253,10 @@ function addServerProgram( id, serverid, type, size, version )
             if( value == name && $("#" + name.toLowerCase() + "-" + id)
                 .hasClass( "doableOperation" ) )
             {
-            alert( 1 );
                 callback();
-            alert( 1 );
             }
         };
         checker( "Research", function(){
-            alert( 1 );
             doAjax( "startresearch", {
                 PROGRAM_ID: id
             });
@@ -283,35 +274,6 @@ function addServerProgram( id, serverid, type, size, version )
             $(this).val( "Select one..." );
         }
     });
-/*
-    $('#research-' + id).click(function( evt ){
-        if( $(this).hasClass( "doableOperation" ) )
-        {
-            doAjax( "startresearch", {
-                PROGRAM_ID: id
-            });
-        }
-        evt.preventDefault();
-    });
-
-    $('#delete-' + id).click(function( evt ){
-        if( $(this).hasClass( "doableOperation" ) )
-        {
-            doAjax( "startdelete", {
-                PROGRAM_ID: id
-            });
-        }
-        evt.preventDefault();
-    });
-
-    $('#exchange-' + id).click(function( evt ){
-        if( $(this).hasClass( "doableOperation" ) )
-        {
-            startExchangeProgram( id );
-        }
-        evt.preventDefault();
-    });
-*/
     tempCache( "program-" + id + "-server", serverid );
     tempCache( "program-" + id + "-type", type, function(elem,val){
         $(elem).html( intToProgramType( val ) );
