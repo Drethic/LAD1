@@ -153,7 +153,7 @@ function serverPrograms( list )
 {
     $('#programdiv').html( "<table id='programtable'><thead><td>Program Type" +
                            "</td><td>Size (MB)</td><td>Version</td><td>" +
-                           "Operations</td></thead></table>" );
+                           "Operation</td></thead></table>" );
 
     for( var i = 0; i < list.length; i++ )
     {
@@ -236,13 +236,54 @@ function addServerProgram( id, serverid, type, size, version )
                intToProgramType( type ) + "</td>";
     tempOut += "<td id='program-" + id + "-size' name='size'></td>";
     tempOut += "<td id='program-" + id + "-version' name='version'></td>";
+    tempOut += "<td><select id='program-" + id + "-select'>" +
+               "<option>Select one...</option>" +
+               "<option id='research-" + id + "'>Research</option>" +
+               "<option id='delete-" + id + "'>Delete</option>" +
+               "<option id='exchange-" + id + "'>Exchange</option>" +
+               "</select></td>";
+    /*
     tempOut += "<td><span id='research-" + id + "'><a href='#research-" +
                id + "'>Research</a></span><span id='delete-" + id +
                "'><a href='#'>Delete</a></span><span id='exchange-" + id +
                "'><a href='#'>Exchange</a></span></td>";
+    */
     tempOut += "</tr>";
     $('#programtable').append( tempOut );
-
+    
+    $('#program-' + id + '-select').change(function(evt){
+        var value = $(this).val();
+        var checker = function(name,callback) {
+            name = name.toString();
+            
+            if( value == name && $("#" + name.toLowerCase() + "-" + id)
+                .hasClass( "doableOperation" ) )
+            {
+            alert( 1 );
+                callback();
+            alert( 1 );
+            }
+        };
+        checker( "Research", function(){
+            alert( 1 );
+            doAjax( "startresearch", {
+                PROGRAM_ID: id
+            });
+        });
+        checker( "Delete", function(){
+            doAjax( "startdelete", {
+                PROGRAM_ID: id
+            });
+        });
+        checker( "Exchange", function(){
+            startExchangeProgram( id );
+        });
+        if( value != "Select one..." )
+        {
+            $(this).val( "Select one..." );
+        }
+    });
+/*
     $('#research-' + id).click(function( evt ){
         if( $(this).hasClass( "doableOperation" ) )
         {
@@ -250,6 +291,7 @@ function addServerProgram( id, serverid, type, size, version )
                 PROGRAM_ID: id
             });
         }
+        evt.preventDefault();
     });
 
     $('#delete-' + id).click(function( evt ){
@@ -259,6 +301,7 @@ function addServerProgram( id, serverid, type, size, version )
                 PROGRAM_ID: id
             });
         }
+        evt.preventDefault();
     });
 
     $('#exchange-' + id).click(function( evt ){
@@ -266,8 +309,9 @@ function addServerProgram( id, serverid, type, size, version )
         {
             startExchangeProgram( id );
         }
+        evt.preventDefault();
     });
-
+*/
     tempCache( "program-" + id + "-server", serverid );
     tempCache( "program-" + id + "-type", type, function(elem,val){
         $(elem).html( intToProgramType( val ) );
@@ -394,66 +438,73 @@ function updateProgramOperations( )
         var researchobj = $('#research-' + programid);
         var deleteobj = $('#delete-' + programid);
         var exchangeobj = $('#exchange-' + programid);
+        var errorstring = "";
         // Update the research button accordingly
         if( cantResearch.indexOf( programid ) != -1 )
         {
-            setOperationEnabled( researchobj, "Can't research because " +
-                                 "program is already being deleted." );
+            setOperationEnabled( researchobj );
+            errorstring = "Can't research because program is already being " +
+                          "deleted.  ";
         }
         else if( !hddavail )
         {
-            setOperationEnabled( researchobj, "Can't research because there " +
-                                 "is not enough HDD space available." );
+            setOperationEnabled( researchobj );
+            errorstring = "Can't research because there is not enough HDD " +
+                          "space available.  "
         }
         else if( !ramavail )
         {
-            setOperationEnabled( researchobj, "Can't research because there " +
-                                 "is not enough RAM to run the research." );
+            setOperationEnabled( researchobj );
+            errorstring = "Can't research because there is not enough RAM " +
+                          "to run a research process.  ";
         }
         else
         {
-            setOperationEnabled( researchobj );
+            setOperationEnabled( researchobj, true );
         }
         // And the delete one
         if( cantDelete.indexOf( programid ) != -1 )
         {
-            setOperationEnabled( deleteobj, "Can't delete because another " +
-                                 "operation is already being performed." );
+            setOperationEnabled( deleteobj );
+            errorstring += "Can't delete because another operation is " +
+                           "already being performed.  ";
         }
         else
         {
-            setOperationEnabled( deleteobj );
+            setOperationEnabled( deleteobj, true );
         }
         // And also the exchange one
         if( cantExchange.indexOf( programid ) != -1 )
         {
-            setOperationEnabled( exchangeobj, "Can't exchange because another" +
-                                 " operation is already being performed." );
+            setOperationEnabled( exchangeobj );
+            errorstring += "Can't exchange because another operation is " +
+                           "already being performed.  ";
         }
         else if( getTempCache( "program-" + programid + "-version" ) == "1" )
         {
-            setOperationEnabled( exchangeobj, "Can't exchange because this " +
-                                 "program is only version 1." );
+            setOperationEnabled( exchangeobj );
+            errorstring += "Can't exchange because this program is only " +
+                           "version 1.  ";
         }
         else
         {
-            setOperationEnabled( exchangeobj );
+            setOperationEnabled( exchangeobj, true );
         }
+        
+        $('#program-' + programid + '-select').attr( 'title', errorstring );
     }
 }
 
-function setOperationEnabled( obj, title )
+function setOperationEnabled( obj, enabled )
 {
-    if( title != undefined )
+    if( enabled != true )
     {
         obj.addClass( 'disabledOperation' )
-           .removeClass( 'doableOperation' )
-           .attr( 'title', title );
+           .removeClass( 'doableOperation' );
     }
     else
     {
         obj.addClass( 'doableOperation' )
-           .removeClass( 'disabledOperation' )
-           .attr( 'title', '' );
+           .removeClass( 'disabledOperation' );
     }
 }
