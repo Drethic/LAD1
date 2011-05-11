@@ -54,7 +54,6 @@
  * 8b. Make sure no other operations are being performed
  * 8c. Start process
  *
- * @TODO: Enforce RAM management for starting processes
  * @TODO: Reorganize process structure for CPU distribution, then enforce
  */
 

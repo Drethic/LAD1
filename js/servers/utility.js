@@ -59,3 +59,16 @@ function getServerDetailSum( type )
     }
     return sum;
 }
+
+function getServerDetailAvailable( type )
+{
+    var total = toNumber( getTempCache( "server" + type ) );
+    var used = getServerDetailSum( type );
+
+    var free = total - used;
+    if( free < 0 )
+    {
+        free = 0;
+    }
+    return free;
+}

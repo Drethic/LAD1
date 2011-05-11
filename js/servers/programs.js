@@ -382,26 +382,15 @@ function updateProgramOperations( )
         cantExchange.push( program );
     }
 
-    var totalhdd = toNumber( getTempCache( "serverhdd" ) );
-    var usedhdd = 0;
-
-    for( i = 0; i < programs.length; i++ )
-    {
-        program = programs[ i ];
-        usedhdd += toNumber( getTempCache( "program-" + programs + "-size" ) );
-    }
-
-    var freehdd = totalhdd - usedhdd;
-    if( freehdd < 0 )
-    {
-        freehdd = 0;
-    }
+    var freehdd = getServerDetailAvailable( "hdd" );
+    var freeram = getServerDetailAvailable( "ram" );
 
     for( i = 0; i < programs.length; i++ )
     {
         var programid = programs[ i ];
         var programtype = getTempCache( "program-" + programid + "-type" );
         var hddavail = getProgramSize( programtype, 1 ) < freehdd;
+        var ramavail = getDefault( "RESEARCH_RAM" ) < freeram;
         var researchobj = $('#research-' + programid);
         var deleteobj = $('#delete-' + programid);
         var exchangeobj = $('#exchange-' + programid);
@@ -415,6 +404,11 @@ function updateProgramOperations( )
         {
             setOperationEnabled( researchobj, "Can't research because there " +
                                  "is not enough HDD space available." );
+        }
+        else if( !ramavail )
+        {
+            setOperationEnabled( researchobj, "Can't research because there " +
+                                 "is not enough RAM to run the research." );
         }
         else
         {
