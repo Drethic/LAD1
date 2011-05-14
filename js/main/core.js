@@ -315,7 +315,7 @@ function runTimeUpdater( object, id, callback, recalc )
             eticObject.setTime( etic );
             return eticObject.getTime() / 1000;
         }
-    }
+    };
     this.recalculateEtics = function(){
         var i;
         for( i = 0; i < this.values.length; i++ )
@@ -325,7 +325,7 @@ function runTimeUpdater( object, id, callback, recalc )
                 this.values[ i ] = this.calculateRemaining( this.objects[ i ] );
             }
         }
-    }
+    };
 
     this.deletions = new Array();
     var i;
