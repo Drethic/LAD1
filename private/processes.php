@@ -14,8 +14,8 @@ class Processes extends MySQLObject
     function getColumns( )
     {
         return array( 'ID', 'TARGET_PROGRAM', 'OWNING_SERVER', 'CPU_USAGE',
-                      'RAM_USAGE', 'BW_USAGE', 'OPERATION', 'COMPLETION_TIME',
-                      'LINKED_ID' );
+                      'RAM_USAGE', 'BW_USAGE', 'OPERATION', 'LINKED_ID',
+                      'CYCLES_COMPLETED', 'CYCLES_REMAINING' );
     }
 
     function getTableName( )
@@ -24,22 +24,23 @@ class Processes extends MySQLObject
     }
 
     function addProcess( $target, $owningServer, $cpu, $ram, $bw, $operation,
-                         $completion )
+                         $remainingCycles )
     {
         return $this->insert( array( 'NULL', $target, $owningServer, $cpu,
-                                     $ram, $bw, $operation, $completion, 0 ) );
+                                     $ram, $bw, $operation, 0, 0,
+                                     $remainingCycles ) );
     }
 
     function addRemoteProcess( $target, $ownerServer, $targetServer, $ownerCPU,
                                $targetCPU, $ownerRAM, $targetRAM, $bw,
-                               $operation, $completion )
+                               $operation, $remainingCycles )
     {
         $id1 = $this->insert( array( 'NULL', $target, $ownerServer, $ownerCPU,
-                                    $ownerRAM, $bw, $operation, $completion,
-                                    0 ) );
+                                    $ownerRAM, $bw, $operation, 0, 0,
+                                    $remainingCycles ) );
         $id2 = $this->insert( array( 'NULL', $target, $targetServer, $targetCPU,
-                                     $targetRAM, $bw, $operation, $completion,
-                                     $id1 ) );
+                                     $targetRAM, $bw, $operation, $id1, 0,
+                                     $remainingCycles ) );
         $this->update( array( 'LINKED_ID' => $id2), array( 'ID' => $id1 ) );
         return array( $id1, $id2 );
     }

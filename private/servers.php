@@ -14,7 +14,7 @@ class Servers extends MySQLObject
     function getColumns( )
     {
         return array( 'ID', 'OWNER_ID', 'IP', 'CPU', 'RAM', 'HDD',
-                      'BANDWIDTH' );
+                      'BANDWIDTH', 'LAST_UPDATE_TIME', 'OPERATING_RATIO' );
     }
 
     function getTableName( )
@@ -43,7 +43,8 @@ class Servers extends MySQLObject
     {
         $randomIP = $this->getAvailableIP();
         return $this->insert( array( 'NULL', $ownerid, $randomIP, DEFAULT_CPU,
-                                     DEFAULT_RAM, DEFAULT_HDD, DEFAULT_BW ) );
+                                     DEFAULT_RAM, DEFAULT_HDD, DEFAULT_BW,
+                                     'NOW()', '1.0' ) );
     }
 
     function getServersByOwner( $ownerid )
