@@ -10,12 +10,12 @@ function serverProcesses( list )
     {
         var pro = list[ i ];
         addServerProcess( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ],
-                          pro[ 5 ], pro[ 6 ], pro[ 7 ] );
+                          pro[ 5 ], pro[ 6 ], pro[ 7 ], pro[ 8 ], pro[ 9 ] );
     }
 }
 
 function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
-                           operation, completiontime )
+                           operation, linkid, cyclescomplete, cyclesremain )
 {
     var processtable = $('#processtable');
     if( processtable.length == 0 )
@@ -46,11 +46,17 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempCache( "process-" + id + "-operation", operation, function(elem, val){
         $(elem).html( intToProcessOperation( val ) );
     });
-    tempCache( "process-" + id + "-completetime", completiontime );
+    
+    var etic = calculateETIC( cyclesremain );
+    tempCache( "process-" + id + "-cyclesremain", cyclesremain );
+    tempCache( "process-" + id + "-completetime", etic );
 
     addTempCacheList( "processes", id );
 
-    runTimeUpdater( "process-" + id + "-completetime", id, function(id,domEl) {
+    runTimeUpdater( function(){
+            return calculateETIC( cpu, getTempCache( "process-" + id + 
+                                                     "-cyclesremain" ) );
+        }, id, function(id,domEl) {
         domEl.html( "<a href='#'>Complete</a>" );
         domEl.children( "a" ).click(function(evt){
             doAjax( "finishprocess", {
@@ -64,15 +70,14 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
             PROCESS_ID: getSimpleID( $(this) )
         });
     });
-    //resizeHeight($('#serverpu'));
 }
 
-function startedResearch( programid, processid, completiontime )
+function startedResearch( programid, processid, remainingcycles )
 {
     addServerProcess( processid, programid, getTempCache("currentserver"),
                       getDefault( "RESEARCH_CPU" ),
                       getDefault( "RESEARCH_RAM" ), 0,
-                      getDefault( "OP_RESEARCH" ), completiontime );
+                      getDefault( "OP_RESEARCH" ), 0, 0, remainingcycles );
     updateProgramOperations();
     updateProcessConsumptions();
 }
@@ -136,12 +141,12 @@ function cancelledProcess( processid )
     updateProcessConsumptions();
 }
 
-function startedDeletion( programid, processid, completiontime )
+function startedDeletion( programid, processid, remainingcycles )
 {
     addServerProcess( processid, programid, getTempCache("currentserver"),
                       getDefault( "DELETE_CPU" ),
                       getDefault( "DELETE_RAM" ), 0,
-                      getDefault( "OP_DELETE" ), completiontime );
+                      getDefault( "OP_DELETE" ), 0, 0, remainingcycles );
     updateProgramOperations();
     updateProcessConsumptions();
 }

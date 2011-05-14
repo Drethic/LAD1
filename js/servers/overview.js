@@ -36,6 +36,8 @@ function ownedServers( list )
         tempCache( "server-" + obj[ 0 ] + "-ram", obj[ 4 ] );
         tempCache( "server-" + obj[ 0 ] + "-hdd", obj[ 5 ] );
         tempCache( "server-" + obj[ 0 ] + "-bw", obj[ 6 ] );
+        tempCache( "server-" + obj[ 0 ] + "-lastupdate", obj[ 7 ] );
+        tempCache( "server-" + obj[ 0 ] + "-operatingratio", obj[ 8 ] );
         $('#server-' + obj[ 0 ] + "-link").click(function(){
             doAjax( "viewserver", {
                 SERVER_ID: obj[ 0 ]

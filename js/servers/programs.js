@@ -22,6 +22,8 @@ function updateServerConsumptionCPU( )
             $(elem).html(getProcessCount() + " @ " + ratio);
         }
     );
+    tempCache( "servercpuratio", ratio );
+    runTimeUpdater( undefined, undefined, undefined, true );
 }
 
 function updateServerConsumption( type, newtotal )

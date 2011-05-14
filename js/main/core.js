@@ -233,7 +233,14 @@ function tempCache( ind, val, updateScreen )
     return old;
 }
 
-function runTimeUpdater( object, id, callback )
+/**
+ * @param object   Name of the object that has the remaining milliseconds or
+ *                 a function to calculate it
+ * @param id       Used for calculating when to delete the updater
+ * @param callback Function to call when completely done
+ * @param recalc   Set to true to recalculate all objects that use functions
+ */
+function runTimeUpdater( object, id, callback, recalc )
 {
     this.updateItem = function( i ){
         var entry = this.values[ i ];
@@ -296,10 +303,37 @@ function runTimeUpdater( object, id, callback )
             this.updateItem( i );
         }
     };
+    this.calculateRemaining = function(object){
+        if( typeof object == 'function' )
+        {
+            return object();
+        }
+        else
+        {
+            var etic = getTempCache( object ).toString();
+            var eticObject = new Date();
+            eticObject.setTime( etic );
+            return eticObject.getTime() / 1000;
+        }
+    }
+    this.recalculateEtics = function(){
+        var i;
+        for( i = 0; i < this.values.length; i++ )
+        {
+            if( typeof this.objects[ i ] == 'function' )
+            {
+                this.values[ i ] = this.calculateRemaining( this.objects[ i ] );
+            }
+        }
+    }
 
     this.deletions = new Array();
     var i;
-    if( object != undefined )
+    if( recalc == true )
+    {
+        this.recalculateEtics();
+    }
+    else if( object != undefined )
     {
         if( this.values == undefined )
         {
@@ -317,20 +351,18 @@ function runTimeUpdater( object, id, callback )
         {
             this.callbacks = new Array();
         }
+        if( this.objects == undefined )
+        {
+            this.objects = new Array();
+        }
 
         this.values[ this.values.length ] = object;
         this.ids[ this.ids.length ] = id;
         this.callbacks[ this.callbacks.length ] = callback;
+        this.objects[ this.objects.length ] = object;
 
-        var etic = getTempCache( object ).toString();
+        var etics = this.calculateRemaining( object );
         var timestamp = Date.now() / 1000;
-        var eticObject = new Date();
-        eticObject.setFullYear( etic.substring( 0, 4 ),
-                                Number( etic.substring( 4, 6 ) ) - 1,
-                                etic.substring( 6, 8 ) );
-        eticObject.setHours( etic.substring( 8, 10 ), etic.substring( 10, 12 ),
-                             etic.substring( 12, 14 ) );
-        var etics = eticObject.getTime() / 1000;
         var secsremaining = etics > timestamp ? etics - timestamp : 0;
         this.remaining[ this.remaining.length ] = secsremaining;
 

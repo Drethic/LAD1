@@ -72,3 +72,14 @@ function getServerDetailAvailable( type )
     }
     return free;
 }
+
+/**
+ * @param cpu             The 1.0 operating frequency of the program
+ * @param remainingCycles The number of cycles that are remaining
+ */
+function calculateETIC( cpu, remainingCycles )
+{
+    var rate = cpu * toNumber( getTempCache( "servercpuratio" ) );
+    var remainingtime = Math.round( remainingCycles / rate );
+    return Date.now() + ( remainingtime * 1000 );
+}
