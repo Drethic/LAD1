@@ -72,6 +72,15 @@ $version[ 12 ] = "ALTER TABLE USERS ADD COLUMN `FLAGS` bigint unsigned " .
                  "NOT NULL DEFAULT 0 AFTER `EMAIL`";
 $version[ 13 ] = "ALTER TABLE USERS MODIFY COLUMN `PASSWORD` char(41) NOT NULL";
 $version[ 14 ] = "UPDATE USERS SET `PASSWORD` = PASSWORD(`PASSWORD`)";
+$version[ 15 ] = "ALTER TABLE SERVERS ADD COLUMN `LAST_UPDATE_TIME` datetime " .
+                 "NOT NULL AFTER `BANDWIDTH`";
+$version[ 16 ] = "ALTER TABLE SERVERS ADD COLUMN `OPERATING_RATIO` " .
+                 "decimal(8,4) NOT NULL AFTER `LAST_UPDATE_TIME`";
+$version[ 17 ] = "ALTER TABLE PROCESSES DROP COLUMN `COMPLETION_TIME`";
+$version[ 18 ] = "ALTER TABLE PROCESSES ADD COLUMN `CYCLES_COMPLETED` " .
+                 "bigint unsigned NOT NULL AFTER `LINKED_ID`";
+$version[ 19 ] = "ALTER TABLE PROCESSES ADD COLUMN `CYCLES_REMAINING` " .
+                 "bigint unsigned NOT NULL AFTER `CYCLES_COMPLETED`";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);
@@ -154,7 +163,8 @@ for( $i = $startVersion; $i < $rowCount; $i++, $actualVersion++ )
 
     if( !$result )
     {
-        echo "Failed to perform query: $query";
+        echo "Failed to perform query: $query\n";
+        echo mysql_error();
         break;
     }
 }
