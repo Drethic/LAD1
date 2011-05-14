@@ -53,8 +53,6 @@
  * 8a. Make sure file belongs to user
  * 8b. Make sure no other operations are being performed
  * 8c. Start process
- *
- * @TODO: Reorganize process structure for CPU distribution, then enforce
  */
 
 require_once( 'private/users.php' );
@@ -292,8 +290,8 @@ elseif( $action == 'startresearch' )
                     DEFAULT_RESEARCH_CPU, DEFAULT_RESEARCH_RAM, 0,
                     PROCESS_OP_RESEARCH, "NOW()+$t" );
             $result = $processes->getProcessByID( $researchid );
-            $etic = $result[ 'COMPLETION_TIME' ];
-            echo( "startedResearch($programid,$researchid,$etic);" );
+            $remainingCycles = $result[ 'CYCLES_REMAINING' ];
+            echo( "startedResearch($programid,$researchid,$remainingCycles);" );
         }
     }
 }
@@ -409,8 +407,8 @@ elseif( $action == 'startdelete' )
             "NOW()+$completionTime" );
 
     $result = $processes->getProcessByID( $processid );
-    $etic = $result[ 'COMPLETION_TIME' ];
-    echo "startedDeletion($programid,$processid,$etic);";
+    $remainingCycles = $result[ 'CYCLES_REMAINING' ];
+    echo "startedDeletion($programid,$processid,$remainingCycles);";
 }
 elseif( $action == 'exchangeprograms' )
 {
