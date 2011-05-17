@@ -105,7 +105,6 @@ abstract class MySQLObject
                $row[ $colIndex ] = intval( $row[ $colIndex ] );
            }
            $ret[] = $row;
-           //print_r( $row );
        }
        return $ret;
    }
