@@ -131,14 +131,13 @@ function finishedResearch( processid )
 
         tempCache( "program-" + progid + "-version", newversion, true );
         tempCache( "program-" + progid + "-size", newsize, true );
-    }, updateAllServerConsumptions);
+    });
 }
 
 function cancelledProcess( processid )
 {
     $("#process-" + processid + "-row").addClass( "disabledOperation" );
-    removeProcess( processid );
-    updateProcessConsumptions();
+    removeProcess( processid, undefined, updateAllServerConsumptions );
 }
 
 function startedDeletion( programid, processid, remainingcycles )
@@ -157,6 +156,5 @@ function finishedDeletion( processid )
 
     var progid = getTempCache( "process-" + processid + "-target" );
     removeServerProgram( progid );
-    removeProcess( processid );
-    updateAllServerConsumptions();
+    removeProcess( processid, undefined, updateAllServerConsumptions );
 }

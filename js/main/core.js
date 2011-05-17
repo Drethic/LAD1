@@ -317,6 +317,10 @@ function runTimeUpdater( object, id, callback, recalc )
         }
     };
     this.recalculateEtics = function(){
+        if( this.values == undefined )
+        {
+            return;
+        }
         var i;
         for( i = 0; i < this.values.length; i++ )
         {
