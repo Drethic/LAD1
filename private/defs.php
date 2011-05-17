@@ -151,6 +151,13 @@ function echo2DArray( $validfunc, $invalidfunc, $arr )
         echo "$validfunc(new Array(";
         for( $i = 0; $i < $arrayCount; $i++ )
         {
+            foreach( $arr[ $i ] as $subArrayIndex => $subArrayValue )
+            {
+                if( is_string( $subArrayValue ) )
+                {
+                    $arr[ $i ][ $subArrayIndex ] = "\"$subArrayValue\"";
+                }
+            }
             echo 'new Array(' . implode( ',', $arr[ $i ] ) . ')';
             if( $i < $arrayCountM1 )
             {

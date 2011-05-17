@@ -88,9 +88,24 @@ abstract class MySQLObject
        }
 
        $ret = array();
+       $columnInfo = array();
+       $columns = mysql_num_fields( $result );
+       for( $i = 0; $i < $columns; $i++ )
+       {
+           $rowInfo = mysql_fetch_field( $result );
+           if( $rowInfo->numeric )
+           {
+               $columnInfo[ $rowInfo->name ] = $rowInfo->numeric;
+           }
+       }
        while( $row = mysql_fetch_assoc( $result ) )
        {
+           foreach( $columnInfo as $colIndex => $colValue )
+           {
+               $row[ $colIndex ] = intval( $row[ $colIndex ] );
+           }
            $ret[] = $row;
+           //print_r( $row );
        }
        return $ret;
    }
