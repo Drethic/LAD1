@@ -464,11 +464,13 @@ function setOperationEnabled( obj, enabled )
     if( enabled != true )
     {
         obj.addClass( 'disabledOperation' )
-           .removeClass( 'doableOperation' );
+           .removeClass( 'doableOperation' )
+           .attr( "disabled", "disabled" );
     }
     else
     {
         obj.addClass( 'doableOperation' )
-           .removeClass( 'disabledOperation' );
+           .removeClass( 'disabledOperation' )
+           .removeAttr( "disabled" );
     }
 }
