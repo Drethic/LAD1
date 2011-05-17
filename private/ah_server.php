@@ -285,10 +285,9 @@ elseif( $action == 'startresearch' )
                 }
             }
             // Alright, the user can research it
-            $t = DEFAULT_RESEARCH_TIME;
             $researchid = $processes->addProcess( $programid, $serverid,
                     DEFAULT_RESEARCH_CPU, DEFAULT_RESEARCH_RAM, 0,
-                    PROCESS_OP_RESEARCH, "NOW()+$t" );
+                    PROCESS_OP_RESEARCH, DEFAULT_RESEARCH_TIME );
             $result = $processes->getProcessByID( $researchid );
             $remainingCycles = $result[ 'CYCLES_REMAINING' ];
             echo( "startedResearch($programid,$researchid,$remainingCycles);" );
@@ -335,7 +334,7 @@ elseif( $action == 'finishprocess' )
         else
         {
 /*********************************** STEP 6b2 *********************************/
-            $processes->deleteProcess( $processid );
+            $processes->deleteProcess( $processid, $serverid );
             $programs->upgradeProgram( $programid, $programtype );
 
             echo "finishedResearch($processid);";
@@ -343,7 +342,7 @@ elseif( $action == 'finishprocess' )
     }
     elseif( $processInfo[ 'OPERATION' ] == PROCESS_OP_DELETE )
     {
-        $processes->deleteProcess( $processid );
+        $processes->deleteProcess( $processid, $serverid );
         $programs->deleteProgram( $programid );
         echo "finishedDeletion($processid);";
     }
@@ -371,7 +370,7 @@ elseif( $action == 'cancelprocess' )
         ahdie( 'Cancelling a process for someone else = bad...for now.' );
     }
 
-    $processes->deleteProcess( $processid );
+    $processes->deleteProcess( $processid, $serverid );
 
     echo "cancelledProcess($processid);";
 }
@@ -438,9 +437,28 @@ elseif( $action == 'exchangeprograms' )
     }
 
     $servers->adjustAllStats( $serverid, $cpuUp, $ramUp, $hddUp, $bwUp );
-    $programs->deleteProgram( $programid );
+    $programs->deleteProgram( $programid, $serverid );
 
     echo( "exchangedProgram($programid,$cpuUp,$ramUp,$hddUp,$bwUp);" );
+}
+
+// Update the processes and the server accordingly
+if( isset( $servers ) && isset( $processes ) )
+{
+    $modifiedServers = $processes->getModifiedServers();
+    if( !empty( $modifiedServers ) )
+    {
+        $infos = $servers->getCPUInfoForServers( $modifiedServers );
+        $onlyUpdate = array();
+        foreach( $infos as $serverInfo )
+        {
+            $updateArray = $processes->redistributeCPU( $serverInfo[ 'ID' ],
+                                         $serverInfo[ 'CPU' ],
+                                         $serverInfo[ 'OPERATING_RATIO' ],
+                                         $serverInfo[ 'LAST_UPDATE_TIME' ] );
+            $servers->updateCPUInfo( $serverInfo[ 'ID' ], $updateArray );
+        }
+    }
 }
 
 ?>

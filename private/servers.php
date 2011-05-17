@@ -21,6 +21,13 @@ class Servers extends MySQLObject
     {
         return 'SERVERS';
     }
+    
+    function getCPUInfoForServers( $arr )
+    {
+        return $this->get( array( 'ID' => $arr ), null, 0,
+                           array( 'CPU', 'LAST_UPDATE_TIME',
+                                  'OPERATING_RATIO', 'ID' ) );
+    }
 
     static function getAvailableIP( )
     {
@@ -124,6 +131,11 @@ class Servers extends MySQLObject
             $changes[ 'BANDWIDTH' ] = "BANDWIDTH+$bw";
         }
         return $this->update( $changes, array( 'ID' => $server ) );
+    }
+    
+    function updateCPUInfo( $serverid, $array )
+    {
+        return $this->update( $array, array( 'ID' => $serverid ) );
     }
 }
 

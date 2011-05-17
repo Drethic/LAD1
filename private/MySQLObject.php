@@ -241,7 +241,7 @@ abstract class MySQLObject
 
                if( is_array( $filter ) )
                {
-                   $sql .= "$filterKey IN (" . implode( ',', $filter) . ") ";
+                   $sql .= "$filterKey IN (" . implode( ',', $filter ) . ") ";
                }
                else
                {
@@ -317,14 +317,22 @@ abstract class MySQLObject
            $rowInfo = mysql_fetch_field( $result );
            if( !$rowInfo->blob )
            {
-               $columnInfo[ $rowInfo->name ] = $rowInfo->blob;
+               $columnInfo[ $rowInfo->name ] = $rowInfo->type;
            }
        }
        while( $row = mysql_fetch_assoc( $result ) )
        {
            foreach( $columnInfo as $colIndex => $colValue )
            {
-               $row[ $colIndex ] = intval( $row[ $colIndex ] );
+               //echo "\n//{$colValue}\n";
+               if( $colValue == 'int' || $colValue == 'datetime' )
+               {
+                   $row[ $colIndex ] = intval( $row[ $colIndex ] );
+               }
+               else if( $colValue == 'real' )
+               {
+                   $row[ $colIndex ] = floatval( $row[ $colIndex ] );
+               }
            }
            $ret[] = $row;
        }
