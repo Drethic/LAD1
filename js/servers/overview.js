@@ -14,7 +14,8 @@ function ownedServers( list )
 {
     getPopupContext( "Servers" ).html(
         "<table id='servertable'><thead><td>IP</td><td>" +
-        "CPU</td><td>RAM</td><td>HDD</td><td>BW</td></thead></table>" );
+        "CPU</td><td>RAM</td><td>HDD</td><td>BW</td><td " +
+        "title='Operating Ratio'>OR</td></thead></table>" );
 
     var serverids = new Array();
     for( var i = 0; i < list.length; i++ )
@@ -24,10 +25,11 @@ function ownedServers( list )
         tempOut += "<td><button href='#server-" + obj[ 0 ] + "' " +
                    "title='View Server' id='server-" + obj[ 0 ] + "-link'>" +
                    intToIP( obj[ 2 ] ) + "</button></td>";
-        for( var j = 3; j < obj.length; j++ )
+        for( var j = 3; j < 7; j++ )
         {
             tempOut += "<td>" + obj[ j ] + "</td>";
         }
+        tempOut += "<td>" + obj[ 8 ] + "</td>";
         tempOut += "</tr>";
         serverids[ i ] = obj[ 0 ];
         $('#servertable').append( tempOut );
