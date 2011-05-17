@@ -13,6 +13,7 @@
  *      minimizeCreator() : Minimizes the input parameter to compress it
  *       escapifyString() : Escapes a string for use in the DB
  *        getOnlyColumn() : Gets signle column(1-D array) based on parameters
+ *       getTypedResult() : Extracts rows from a result with proper types set
  *
  * Abstracts:
  *       getColumns() : Return an array with column names in the values
@@ -87,26 +88,7 @@ abstract class MySQLObject
            die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
        }
 
-       $ret = array();
-       $columnInfo = array();
-       $columns = mysql_num_fields( $result );
-       for( $i = 0; $i < $columns; $i++ )
-       {
-           $rowInfo = mysql_fetch_field( $result );
-           if( $rowInfo->numeric )
-           {
-               $columnInfo[ $rowInfo->name ] = $rowInfo->numeric;
-           }
-       }
-       while( $row = mysql_fetch_assoc( $result ) )
-       {
-           foreach( $columnInfo as $colIndex => $colValue )
-           {
-               $row[ $colIndex ] = intval( $row[ $colIndex ] );
-           }
-           $ret[] = $row;
-       }
-       return $ret;
+       return $this->getTypedResult( $result );
    }
 
    public function insert( $values )
@@ -236,18 +218,7 @@ abstract class MySQLObject
            die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
        }
 
-       $ret = array();
-       while( $row = mysql_fetch_assoc( $result ) )
-       {
-           if( count( $row ) == 1 )
-           {
-               $ret[] = $row[ 0 ];
-           }
-           else
-           {
-               $ret[] = $row;
-           }
-       }
+       $ret = MySQLObject::getTypedResult( $result );
 
        if( count( $ret ) == 1 )
        {
@@ -333,6 +304,30 @@ abstract class MySQLObject
            }
        }
        $ret .= ']';
+       return $ret;
+   }
+   
+   public static function getTypedResult( $result )
+   {
+       $ret = array();
+       $columnInfo = array();
+       $columns = mysql_num_fields( $result );
+       for( $i = 0; $i < $columns; $i++ )
+       {
+           $rowInfo = mysql_fetch_field( $result );
+           if( !$rowInfo->blob )
+           {
+               $columnInfo[ $rowInfo->name ] = $rowInfo->blob;
+           }
+       }
+       while( $row = mysql_fetch_assoc( $result ) )
+       {
+           foreach( $columnInfo as $colIndex => $colValue )
+           {
+               $row[ $colIndex ] = intval( $row[ $colIndex ] );
+           }
+           $ret[] = $row;
+       }
        return $ret;
    }
 }
