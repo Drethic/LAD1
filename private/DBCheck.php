@@ -81,6 +81,8 @@ $version[ 18 ] = "ALTER TABLE PROCESSES ADD COLUMN `CYCLES_COMPLETED` " .
                  "bigint unsigned NOT NULL AFTER `LINKED_ID`";
 $version[ 19 ] = "ALTER TABLE PROCESSES ADD COLUMN `CYCLES_REMAINING` " .
                  "bigint unsigned NOT NULL AFTER `CYCLES_COMPLETED`";
+$version[ 20 ] = "ALTER TABLE SERVERS MODIFY COLUMN `LAST_UPDATE_TIME` " .
+                 "bigint unsigned NOT NULL";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);
