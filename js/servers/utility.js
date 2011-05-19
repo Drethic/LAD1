@@ -80,6 +80,9 @@ function getServerDetailAvailable( type )
 function calculateETIC( cpu, remainingCycles )
 {
     var rate = cpu * toNumber( getTempCache( "servercpuratio" ) );
-    var remainingtime = Math.round( remainingCycles / rate );
-    return Date.now() + ( remainingtime * 1000 );
+    var lastupdate = toNumber( getTempCache( "lastServerUpdateTime") );
+    var now = new Date();
+    var sinceupdate = ( now.getTime() / 1000 ) - lastupdate;
+    var remainingtime = Math.round( remainingCycles / rate ) - sinceupdate;
+    return remainingtime;
 }

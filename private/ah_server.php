@@ -457,6 +457,8 @@ if( isset( $servers ) && isset( $processes ) )
                                          $serverInfo[ 'OPERATING_RATIO' ],
                                          $serverInfo[ 'LAST_UPDATE_TIME' ] );
             $servers->updateCPUInfo( $serverInfo[ 'ID' ], $updateArray );
+            $lastUpdateTime = $processes->getLastUpdateTime();
+            echo( "lastServerUpdateTime($lastUpdateTime);" );
         }
     }
 }

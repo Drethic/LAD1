@@ -48,12 +48,13 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     });
     
     var etic = calculateETIC( cyclesremain );
+    tempCache( "process-" + id + "-cyclescomplete", cyclescomplete );
     tempCache( "process-" + id + "-cyclesremain", cyclesremain );
     tempCache( "process-" + id + "-completetime", etic );
 
     addTempCacheList( "processes", id );
 
-    runTimeUpdater( function(){
+    runTimeUpdater( "process-" + id + "-completetime", function(){
             return calculateETIC( cpu, getTempCache( "process-" + id + 
                                                      "-cyclesremain" ) );
         }, id, function(id,domEl) {
@@ -157,4 +158,10 @@ function finishedDeletion( processid )
     var progid = getTempCache( "process-" + processid + "-target" );
     removeServerProgram( progid );
     removeProcess( processid, undefined, updateAllServerConsumptions );
+}
+
+function updateProcessProgress( procid, completed, remaining )
+{
+    tempCache( "process-" + procid + "-cyclescomplete", completed );
+    tempCache( "process-" + procid + "-cyclesremain", remaining );
 }

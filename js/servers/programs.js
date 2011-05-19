@@ -1,5 +1,6 @@
 function updateServerConsumptionCPU( )
 {
+    // BUG: When cancelling a process, it will double the +100 sometimes, why?
     var cpuSum = getServerDetailSum( "cpu" );
     var total = toNumber( getTempCache( "servercpu" ) );
     var ratio = Math.round( total / cpuSum * 100 ) / 100;
@@ -23,7 +24,7 @@ function updateServerConsumptionCPU( )
         }
     );
     tempCache( "servercpuratio", ratio );
-    runTimeUpdater( undefined, undefined, undefined, true );
+    runTimeUpdater( undefined, undefined, undefined, undefined, true );
 }
 
 function updateServerConsumption( type, newtotal )
@@ -89,6 +90,12 @@ function updateServerDetail( type, value, oldvalue )
     updateServerConsumption( type, value );
 }
 
+function lastServerUpdateTime( lastTime )
+{
+    tempCache( "lastServerUpdateTime", lastTime );
+    updateServerConsumptionCPU();
+}
+
 function generateServerDetailRow( type, title )
 {
     type = type.toString();
@@ -101,7 +108,7 @@ function generateServerDetailRow( type, title )
            "'></span></td></tr>";
 }
 
-function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
+function beginServerView( id, owner, ip, cpu, ram, hdd, bw, lastUpdate )
 {
     var context = getPopupContext( "Servers" );
     context.html( "" );
@@ -133,16 +140,17 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw )
     tempCache( "serverbw", bw );
     tempCache( "processes" );
     tempCache( "programs" );
+    tempCache( "lastServerUpdateTime", lastUpdate );
 }
 
 function endServerView()
 {
     resizePopup( "Servers" );
     updateProgramOperations();
-    updateServerDetail( "cpu", getTempCache( "servercpu" ) );
     updateServerDetail( "ram", getTempCache( "serverram" ) );
     updateServerDetail( "hdd", getTempCache( "serverhdd" ) );
     updateServerDetail( "bw", getTempCache( "serverbw" ) );
+    updateServerDetail( "cpu", getTempCache( "servercpu" ) );
 }
 
 function noServerPrograms()

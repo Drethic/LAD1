@@ -234,13 +234,14 @@ function tempCache( ind, val, updateScreen )
 }
 
 /**
- * @param object   Name of the object that has the remaining milliseconds or
- *                 a function to calculate it
- * @param id       Used for calculating when to delete the updater
- * @param callback Function to call when completely done
- * @param recalc   Set to true to recalculate all objects that use functions
+ * @param objectname Name of the object
+ * @param object     Name of the temp cache that has the target time or a
+                     function to calculate it
+ * @param id         Used for calculating when to delete the updater
+ * @param callback   Function to call when completely done
+ * @param recalc     Set to true to recalculate all objects that use functions
  */
-function runTimeUpdater( object, id, callback, recalc )
+function runTimeUpdater( objectname, object, id, callback, recalc )
 {
     this.updateItem = function( i ){
         var entry = this.values[ i ];
@@ -304,17 +305,21 @@ function runTimeUpdater( object, id, callback, recalc )
         }
     };
     this.calculateRemaining = function(object){
+        var targetTime;
         if( typeof object == 'function' )
         {
-            return object();
+            targetTime = object();
         }
         else
         {
             var etic = getTempCache( object ).toString();
             var eticObject = new Date();
             eticObject.setTime( etic );
-            return eticObject.getTime() / 1000;
+            targetTime = eticObject.getTime() / 1000;
+            var timestamp = Date.now() / 1000;
+            targetTime = ( eticObject.getTime() / 1000 ) - ( Date.now() / 1000 );
         }
+        return targetTime > 0 ? targetTime : 0;
     };
     this.recalculateEtics = function(){
         if( this.values == undefined )
@@ -326,7 +331,9 @@ function runTimeUpdater( object, id, callback, recalc )
         {
             if( typeof this.objects[ i ] == 'function' )
             {
-                this.values[ i ] = this.calculateRemaining( this.objects[ i ] );
+                this.remaining[ i ] =
+                    this.calculateRemaining( this.objects[ i ] );
+                this.updateItem( i );
             }
         }
     };
@@ -339,35 +346,40 @@ function runTimeUpdater( object, id, callback, recalc )
     }
     else if( object != undefined )
     {
+        // Stores the name of the object
         if( this.values == undefined )
         {
             this.values = new Array();
         }
+        // Number of seconds remainings
         if( this.remaining == undefined )
         {
             this.remaining = new Array();
         }
+        // The ID of the object, sent to the callback
+        // Useful for identifying which object it is in the callback
         if( this.ids == undefined )
         {
             this.ids = new Array();
         }
+        // Function to be called when counter reaches 0
         if( this.callbacks == undefined )
         {
             this.callbacks = new Array();
         }
+        // Either a function or the temp cache that calculates the remaining
+        // seconds
         if( this.objects == undefined )
         {
             this.objects = new Array();
         }
 
-        this.values[ this.values.length ] = object;
+        this.values[ this.values.length ] = objectname;
         this.ids[ this.ids.length ] = id;
         this.callbacks[ this.callbacks.length ] = callback;
         this.objects[ this.objects.length ] = object;
 
-        var etics = this.calculateRemaining( object );
-        var timestamp = Date.now() / 1000;
-        var secsremaining = etics > timestamp ? etics - timestamp : 0;
+        var secsremaining = this.calculateRemaining( object );
         this.remaining[ this.remaining.length ] = secsremaining;
 
         if( this.timer == undefined || this.timer == -1 )

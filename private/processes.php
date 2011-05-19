@@ -12,6 +12,12 @@ require_once( 'MySqlObject.php' );
 class Processes extends MySQLObject
 {
     private $modifiedServers = array();
+    private $lastUpdateTime = 0;
+    
+    function getLastUpdateTime()
+    {
+        return $this->lastUpdateTime;
+    }
     
     function getModifiedServers()
     {
@@ -123,15 +129,17 @@ class Processes extends MySQLObject
         }
         
         $ratio = round( ( $servercpu / $cpuTotal ), 4 );
-        $nowtime = time();
+        $this->lastUpdateTime = time();
+        $nowtime = $this->lastUpdateTime;
         
+        // BUG: I think this isn't calculating correctly
         if( $serverratio != 0 )
         {
             foreach( $procs as $proc )
             {
                 $previousConsumed = $proc[ 'CYCLES_COMPLETED' ];
                 $perSecondRatio = $proc[ 'CPU_USAGE' ] * $serverratio;
-                $elapsedTime = ( $nowtime - $serverupdate ) / 1000.0;
+                $elapsedTime = $nowtime - $serverupdate;
                 $completedCycles = $serverratio * $elapsedTime;
                 $newCompleted = $previousConsumed + $completedCycles;
                 $newRemaining = $proc[ 'CYCLES_REMAINING' ] - $completedCycles;
@@ -142,6 +150,8 @@ class Processes extends MySQLObject
                 $this->update( array( 'CYCLES_COMPLETED' => $newCompleted,
                                       'CYCLES_REMAINING' => $newRemaining ),
                                array( 'ID' => $proc[ 'ID' ] ) );
+                echo( "updateProcessProgress({$proc['ID']},$newCompleted," .
+                      "$newRemaining);" );
             }
         }
         
