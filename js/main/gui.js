@@ -137,8 +137,8 @@ function createWindow( name )
                       "<span class='ui-icon ui-icon-arrowrefresh-1-s'>" +
                       "</span></div>")
                 .click( function() {
-                    //refreshCurrent( name );
-                    resizeElement($(this).parents('.popup').attr('id'));
+                    refreshCurrent( name );
+                    //resizeElement($(this).parents('.popup').attr('id'));
                 })
             )
             .append($("<div class='min_popup' title='Minimize'><span class='ui-icon " +
