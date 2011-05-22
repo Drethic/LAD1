@@ -110,7 +110,7 @@ elseif( $action == 'viewserver' )
     }
 
     // General Server Information plus layout the screen for programs/processes
-    echo 'beginServerView(' . implode( ',', $serverInfo ) . ');';
+    echo 'beginServerView(' . cleanupRowForJS( $serverInfo ) . ');';
 
     $programs = new Programs();
     $allPrograms = $programs->getProgramsByServer( $id );
@@ -440,6 +440,21 @@ elseif( $action == 'exchangeprograms' )
     $programs->deleteProgram( $programid, $serverid );
 
     echo( "exchangedProgram($programid,$cpuUp,$ramUp,$hddUp,$bwUp);" );
+}
+else if( $action == 'changeservername' )
+{
+    $id = $_REQUEST[ 'SERVER_ID' ];
+    $servers = new Servers();
+    $serverInfo = $servers->getServerByID( $id );
+
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
+    {
+        ahdie( 'No changing names of servers you don\'t own.' );
+    }
+
+    $name = $_REQUEST[ 'NAME' ];
+    $servers->updateName( $id, $name );
+    echo( "changedServerName($id," . cleanupRowForJS( array( $name ) ) . ");" );
 }
 
 // Update the processes and the server accordingly

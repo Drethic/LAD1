@@ -17,6 +17,7 @@
  *     cancelprocess = User wants to cancel a process
  *       startdelete = User wants to delete a file
  *  exchangeprograms = User wants to exchange programs for hardware upgrade
+ *  changeservername = User wants to change the name of their server
  *
  * Session vars:
  *  ID          = Sets the ID into session to help control authorization
@@ -55,7 +56,9 @@ $actionRequirements =
          'cancelprocess' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ),
          'startdelete' => array( 0, 'ah_server', array( 'PROGRAM_ID' ) ),
          'exchangeprograms' => array( 0, 'ah_server', array( 'PROGRAM_ID',
-                                      'CPU_UP', 'RAM_UP', 'HDD_UP', 'BW_UP' )));
+                                      'CPU_UP', 'RAM_UP', 'HDD_UP', 'BW_UP' )),
+         'changeservername' => array( 0, 'ah_server', array('SERVER_ID',
+                                      'NAME' )));
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/

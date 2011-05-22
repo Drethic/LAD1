@@ -137,6 +137,32 @@ function getProgramSize( $type )
     }
 }
 
+/**
+ * @param $row The row to cleanup for viewing
+ * @return Similar to implode except that strings are properly handled
+ */
+function cleanupRowForJS( $row )
+{
+    $keys = array_keys( $row );
+    $len = count( $row );
+    $lenM1 = $len - 1;
+    $ret = '';
+    for( $i = 0; $i < $len; $i++ )
+    {
+        $item = $row[ $keys[ $i ] ];
+        if( is_string( $item ) )
+        {
+            $item = "\"" . mysql_real_escape_string( $item ) . "\"";
+        }
+        $ret .= $item;
+        if( $i < $lenM1 )
+        {
+            $ret .= ',';
+        }
+    }
+    return $ret;
+}
+
 // Tells JS to handle a 2D array based on its existence
 function echo2DArray( $validfunc, $invalidfunc, $arr )
 {
@@ -148,23 +174,17 @@ function echo2DArray( $validfunc, $invalidfunc, $arr )
     else
     {
         $arrayCountM1 = $arrayCount - 1;
-        echo "$validfunc(new Array(";
+        echo "$validfunc([";
         for( $i = 0; $i < $arrayCount; $i++ )
         {
-            foreach( $arr[ $i ] as $subArrayIndex => $subArrayValue )
-            {
-                if( is_string( $subArrayValue ) )
-                {
-                    $arr[ $i ][ $subArrayIndex ] = "\"$subArrayValue\"";
-                }
-            }
-            echo 'new Array(' . implode( ',', $arr[ $i ] ) . ')';
+            $prettyRow = cleanupRowForJS( $arr[ $i ] );
+            echo "[$prettyRow]";
             if( $i < $arrayCountM1 )
             {
                 echo ',';
             }
         }
-        echo '));';
+        echo ']);';
     }
 }
 
