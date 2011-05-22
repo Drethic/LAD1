@@ -107,13 +107,24 @@ function generateServerDetailRow( type, title )
            "'></span></td></tr>";
 }
 
-function beginServerView( id, owner, ip, cpu, ram, hdd, bw, lastUpdate )
+function changedServerName( id, name )
 {
+    tempCache( "server-" + id + "-customname", name );
+}
+
+function beginServerView( id, owner, ip, customname, cpu, ram, hdd, bw,
+                          lastUpdate )
+{
+    if( customname == "" )
+    {
+        customname = "Server #" + id;
+    }
     var context = getPopupContext( "Servers" );
     context.html( "" );
     context.append( $("<table style='width:100%'></table>")
-        .append( "<tr><th colspan=4>Server #" + id + "&nbsp;&nbsp;&nbsp;" +
-                 "IP: <span id='serverip'></span></th></tr>")
+        .append( "<tr><th colspan=4><input type='text' id='servercustomname' " +
+                 "class='semihidden' title='Click to Edit' />" +
+                 "&nbsp;&nbsp;&nbsp;IP: <span id='serverip'></span></th></tr>")
         .append( "<tr><th>Region</th><th>Current</th><th></th><th>Total</th></tr>" )
         .append( generateServerDetailRow( "cpu", "Distributed to each " +
                  "running program.  Determines the rate at which processes " +
@@ -127,12 +138,31 @@ function beginServerView( id, owner, ip, cpu, ram, hdd, bw, lastUpdate )
     );
     context.append("<div id='programdiv'></div>");
     context.append("<div id='processdiv'></div>");
+    $("#servercustomname").val( customname ).hover(function(){
+        $(this).addClass("semihiddenhover");
+    }, function(){
+        $(this).removeClass("semihiddenhover");
+    }).focus(function(){
+        $(this).addClass("semihiddenactive");
+    }).blur(function(){
+        $(this).removeClass("semihiddenactive");
+        var oldVal = getTempCache( "servercustomname" );
+        var newVal = $(this).val();
+        if( oldVal != newVal )
+        {
+            doAjax( "changeservername", {
+                SERVER_ID: id,
+                NAME: newVal
+            });
+        }
+    });
 
     tempCache( "currentserver", id );
     tempCache( "serverowner", owner );
     tempCache( "serverip", ip, function(elem, val) {
         $(elem).html( intToIP( val ) );
     });
+    tempCache( "server-" + id + "-customname", customname );
     tempCache( "servercpu", cpu );
     tempCache( "serverram", ram );
     tempCache( "serverhdd", hdd );

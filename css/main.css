@@ -255,3 +255,14 @@ div.refresh_popup {
     color: red;
     font-weight: bold;
 }
+
+.semihidden {
+    outline: none;
+    border: solid transparent 2px;
+}
+
+input.semihiddenactive, input.semihiddenhover {
+    outline: none;
+    border: solid #dd7 2px;
+    background-color: #ee9;
+}

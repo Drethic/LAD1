@@ -13,7 +13,7 @@ function noOwnedServers()
 function ownedServers( list )
 {
     getPopupContext( "Servers" ).html(
-        "<table id='servertable'><thead><td>IP</td><td>" +
+        "<table id='servertable'><thead><td>IP</td><td>Name</td><td>" +
         "CPU</td><td>RAM</td><td>HDD</td><td>BW</td><td " +
         "title='Operating Ratio'>OR</td></thead></table>" );
 
@@ -21,28 +21,52 @@ function ownedServers( list )
     for( var i = 0; i < list.length; i++ )
     {
         var obj = list[ i ];
+        var id = obj[ 0 ];
         var tempOut = "<tr>";
-        tempOut += "<td><button href='#server-" + obj[ 0 ] + "' " +
-                   "title='View Server' id='server-" + obj[ 0 ] + "-link'>" +
+        tempOut += "<td><button href='#server-" + id + "' " +
+                   "title='View Server' id='server-" + id + "-link'>" +
                    intToIP( obj[ 2 ] ) + "</button></td>";
-        for( var j = 3; j < 7; j++ )
+        tempOut += "<td><input type='text' id='server-" + id + "-customname' " +
+                   "class='semihidden' title='Click to Edit' />" +
+                   "</td>";
+        for( var j = 4; j < 8; j++ )
         {
             tempOut += "<td>" + obj[ j ] + "</td>";
         }
         tempOut += "<td>" + obj[ 8 ] + "</td>";
         tempOut += "</tr>";
-        serverids[ i ] = obj[ 0 ];
+        serverids[ i ] = id;
         $('#servertable').append( tempOut );
-        tempCache( "server-" + obj[ 0 ] + "-ip", obj[ 2 ] );
-        tempCache( "server-" + obj[ 0 ] + "-cpu", obj[ 3 ] );
-        tempCache( "server-" + obj[ 0 ] + "-ram", obj[ 4 ] );
-        tempCache( "server-" + obj[ 0 ] + "-hdd", obj[ 5 ] );
-        tempCache( "server-" + obj[ 0 ] + "-bw", obj[ 6 ] );
-        tempCache( "server-" + obj[ 0 ] + "-lastupdate", obj[ 7 ] );
-        tempCache( "server-" + obj[ 0 ] + "-operatingratio", obj[ 8 ] );
-        $('#server-' + obj[ 0 ] + "-link").click(function(){
+        $('#server-' + id + '-customname').val( obj[ 3 ] )
+            .hover(function(){
+                $(this).addClass("semihiddenhover");
+            }, function(){
+                $(this).removeClass("semihiddenhover");
+            }).focus(function(){
+                $(this).addClass("semihiddenactive");
+            }).blur(function(){
+                $(this).removeClass("semihiddenactive");
+                var oldVal = getTempCache( "servercustomname" );
+                var newVal = $(this).val();
+                if( oldVal != newVal )
+                {
+                    doAjax( "changeservername", {
+                        SERVER_ID: id,
+                        NAME: newVal
+                    });
+                }
+            });
+        tempCache( "server-" + id + "-ip", obj[ 2 ] );
+        tempCache( "server-" + id + "-customname", obj[ 3 ] );
+        tempCache( "server-" + id + "-cpu", obj[ 4 ] );
+        tempCache( "server-" + id + "-ram", obj[ 5 ] );
+        tempCache( "server-" + id + "-hdd", obj[ 6 ] );
+        tempCache( "server-" + id + "-bw", obj[ 7 ] );
+        tempCache( "server-" + id + "-lastupdate", obj[ 8 ] );
+        tempCache( "server-" + id + "-operatingratio", obj[ 9 ] );
+        $('#server-' + id + "-link").click(function(){
             doAjax( "viewserver", {
-                SERVER_ID: obj[ 0 ]
+                SERVER_ID: id
             }, "Servers" );
         });
     }
