@@ -452,10 +452,8 @@ if( isset( $servers ) && isset( $processes ) )
         $onlyUpdate = array();
         foreach( $infos as $serverInfo )
         {
-            $updateArray = $processes->redistributeCPU( $serverInfo[ 'ID' ],
-                                         $serverInfo[ 'CPU' ],
-                                         $serverInfo[ 'OPERATING_RATIO' ],
-                                         $serverInfo[ 'LAST_UPDATE_TIME' ] );
+            $updateArray = $processes->calculateServerRatio( $serverInfo[ 'ID' ],
+                                         $serverInfo[ 'CPU' ] );
             $servers->updateCPUInfo( $serverInfo[ 'ID' ], $updateArray );
             $lastUpdateTime = $processes->getLastUpdateTime();
             echo( "lastServerUpdateTime($lastUpdateTime);" );

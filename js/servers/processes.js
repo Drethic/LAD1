@@ -80,7 +80,7 @@ function startedResearch( programid, processid, remainingcycles )
                       getDefault( "RESEARCH_RAM" ), 0,
                       getDefault( "OP_RESEARCH" ), 0, 0, remainingcycles );
     updateProgramOperations();
-    updateProcessConsumptions();
+    updateAllServerConsumptions();
 }
 
 function removeProcess( id, callback, postcallback )
@@ -148,7 +148,6 @@ function startedDeletion( programid, processid, remainingcycles )
                       getDefault( "DELETE_RAM" ), 0,
                       getDefault( "OP_DELETE" ), 0, 0, remainingcycles );
     updateProgramOperations();
-    updateProcessConsumptions();
 }
 
 function finishedDeletion( processid )

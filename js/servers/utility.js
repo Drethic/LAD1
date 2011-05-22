@@ -81,8 +81,9 @@ function calculateETIC( cpu, remainingCycles )
 {
     var rate = cpu * toNumber( getTempCache( "servercpuratio" ) );
     var lastupdate = toNumber( getTempCache( "lastServerUpdateTime") );
-    var now = new Date();
-    var sinceupdate = ( now.getTime() / 1000 ) - lastupdate;
+    var nowDate = new Date();
+    var nowsecs = Math.round( nowDate.getTime() / 1000 );
+    var sinceupdate = nowsecs - lastupdate;
     var remainingtime = Math.round( remainingCycles / rate ) - sinceupdate;
     return remainingtime;
 }

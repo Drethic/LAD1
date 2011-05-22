@@ -8,6 +8,7 @@
  */
 
 require_once( 'MySqlObject.php' );
+require_once( 'servers.php' );
 
 class Processes extends MySQLObject
 {
@@ -26,8 +27,17 @@ class Processes extends MySQLObject
     
     function mergeModifiedServer( $serverid )
     {
-        $this->modifiedServers = array_merge( $this->modifiedServers,
-                                              array( $serverid ) );
+        echo( "\n//Merging $serverid\n" );
+        if( !in_array( $serverid, $this->modifiedServers ) )
+        {
+            $serverObj = new Servers();
+            $serverInfo = $serverObj->getServerByID( $serverid );
+            echo( "\n/* Redistributing\n" );
+            print_r( $serverInfo );
+            echo( "*/\n" );
+            $this->redistributeCPU( $serverInfo );
+            $this->modifiedServers[] = $serverid;
+        }
     }
     
     function getColumns( )
@@ -56,6 +66,7 @@ class Processes extends MySQLObject
                                $operation, $remainingCycles )
     {
         $this->mergeModifiedServer( $owningServer );
+        $this->mergeModifiedServer( $targetServer );
         $id1 = $this->insert( array( 'NULL', $target, $ownerServer, $ownerCPU,
                                     $ownerRAM, $bw, $operation, 0, 0,
                                     $remainingCycles ) );
@@ -113,8 +124,7 @@ class Processes extends MySQLObject
         return $this->delete( array( 'ID' => $id ) );
     }
     
-    function redistributeCPU( $serverid, $servercpu, $serverratio,
-                              $serverupdate )
+    function calculateServerRatio( $serverid, $servercpu )
     {
         $procs = $this->getProcessesByServer( $serverid );
         if( count( $procs ) == 0 )
@@ -129,8 +139,37 @@ class Processes extends MySQLObject
         }
         
         $ratio = round( ( $servercpu / $cpuTotal ), 4 );
-        $this->lastUpdateTime = time();
+        return array( 'LAST_UPDATE_TIME' => $this->lastUpdateTime,
+                      'OPERATING_RATIO' => $ratio );
+    }
+    
+    function redistributeCPU( $serverInfo )
+    {
+        $serverid = $serverInfo[ 'ID' ];
+        $servercpu = $serverInfo[ 'CPU' ];
+        $serverratio = $serverInfo[ 'OPERATING_RATIO' ];
+        $serverupdate = $serverInfo[ 'LAST_UPDATE_TIME' ];
+        $procs = $this->getProcessesByServer( $serverid );
+        
+        // Update last update time
+        if( $this->lastUpdateTime == 0 )
+        {
+            $this->lastUpdateTime = time();
+        }
+        
+        // If there aren't any processes, no need to redistribute
+        if( count( $procs ) == 0 )
+        {
+            return;
+        }
+        $cpuTotal = 0;
+        foreach( $procs as $proc )
+        {
+            $cpuTotal += $proc[ 'CPU_USAGE' ];
+        }
+        
         $nowtime = $this->lastUpdateTime;
+        echo( "\n//Last Update Time: {$this->lastUpdateTime}\n" );
         
         // BUG: I think this isn't calculating correctly
         if( $serverratio != 0 )
@@ -140,7 +179,7 @@ class Processes extends MySQLObject
                 $previousConsumed = $proc[ 'CYCLES_COMPLETED' ];
                 $perSecondRatio = $proc[ 'CPU_USAGE' ] * $serverratio;
                 $elapsedTime = $nowtime - $serverupdate;
-                $completedCycles = $serverratio * $elapsedTime;
+                $completedCycles = $perSecondRatio * $elapsedTime;
                 $newCompleted = $previousConsumed + $completedCycles;
                 $newRemaining = $proc[ 'CYCLES_REMAINING' ] - $completedCycles;
                 if( $newRemaining < 0 )
@@ -150,13 +189,16 @@ class Processes extends MySQLObject
                 $this->update( array( 'CYCLES_COMPLETED' => $newCompleted,
                                       'CYCLES_REMAINING' => $newRemaining ),
                                array( 'ID' => $proc[ 'ID' ] ) );
+                echo( "\n//Previous Consumed: $previousConsumed" );
+                echo( "\n//Per Second Ratio: $perSecondRatio" );
+                echo( "\n//Elapsed Time: $elapsedTime" );
+                echo( "\n//Completed Cycles: $completedCycles" );
+                echo( "\n//New Completed: $newCompleted" );
+                echo( "\n//New Remaining: $newRemaining\n" );
                 echo( "updateProcessProgress({$proc['ID']},$newCompleted," .
                       "$newRemaining);" );
             }
         }
-        
-        return array( 'LAST_UPDATE_TIME' => $nowtime,
-                      'OPERATING_RATIO' => $ratio );
     }
 }
 
