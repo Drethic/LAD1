@@ -80,7 +80,7 @@ function startedResearch( programid, processid, remainingcycles )
                       getDefault( "RESEARCH_RAM" ), 0,
                       getDefault( "OP_RESEARCH" ), 0, 0, remainingcycles );
     updateProgramOperations();
-    updateAllServerConsumptions();
+    updateProcessConsumptions();
 }
 
 function removeProcess( id, callback, postcallback )
@@ -132,7 +132,7 @@ function finishedResearch( processid )
 
         tempCache( "program-" + progid + "-version", newversion, true );
         tempCache( "program-" + progid + "-size", newsize, true );
-    });
+    }, updateAllServerConsumptions );
 }
 
 function cancelledProcess( processid )
@@ -148,6 +148,7 @@ function startedDeletion( programid, processid, remainingcycles )
                       getDefault( "DELETE_RAM" ), 0,
                       getDefault( "OP_DELETE" ), 0, 0, remainingcycles );
     updateProgramOperations();
+    updateProcessConsumptions();
 }
 
 function finishedDeletion( processid )
@@ -155,7 +156,7 @@ function finishedDeletion( processid )
     $("#process-" + processid + "-row").addClass( "doableOperation" );
 
     var progid = getTempCache( "process-" + processid + "-target" );
-    removeServerProgram( progid );
+    removeServerProgram( progid, undefined, updateAllServerConsumptions );
     removeProcess( processid, undefined, updateAllServerConsumptions );
 }
 

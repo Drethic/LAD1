@@ -1,6 +1,5 @@
 function updateServerConsumptionCPU( )
 {
-    // BUG: When cancelling a process, it will double the +100 sometimes, why?
     var cpuSum = getServerDetailSum( "cpu" );
     var total = toNumber( getTempCache( "servercpu" ) );
     var ratio = Math.round( total / cpuSum * 100 ) / 100;
@@ -356,7 +355,7 @@ function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
     }
 
     updateProgramOperations();
-    updateServerConsumption( "hdd" );
+    updateAllServerConsumptions();
 }
 
 function updateProgramOperations( )

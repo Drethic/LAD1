@@ -104,7 +104,7 @@ function animateServerStatModification( obj, objname, newvalue, cb )
 {
     obj.queue([]);
     obj.stop();
-    obj.show();
+    obj.animate( { opacity: 100 }, 1 );
     obj.delay( 1000 )
         .fadeOut( 100 )
         .fadeIn( 100 )
