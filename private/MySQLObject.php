@@ -132,6 +132,10 @@ abstract class MySQLObject
       {
          $valueKey = $valueKeys[ $i ];
          $value = $values[ $valueKey ];
+         if( is_string( $value ) )
+         {
+             $value = "\"" . mysql_real_escape_string( $value ) . "\"";
+         }
          $sql .= "$valueKey=$value ";
          if( $i < count( $values ) - 1 )
          {
