@@ -80,22 +80,39 @@ function applyModificationToServerStat( objname, newvalue, good, modification,
         return;
     }
     var style = good ? "positivemodifier" : "negativemodifier";
-    var prefix = "<span class='" + style + "'>&nbsp;&nbsp;&nbsp;&nbsp;";
-    if( modification > 0 )
+    var obj;
+    if( $("#" + objname + "-modification").length == 0 )
     {
-        prefix += "+";
+        var prefix = "<span class='" + style + "' id='" + objname +
+                     "-modification'>&nbsp;&nbsp;&nbsp;&nbsp;";
+        if( modification > 0 )
+        {
+            prefix += "+";
+        }
+        var postfix = "</span>";
+        obj = $(prefix + modification + postfix).appendTo( $('#' + objname) );
+        animateServerStatModification( obj, objname, newvalue, callback );
     }
-    var postfix = "</span>";
-    $(prefix + modification + postfix)
-        .appendTo( $('#' + objname) )
-        .delay( 1000 )
+    else
+    {
+        obj = $("#" + objname + "-modification");
+        animateServerStatModification( obj, objname, newvalue, callback );
+    }
+}
+
+function animateServerStatModification( obj, objname, newvalue, cb )
+{
+    obj.queue([]);
+    obj.stop();
+    obj.show();
+    obj.delay( 1000 )
         .fadeOut( 100 )
         .fadeIn( 100 )
         .fadeOut( 100 )
         .fadeIn( 100 )
         .delay( 1000 )
         .fadeOut( 300 )
-        .queue(function() {
-            tempCache( objname, newvalue, callback );
+        .queue(function(){
+            tempCache( objname, newvalue, cb );
         });
 }
