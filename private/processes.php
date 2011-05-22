@@ -27,14 +27,10 @@ class Processes extends MySQLObject
     
     function mergeModifiedServer( $serverid )
     {
-        echo( "\n//Merging $serverid\n" );
         if( !in_array( $serverid, $this->modifiedServers ) )
         {
             $serverObj = new Servers();
             $serverInfo = $serverObj->getServerByID( $serverid );
-            echo( "\n/* Redistributing\n" );
-            print_r( $serverInfo );
-            echo( "*/\n" );
             $this->redistributeCPU( $serverInfo );
             $this->modifiedServers[] = $serverid;
         }
@@ -169,9 +165,7 @@ class Processes extends MySQLObject
         }
         
         $nowtime = $this->lastUpdateTime;
-        echo( "\n//Last Update Time: {$this->lastUpdateTime}\n" );
         
-        // BUG: I think this isn't calculating correctly
         if( $serverratio != 0 )
         {
             foreach( $procs as $proc )
@@ -189,12 +183,6 @@ class Processes extends MySQLObject
                 $this->update( array( 'CYCLES_COMPLETED' => $newCompleted,
                                       'CYCLES_REMAINING' => $newRemaining ),
                                array( 'ID' => $proc[ 'ID' ] ) );
-                echo( "\n//Previous Consumed: $previousConsumed" );
-                echo( "\n//Per Second Ratio: $perSecondRatio" );
-                echo( "\n//Elapsed Time: $elapsedTime" );
-                echo( "\n//Completed Cycles: $completedCycles" );
-                echo( "\n//New Completed: $newCompleted" );
-                echo( "\n//New Remaining: $newRemaining\n" );
                 echo( "updateProcessProgress({$proc['ID']},$newCompleted," .
                       "$newRemaining);" );
             }
