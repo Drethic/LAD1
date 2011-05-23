@@ -30,10 +30,12 @@
  */
 
 require_once( 'private/defs.php' );
+require_once( 'private/errors.php' );
 
 function ahdie( $reason )
 {
-    //TODO Handle ajax handler deaths
+    $errors = new Errors;
+    $errors->addError( $reason );
     die( 'forceRefresh();' );
 }
 

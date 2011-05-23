@@ -85,6 +85,13 @@ $version[ 20 ] = "ALTER TABLE SERVERS MODIFY COLUMN `LAST_UPDATE_TIME` " .
                  "bigint unsigned NOT NULL";
 $version[ 21 ] = "ALTER TABLE SERVERS ADD COLUMN `CUSTOM_NAME` varchar(15) " .
                  "NOT NULL AFTER `IP`";
+$version[ 22 ] = "CREATE TABLE `ERRORS` (\n" .
+                 "`ERROR_TIME` bigint unsigned NOT NULL,\n" .
+                 "`DESCRIPTION` text NOT NULL,\n" .
+                 "`POST_DATA` text NOT NULL,\n" .
+                 "`SESSION_DATA` text NOT NULL,\n" .
+                 "`IP` varchar(20) NOT NULL\n" .
+                 ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);

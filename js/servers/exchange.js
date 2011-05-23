@@ -120,7 +120,6 @@ function createRow( name, minpoints, steppoints, availpoints )
 function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
 {
     // All our data is already cached, simply restore it
-    // TODO: Functionize when this needs to be duplicated
     var id = toNumber( getTempCache( "currentserver" ) );
     var owner = toNumber( getTempCache( "serverowner" ) );
     var ip = toNumber( getTempCache( "serverip" ) );
