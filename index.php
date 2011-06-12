@@ -1,5 +1,13 @@
 <?php
 
+/*
+ * @TODO: Finish run program
+ * @TODO: Custom program names
+ * @TODO: Create NPC servers
+ * @TODO: Add virus table, type, GUI
+ * @TODO: Run virus
+ */
+
 require_once( 'private/defs.php' );
 
 ?><!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
