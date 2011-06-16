@@ -17,7 +17,8 @@ function prepareThis()
     {
         this.prototype = {
             popupdata: new Array(),
-            cacheValues: new Array()
+            cacheValues: new Array(),
+            ajaxcb: function() {}
         }
     }
 }
@@ -465,3 +466,9 @@ function addScriptElement( url, callback )
     //head.appendChild( script );
     //$("body").append( script );
 }
+
+String.prototype.toCamelCase = function(){
+    return this.replace(/(?:^|\s)\w/g, function(match){
+        return match.toUpperCase();
+    });
+};

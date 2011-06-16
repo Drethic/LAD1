@@ -40,7 +40,8 @@ function ahdie( $reason )
 }
 
 /*********************************** STEP 1 ***********************************/
-define( 'NO_LOGIN', 1 );
+define( 'NO_LOGIN',   0x01 );
+define( 'ADMIN_ONLY', 0x02 );
 
 $actionRequirements =
   array( 'login' => array( NO_LOGIN, 'ah_login',
@@ -60,7 +61,9 @@ $actionRequirements =
          'exchangeprograms' => array( 0, 'ah_server', array( 'PROGRAM_ID',
                                       'CPU_UP', 'RAM_UP', 'HDD_UP', 'BW_UP' )),
          'changeservername' => array( 0, 'ah_server', array('SERVER_ID',
-                                      'NAME' )));
+                                      'NAME' )),
+         'a_gettables' => array( ADMIN_ONLY, 'ah_admin', array()),
+         'a_gettable' => array( ADMIN_ONLY, 'ah_admin', array('TABLE')));
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
@@ -83,6 +86,13 @@ if( isset( $_REQUEST['action'] ) )
         if( !( $requirements & NO_LOGIN ) && !isset( $_SESSION[ 'ID' ] ) )
         {
             ahdie( 'Action requires login.' );
+        }
+        
+        // If the user isn't a admin but needs to be, deny
+        if( ( $requirements & ADMIN_ONLY ) && !( isset( $_SESSION['isAdmin'] )
+            && $_SESSION['isAdmin'] ) )
+        {
+            ahdie( "Attempt to access admin command $action when not admin." );
         }
 
         // Now we check if there are bad parameters. The third column of the

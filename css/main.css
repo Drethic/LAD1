@@ -266,3 +266,15 @@ input.semihiddenactive, input.semihiddenhover {
     border: solid #dd7 2px;
     background-color: #ee9;
 }
+
+.primaryRow {
+    background-color: #456;
+}
+
+.alternateRow {
+    background-color: #654;
+}
+
+th {
+    font-size: 14px;
+}

@@ -213,7 +213,7 @@ abstract class MySQLObject
        return $ret;
    }
 
-   protected static function getCustom( $sql )
+   public static function getCustom( $sql )
    {
        $result = mysql_query( $sql );
 
