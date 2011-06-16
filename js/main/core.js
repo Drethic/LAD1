@@ -472,3 +472,34 @@ String.prototype.toCamelCase = function(){
         return match.toUpperCase();
     });
 };
+
+function stringify(obj) {
+    var t = typeof obj;
+    if( t != "object" || obj === null )
+    {
+        if( t == "string" )
+        {
+            obj = '"' + obj + '"';
+        }
+        return String( obj );
+    }
+    else
+    {
+        var n, v, j = [], arr = ( obj && obj.constructor == Array );
+        for( n in obj )
+        {
+            v = obj[ n ];
+            t = typeof obj;
+            if( t == "string" )
+            {
+                v = '"' + v + '"';
+            }
+            else if( t == "object" && v !== null )
+            {
+                v = stringify( v );
+            }
+            j.push( ( arr ? "" : '"' + n + '":' ) + String(v) );
+        }
+        return (arr ? "[" : "{") + String(j) + (arr ? "]" : "}");
+    }
+}

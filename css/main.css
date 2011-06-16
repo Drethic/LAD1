@@ -278,3 +278,8 @@ input.semihiddenactive, input.semihiddenhover {
 th {
     font-size: 14px;
 }
+
+.sorttblhead {
+    cursor: pointer;
+    font-size: 10px;
+}

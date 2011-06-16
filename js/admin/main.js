@@ -61,7 +61,14 @@ function admin_addTables( tablenames )
 
 function admin_tableView( values )
 {
+    var headers = values.shift();
     var view = $("#admin_tbl" + getTempCache( "currentAccordionView" ) );
+    view.append( makeSortableTable( headers, values, "admin-table", function(){
+        $("#admintableaccordion").accordion( "resize" );
+    }));
+    $("#admintableaccordion").accordion( "resize" );
+    /*
+    tempCache( "admin-tablevalues", stringify( values ) );
     var text = "<table style='font-size:10px'>";
     for( var i = 0; i < values.length; i++ )
     {
@@ -77,7 +84,7 @@ function admin_tableView( values )
             var open = "<td>", close = "</td>";
             if( i == 0 )
             {
-                open = "<th style='font-size:12px'>";
+                open = "<th style='font-size:12px;cursor:pointer'>";
                 close = "</th>";
             }
             text += open + row[ j ] + close;
@@ -86,7 +93,34 @@ function admin_tableView( values )
     }
     text += "</table>";
     view.html( text );
-    $("#admintableaccordion").accordion( "resize" );
+    view.find( "th" ).each(function(index,elem){
+        $(this).click(function(){
+            var valuestring = getTempCache( "admin-tablevalues" );
+            eval( "values = " + valuestring );
+            var header = values.shift();
+            var lastSort = getTempCache( "admin-tablelastsort" );
+            var newSort = index;
+            if( lastSort != index )
+            {
+                values.sort(function(a,b)
+                {
+                    return a[ index ] - b[ index ];
+                });
+            }
+            else
+            {
+                values.sort(function(a,b)
+                {
+                    return b[ index ] - a[ index ];
+                });
+                newSort = -1;
+            }
+            tempCache( "admin-tablelastsort", newSort );
+            values.unshift( header );
+            admin_tableView( values );
+        });
+    });
+    */
 }
 
 function admin_noTableView()

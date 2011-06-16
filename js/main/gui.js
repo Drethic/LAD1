@@ -414,3 +414,77 @@ function refreshCurrent( name )
 {
     doAjax( undefined, undefined, name );
 }
+
+/**
+ * @param headers 1-D array of headers
+ * @param values 2-D array of values
+ * @param cacheprefix Prefix for cache entries, must be unique
+ * @param postsortfunc Function(jQuery_table) to call after being sorted
+ */
+function makeSortableTable( headers, values, cacheprefix, postsortfunc )
+{
+    var table = $("<table id='" + cacheprefix + "tbl'></table>");
+    var headerrow = $("<tr class='primaryRow'></tr>");
+    var i, j;
+    
+    var printCells = function(values){
+        table.find( "tr:gt(0)" ).remove();
+        for( i = 0; i < values.length; i++ )
+        {
+            var row = $("<tr></tr>");
+            if( ( i - 1 ) % 2 == 0 )
+            {
+                row.addClass( "alternateRow" );
+            }
+            else
+            {
+                row.addClass( "primaryRow" );
+            }
+            for( j = 0; j < headers.length; j++ )
+            {
+                row.append( "<td>" + values[ i ][ j ] + "</td>" );
+            }
+            table.append( row );
+        }
+        if( postsortfunc != undefined )
+        {
+            postsortfunc(table);
+        }
+        tempCache( cacheprefix + "-values", stringify( values ) );
+    };
+
+    for( i = 0; i < headers.length; i++ )
+    {
+        var cell = $( "<th class='sorttblhead'>" + headers[ i ] + "</th>" );
+        cell.click(function(){
+            var index = $(this).prevAll("th").length;
+            var valuestring = getTempCache( cacheprefix + "-values" );
+            eval( "values = " + valuestring );
+            var lastSort = getTempCache( cacheprefix + "-lastsort" );
+            var newSort = index;
+            if( lastSort != index )
+            {
+                values.sort(function(a,b)
+                {
+                    return a[ index ] - b[ index ];
+                });
+            }
+            else
+            {
+                values.sort(function(a,b)
+                {
+                    return b[ index ] - a[ index ];
+                });
+                newSort = -1;
+            }
+            tempCache( cacheprefix + "-lastsort", newSort );
+            printCells( values );
+        });
+        headerrow.append( cell );
+    }
+    
+    table.append( headerrow );
+    printCells( values );
+    
+    return table;
+}
