@@ -446,11 +446,12 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc )
             }
             table.append( row );
         }
+        
+        tempCache( cacheprefix + "-values", stringify( values ) );
         if( postsortfunc != undefined )
         {
-            postsortfunc(table);
+            postsortfunc( table );
         }
-        tempCache( cacheprefix + "-values", stringify( values ) );
     };
 
     for( i = 0; i < headers.length; i++ )

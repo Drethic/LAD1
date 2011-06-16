@@ -67,60 +67,6 @@ function admin_tableView( values )
         $("#admintableaccordion").accordion( "resize" );
     }));
     $("#admintableaccordion").accordion( "resize" );
-    /*
-    tempCache( "admin-tablevalues", stringify( values ) );
-    var text = "<table style='font-size:10px'>";
-    for( var i = 0; i < values.length; i++ )
-    {
-        var row = values[ i ];
-        var cName = 'primaryRow';
-        if( ( i - 1 ) % 2 == 0 )
-        {
-            cName = 'alternateRow';
-        }
-        text += "<tr class='" + cName + "'>";
-        for( var j = 0; j < row.length; j++ )
-        {
-            var open = "<td>", close = "</td>";
-            if( i == 0 )
-            {
-                open = "<th style='font-size:12px;cursor:pointer'>";
-                close = "</th>";
-            }
-            text += open + row[ j ] + close;
-        }
-        text += "</tr>";
-    }
-    text += "</table>";
-    view.html( text );
-    view.find( "th" ).each(function(index,elem){
-        $(this).click(function(){
-            var valuestring = getTempCache( "admin-tablevalues" );
-            eval( "values = " + valuestring );
-            var header = values.shift();
-            var lastSort = getTempCache( "admin-tablelastsort" );
-            var newSort = index;
-            if( lastSort != index )
-            {
-                values.sort(function(a,b)
-                {
-                    return a[ index ] - b[ index ];
-                });
-            }
-            else
-            {
-                values.sort(function(a,b)
-                {
-                    return b[ index ] - a[ index ];
-                });
-                newSort = -1;
-            }
-            tempCache( "admin-tablelastsort", newSort );
-            values.unshift( header );
-            admin_tableView( values );
-        });
-    });
-    */
 }
 
 function admin_noTableView()
@@ -136,13 +82,18 @@ function admin_viewTempCache()
     {
         return;
     }
-    var text = "<table style='font-size:10px'>";
-    var arr = this.prototype.cacheValues;
-    for( var ind in arr )
+    var cacheValues = [];
+    for( var ind in this.prototype.cacheValues )
     {
-        text += "<tr><td>" + ind + "</td><td>" + arr[ ind ] + "</td></tr>";
+        cacheValues.push( [ ind, this.prototype.cacheValues[ ind ] ] );
     }
-    text += "</table>";
-    $("#admintab-Temp_Cache").html( text );
+    
+    obj.children().remove();
+    obj.append( makeSortableTable( ["Name", "Value"],
+        cacheValues, "admin-tempcache", function(tbl){
+            var children = tbl.find("td:contains('admin-tempcache')");
+            var parent = children.parent();
+            parent.remove();
+    }));
     resizePopup( "Admin" );
 }
