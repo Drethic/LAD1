@@ -63,7 +63,9 @@ $actionRequirements =
          'changeservername' => array( 0, 'ah_server', array('SERVER_ID',
                                       'NAME' )),
          'a_gettables' => array( ADMIN_ONLY, 'ah_admin', array()),
-         'a_gettable' => array( ADMIN_ONLY, 'ah_admin', array('TABLE')));
+         'a_gettable' => array( ADMIN_ONLY, 'ah_admin', array('TABLE')),
+         'a_runsqlselect' => array( ADMIN_ONLY, 'ah_admin', array('SQL')),
+         'a_runsqlother' => array( ADMIN_ONLY, 'ah_admin', array('SQL')));
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/

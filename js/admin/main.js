@@ -15,13 +15,17 @@ addMenuButton( "Admin", "ui-icon-star", function(){
     
     $('#admintabs').tabs({
         select: function(event, ui){
-            $(ui.panel).html( "" );
+            var panel = $(ui.panel);
             switch( ui.index )
             {
                 case 0:
+                    panel.html( "" );
                     doAjax( "a_gettables" );
                     break;
+                case 1:
+                    break;
                 case 2:
+                    panel.html( "" );
                     admin_viewTempCache();
             }
             return true;
@@ -32,7 +36,54 @@ addMenuButton( "Admin", "ui-icon-star", function(){
         },
         idPrefix: "admintab-"
     });
+    var sqltab = $("#admintab-Run_SQL");
+    sqltab.append( "Select:<br>" ).
+      append("<input type='text' id='admin_selectsql' style='width:100%'>").
+      append($("<div>Select</div>").
+        click(function(){
+            doAjax( "a_runsqlselect", {
+                SQL: $("#admin_selectsql").val()
+            });
+        }).button()
+      ).
+      append("<br><br>").
+      append("<input type='text' id='admin_othersql' style='width:100%'>").
+      append($("<div>Insert/Update/Delete</div>").
+        click(function(){
+            doAjax( "a_runsqlother", {
+                SQL: $("#admin_othersql").val()
+            });
+        }).button()
+      )
+      .append("<br><br>Result:<div id='admin_sqlresult'></div>");
 });
+
+function admin_selectSQLResult( headers, table, error )
+{
+    var result = $("#admin_sqlresult");
+    if( error != undefined )
+    {
+        result.html( error );
+    }
+    else
+    {
+        result.html( "" );
+        result.append( makeSortableTable( headers, table, "admin-sql" ) );
+    }
+}
+
+function admin_otherSQLResult( modified, error )
+{
+    var result = $("#admin_sqlresult");
+    if( error != undefined )
+    {
+        result.html( error );
+    }
+    else
+    {
+        result.html( modified + " rows were affected." );
+    }
+}
 
 function admin_addTables( tablenames )
 {
