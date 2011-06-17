@@ -18,7 +18,7 @@ function prepareThis()
         this.prototype = {
             popupdata: new Array(),
             cacheValues: new Array(),
-            ajaxcb: function() {}
+            clearRegions: new Array()
         }
     }
 }
@@ -201,7 +201,14 @@ function getTempCache( ind )
     return ret;
 }
 
-function tempCache( ind, val, updateScreen )
+/**
+ * @param ind          Index to set
+ * @param val          Value to set
+ * @param clearRegions The regions that will cause the index to be unset
+ * @param updateScreen calls Function(ind, val, old) or updates screen with \
+ *                     the object that has ID of ind with value of val
+ */
+function tempCache( ind, val, clearRegions, updateScreen )
 {
     prepareThis();
     if( ind == undefined )
@@ -216,6 +223,10 @@ function tempCache( ind, val, updateScreen )
     }
     var old = this.prototype.cacheValues[ ind ];
     this.prototype.cacheValues[ ind ] = val;
+    if( clearRegions != undefined )
+    {
+        this.prototype.clearRegions[ ind ] = clearRegions;
+    }
     if( updateScreen )
     {
         var obj = $("#" + ind);

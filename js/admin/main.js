@@ -63,6 +63,7 @@ function admin_tableView( values )
 {
     var headers = values.shift();
     var view = $("#admin_tbl" + getTempCache( "currentAccordionView" ) );
+    view.html( "" );
     view.append( makeSortableTable( headers, values, "admin-table", function(){
         $("#admintableaccordion").accordion( "resize" );
     }));
@@ -82,6 +83,8 @@ function admin_viewTempCache()
     {
         return;
     }
+    tempCache( "admin-tempcache-values", "" );
+    tempCache( "admin-tempcache-lastsort", "" );
     var cacheValues = [];
     for( var ind in this.prototype.cacheValues )
     {

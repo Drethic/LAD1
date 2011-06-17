@@ -427,9 +427,9 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc )
     var headerrow = $("<tr class='primaryRow'></tr>");
     var i, j;
     
-    var printCells = function(values){
+    var printCells = function(values, table){
         table.find( "tr:gt(0)" ).remove();
-        for( i = 0; i < values.length; i++ )
+        for( var i = 0; i < values.length; i++ )
         {
             var row = $("<tr></tr>");
             if( ( i - 1 ) % 2 == 0 )
@@ -463,29 +463,44 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc )
             eval( "values = " + valuestring );
             var lastSort = getTempCache( cacheprefix + "-lastsort" );
             var newSort = index;
+            var customsort = function(a,b){
+                var ca = Number(a);
+                var cb = Number(b);
+                if( !isNaN( ca ) )
+                {
+                    if( !isNaN( cb ) )
+                    {
+                        return ca - cb;
+                    }
+                    return -1;
+                }
+                else if( !isNaN( cb ) || a == undefined )
+                {
+                    return 1;
+                }
+                return a.localeCompare(b);
+            };
             if( lastSort != index )
             {
-                values.sort(function(a,b)
-                {
-                    return a[ index ] - b[ index ];
+                values.sort(function(a,b){
+                    return customsort(a[index],b[index]);
                 });
             }
             else
             {
-                values.sort(function(a,b)
-                {
-                    return b[ index ] - a[ index ];
+                values.sort(function(a,b){
+                    return customsort(b[index],a[index]);
                 });
                 newSort = -1;
             }
             tempCache( cacheprefix + "-lastsort", newSort );
-            printCells( values );
+            printCells( values, $("#" + cacheprefix + "tbl") );
         });
         headerrow.append( cell );
     }
     
     table.append( headerrow );
-    printCells( values );
+    printCells( values, table );
     
     return table;
 }
