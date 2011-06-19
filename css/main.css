@@ -12,10 +12,6 @@
     padding: 1px;
 }
 
-#loginbutton, #newuserbutton {
-    font-size: 0.6em;
-}
-
 #usernameerror, #passworderror, #cpassworderror, #emailerror {
     font-weight: bold;
 }
@@ -68,9 +64,12 @@ html, body {
     text-align: center;
 }
 
-button#logout, button#Servers, button#Explorer, button#Admin, button#Options {
-    width: 150px;
-    height: 26px;
+#menu button {
+    margin: 1px 0px;
+}
+
+#menu button .ui-button-text {
+    width: 100px;
     font-size: 12px;
     text-align: left;
 }

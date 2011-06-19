@@ -36,8 +36,9 @@ function validLogin( id )
         if($(this).hasClass('active'))
         {
             $(this).removeClass('active');
-            $("#menu").slideToggle();
-            $("#layout-container").layout().resetOverflow('south');
+            $("#menu").slideToggle(function(){
+                $("#layout-container").layout().resetOverflow('south');
+            });
         }
         else
         {
@@ -64,6 +65,16 @@ function validLogin( id )
         resizeHeight($('div.popup_body'));
         resizeWidth($('div.popup_body'));
     });
+    $('#center, #east, #taskbar :not(#start,#menu)').click(function(){
+        var start = $('#start');
+        if( start.hasClass( 'active' ) )
+        {
+            start.removeClass('active');
+            $("#menu").slideToggle(function(){
+                $("#layout-container").layout().resetOverflow('south');
+            });
+        }
+    })
 }
 
 function addMenuButton( name, icon, fn )
