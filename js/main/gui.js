@@ -243,6 +243,12 @@ function createWindow( name )
                     $(this).parents('.popup').fadeOut('fast').queue(function(){
                         $(this).removeClass('popup');
                         $(this).updatejTaskBar();
+                        updateCache( name );
+                        var cb = window.prototype.cbs[ "windowclose" ];
+                        if( cb != undefined )
+                        {
+                            cb( name );
+                        }
                         $(this).dequeue();
                     });
                     window.location.hash = '';
@@ -369,8 +375,10 @@ function refreshCurrent( name )
  * @param values 2-D array of values
  * @param cacheprefix Prefix for cache entries, must be unique
  * @param postsortfunc Function(jQuery_table) to call after being sorted
+ * @param clearRegion Region for clearing temp cache entries
  */
-function makeSortableTable( headers, values, cacheprefix, postsortfunc )
+function makeSortableTable( headers, values, cacheprefix, postsortfunc,
+                            clearRegion )
 {
     var table = $("<table id='" + cacheprefix + "tbl'></table>");
     var headerrow = $("<tr class='primaryRow'></tr>");
@@ -396,7 +404,7 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc )
             table.append( row );
         }
         
-        tempCache( cacheprefix + "-values", stringify( values ) );
+        tempCache( cacheprefix + "-values", stringify( values ), clearRegion );
         if( postsortfunc != undefined )
         {
             postsortfunc( table );
@@ -442,7 +450,7 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc )
                 });
                 newSort = -1;
             }
-            tempCache( cacheprefix + "-lastsort", newSort );
+            tempCache( cacheprefix + "-lastsort", newSort, clearRegion );
             printCells( values, $("#" + cacheprefix + "tbl") );
         });
         headerrow.append( cell );

@@ -1,7 +1,6 @@
 function noServerProcesses()
 {
     $('#processdiv').html( "This server has no processes!" );
-    //resizeHeight($('#serverpu'));
 }
 
 function serverProcesses( list )
@@ -18,6 +17,7 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
                            operation, linkid, cyclescomplete, cyclesremain )
 {
     var processtable = $('#processtable');
+    var cache = "Server-View";
     if( processtable.length == 0 )
     {
         $('#processdiv').html( "<table id='processtable'><thead><td>Target ID" +
@@ -38,21 +38,22 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempOut += "</tr>";
     processtable.append( tempOut );
 
-    tempCache( "process-" + id + "-target", targetprog, true );
-    tempCache( "process-" + id + "-server", owningserver );
-    tempCache( "process-" + id + "-cpu", cpu, true );
-    tempCache( "process-" + id + "-ram", ram, true );
-    tempCache( "process-" + id + "-bw", bw, true );
-    tempCache( "process-" + id + "-operation", operation, function(elem, val){
+    tempCache( "process-" + id + "-target", targetprog, cache, true );
+    tempCache( "process-" + id + "-server", owningserver, cache );
+    tempCache( "process-" + id + "-cpu", cpu, cache, true );
+    tempCache( "process-" + id + "-ram", ram, cache, true );
+    tempCache( "process-" + id + "-bw", bw, cache, true );
+    tempCache( "process-" + id + "-operation", operation, cache,
+      function(elem, val){
         $(elem).html( intToProcessOperation( val ) );
     });
     
     var etic = calculateETIC( cyclesremain );
-    tempCache( "process-" + id + "-cyclescomplete", cyclescomplete );
-    tempCache( "process-" + id + "-cyclesremain", cyclesremain );
-    tempCache( "process-" + id + "-completetime", etic );
+    tempCache( "process-" + id + "-cyclescomplete", cyclescomplete, cache );
+    tempCache( "process-" + id + "-cyclesremain", cyclesremain, cache );
+    tempCache( "process-" + id + "-completetime", etic, cache );
 
-    addTempCacheList( "processes", id );
+    addTempCacheList( "processes", id, cache );
 
     runTimeUpdater( "process-" + id + "-completetime", function(){
             return calculateETIC( cpu, getTempCache( "process-" + id + 
@@ -102,7 +103,7 @@ function removeProcess( id, callback, postcallback )
         tempCache( "process-" + id + "-operation" );
         tempCache( "process-" + id + "-completetime" );
 
-        removeTempCacheList( "processes", id );
+        removeTempCacheList( "processes", id, "Server-View" );
         
         if( postcallback != undefined )
         {
@@ -120,6 +121,7 @@ function removeProcess( id, callback, postcallback )
 
 function finishedResearch( processid )
 {
+    var cache = "Server-View";
     $("#process-" + processid + "-row").addClass( "doableOperation" );
     removeProcess( processid, function(id){
         var progid = getTempCache( "process-" + id + "-target" );
@@ -130,8 +132,8 @@ function finishedResearch( processid )
         var newversion = toNumber( programversion )+ 1;
         var newsize = toNumber( programsize ) + getProgramSize( programtype, 1 );
 
-        tempCache( "program-" + progid + "-version", newversion, true );
-        tempCache( "program-" + progid + "-size", newsize, true );
+        tempCache( "program-" + progid + "-version", newversion, cache, true );
+        tempCache( "program-" + progid + "-size", newsize, cache, true );
     }, updateAllServerConsumptions );
 }
 
@@ -162,6 +164,7 @@ function finishedDeletion( processid )
 
 function updateProcessProgress( procid, completed, remaining )
 {
-    tempCache( "process-" + procid + "-cyclescomplete", completed );
-    tempCache( "process-" + procid + "-cyclesremain", remaining );
+    var cache = "Server-View";
+    tempCache( "process-" + procid + "-cyclescomplete", completed, cache );
+    tempCache( "process-" + procid + "-cyclesremain", remaining, cache );
 }

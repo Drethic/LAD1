@@ -1,6 +1,9 @@
 // Initialize some stuffs
 createWindow( "Admin" );
 $("body").ajaxComplete( function(){admin_viewTempCache();} );
+prepareThis();
+this.prototype.cbs[ "windowclose" ] = function(){admin_viewTempCache();};
+
 addMenuButton( "Admin", "ui-icon-star", function(){
     var w = getPopupContext( "Admin" );
     w.html( "<div id='admintabs'><ul>" +
@@ -103,7 +106,7 @@ function admin_addTables( tablenames )
             doAjax( "a_gettable", {
                 TABLE: text
             });
-            tempCache( "currentAccordionView", text );
+            tempCache( "currentAccordionView", text, "Admin-Tables" );
         },
         collapsible: true,
         clearStyle: true
@@ -134,16 +137,17 @@ function admin_viewTempCache( force )
     {
         return;
     }
-    tempCache( "admin-tempcache-values", "" );
-    tempCache( "admin-tempcache-lastsort", "" );
+    tempCache( "admin-tempcache-values", "", "Admin-TempCache" );
+    tempCache( "admin-tempcache-lastsort", "", "Admin-TempCache" );
     var cacheValues = [];
     for( var ind in this.prototype.cacheValues )
     {
-        cacheValues.push( [ ind, this.prototype.cacheValues[ ind ] ] );
+        cacheValues.push( [ ind, this.prototype.cacheValues[ ind ],
+                            this.prototype.clearRegions[ ind ] ] );
     }
     
     obj.children().remove();
-    obj.append( makeSortableTable( ["Name", "Value"],
+    obj.append( makeSortableTable( ["Name", "Value", "Region"],
         cacheValues, "admin-tempcache", function(tbl){
             var children = tbl.find("td:contains('admin-tempcache')");
             var parent = children.parent();

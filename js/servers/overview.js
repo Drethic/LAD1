@@ -8,6 +8,7 @@ function noOwnedServers()
     });
 
     resizePopup( "Servers" );
+    updateCache( "Servers", "Server-Overview" );
 }
 
 function ownedServers( list )
@@ -18,6 +19,7 @@ function ownedServers( list )
         "title='Operating Ratio'>OR</td></thead></table>" );
 
     var serverids = new Array();
+    var cache = "Server-Overview";
     for( var i = 0; i < list.length; i++ )
     {
         var obj = list[ i ];
@@ -56,14 +58,14 @@ function ownedServers( list )
                     });
                 }
             });
-        tempCache( "server-" + id + "-ip", obj[ 2 ] );
-        tempCache( "server-" + id + "-customname", obj[ 3 ] );
-        tempCache( "server-" + id + "-cpu", obj[ 4 ] );
-        tempCache( "server-" + id + "-ram", obj[ 5 ] );
-        tempCache( "server-" + id + "-hdd", obj[ 6 ] );
-        tempCache( "server-" + id + "-bw", obj[ 7 ] );
-        tempCache( "server-" + id + "-lastupdate", obj[ 8 ] );
-        tempCache( "server-" + id + "-operatingratio", obj[ 9 ] );
+        tempCache( "server-" + id + "-ip", obj[ 2 ], cache );
+        tempCache( "server-" + id + "-customname", obj[ 3 ], cache );
+        tempCache( "server-" + id + "-cpu", obj[ 4 ], cache );
+        tempCache( "server-" + id + "-ram", obj[ 5 ], cache );
+        tempCache( "server-" + id + "-hdd", obj[ 6 ], cache );
+        tempCache( "server-" + id + "-bw", obj[ 7 ], cache );
+        tempCache( "server-" + id + "-lastupdate", obj[ 8 ], cache );
+        tempCache( "server-" + id + "-operatingratio", obj[ 9 ], cache );
         $('#server-' + id + "-link").click(function(){
             doAjax( "viewserver", {
                 SERVER_ID: id
@@ -71,9 +73,10 @@ function ownedServers( list )
         });
     }
 
-    tempCache( "servers", serverids.join(",") );
+    tempCache( "servers", serverids.join(","), cache );
 
     resizePopup( "Servers" );
+    updateCache( "Servers", "Server-Overview" );
 }
 
 function requestServers()
@@ -100,7 +103,7 @@ function applyModificationToServerStat( objname, newvalue, good, modification,
     }
     if( $('#' + objname).html() == "" || newvalue == getTempCache( objname ) )
     {
-        tempCache( objname, newvalue, callback );
+        tempCache( objname, newvalue, "Server-View", callback );
         return;
     }
     var style = good ? "positivemodifier" : "negativemodifier";
@@ -137,6 +140,6 @@ function animateServerStatModification( obj, objname, newvalue, cb )
         .delay( 1000 )
         .fadeOut( 300 )
         .queue(function(){
-            tempCache( objname, newvalue, cb );
+            tempCache( objname, newvalue, "Server-View", cb );
         });
 }

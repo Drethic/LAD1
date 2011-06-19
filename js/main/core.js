@@ -17,8 +17,10 @@ function prepareThis()
     {
         this.prototype = {
             popupdata: new Array(),
-            cacheValues: new Array(),
-            clearRegions: new Array()
+            cacheValues: {},
+            clearRegions: {},
+            windowClearRegions: new Array(),
+            cbs: new Array()
         }
     }
 }
@@ -147,6 +149,26 @@ function getProgramSize( type, version )
     }
 }
 
+function updateCache( win, cache )
+{
+    prepareThis();
+    var old = this.prototype.windowClearRegions[ win ];
+    this.prototype.windowClearRegions[ win ] = cache;
+    var arr = new Array();
+    var i;
+    for( i in this.prototype.clearRegions )
+    {
+        if( this.prototype.clearRegions[ i ] == old )
+        {
+            arr.push( i );
+        }
+    }
+    for( i in arr )
+    {
+        tempCache( arr[ i ] );
+    }
+}
+
 function getTempCacheListLength( ind )
 {
     var indstring = getTempCache( ind ).toString();
@@ -158,21 +180,21 @@ function getTempCacheListLength( ind )
     return elems.length;
 }
 
-function addTempCacheList( ind, val )
+function addTempCacheList( ind, val, clearRegion )
 {
     var curr = getTempCache( ind );
     if( curr == "" )
     {
-        tempCache( ind, val );
+        tempCache( ind, val, clearRegion );
         return;
     }
     var currList = curr.toString().split( "," );
     currList.push( val );
     var joined = currList.join( "," );
-    tempCache( ind, joined );
+    tempCache( ind, joined, clearRegion );
 }
 
-function removeTempCacheList( ind, val )
+function removeTempCacheList( ind, val, clearRegion )
 {
     var curr = getTempCache( ind );
     if( curr == "" )
@@ -185,7 +207,7 @@ function removeTempCacheList( ind, val )
         if( currList[ i ] == val )
         {
             currList.splice( i, 1 );
-            tempCache( ind, currList.join( "," ) );
+            tempCache( ind, currList.join( "," ), clearRegion );
         }
     }
 }
@@ -222,7 +244,15 @@ function tempCache( ind, val, clearRegions, updateScreen )
         val = val.toString();
     }
     var old = this.prototype.cacheValues[ ind ];
-    this.prototype.cacheValues[ ind ] = val;
+    if( val != undefined )
+    {
+        this.prototype.cacheValues[ ind ] = val;
+    }
+    else
+    {
+        delete this.prototype.cacheValues[ ind ];
+        delete this.prototype.clearRegions[ ind ];
+    }
     if( clearRegions != undefined )
     {
         this.prototype.clearRegions[ ind ] = clearRegions;
