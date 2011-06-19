@@ -428,7 +428,9 @@ elseif( $action == 'exchangeprograms' )
         ahdie( 'Upgrading something other than that file.' );
     }
 
-    $servers->adjustAllStats( $serverid, $cpuUp, $ramUp, $hddUp, $bwUp );
+    $servers->adjustAllStats( $serverid, $cpuUp * STEP_CPU,
+                              $ramUp * STEP_RAM, $hddUp * STEP_HDD,
+                              $bwUp * STEP_BW );
     $programs->deleteProgram( $programid, $serverid );
 
     echo( "exchangedProgram($programid,$cpuUp,$ramUp,$hddUp,$bwUp);" );
