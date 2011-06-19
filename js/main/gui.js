@@ -414,45 +414,65 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc,
     for( i = 0; i < headers.length; i++ )
     {
         var cell = $( "<th class='sorttblhead'>" + headers[ i ] + "</th>" );
-        cell.click(function(){
-            var index = $(this).prevAll("th").length;
-            var valuestring = getTempCache( cacheprefix + "-values" );
-            eval( "values = " + valuestring );
-            var lastSort = getTempCache( cacheprefix + "-lastsort" );
-            var newSort = index;
-            var customsort = function(a,b){
-                var ca = Number(a);
-                var cb = Number(b);
-                if( !isNaN( ca ) )
-                {
-                    if( !isNaN( cb ) )
+        if( values.length > 1 )
+        {
+            cell.prepend($('<span></span>').addClass('ui-icon').
+                addClass('ui-icon-arrowthick-2-n-s').
+                css( 'float', 'left' ));
+            cell.click(function(){
+                var sibth = $(this).siblings("th");
+                var sibicons = sibth.children(".ui-icon");
+                var thisicon = $(this).children(".ui-icon");
+                sibth.removeClass( "ui-state-hover" );
+                $(this).addClass( "ui-state-hover" );
+                sibicons.removeClass( 'ui-icon-arrowthick-1-s').
+                      removeClass( 'ui-icon-arrowthick-1-n').
+                      addClass( 'ui-icon-arrowthick-2-n-s');
+                thisicon.
+                      removeClass( 'ui-icon-arrowthick-2-n-s').
+                      removeClass( 'ui-icon-arrowthick-1-s').
+                      removeClass( 'ui-icon-arrowthick-1-n');
+                var index = $(this).prevAll("th").length;
+                var valuestring = getTempCache( cacheprefix + "-values" );
+                eval( "values = " + valuestring );
+                var lastSort = getTempCache( cacheprefix + "-lastsort" );
+                var newSort = index;
+                var customsort = function(a,b){
+                    var ca = Number(a);
+                    var cb = Number(b);
+                    if( !isNaN( ca ) )
                     {
-                        return ca - cb;
+                        if( !isNaN( cb ) )
+                        {
+                            return ca - cb;
+                        }
+                        return -1;
                     }
-                    return -1;
-                }
-                else if( !isNaN( cb ) || a == undefined )
+                    else if( !isNaN( cb ) || a == undefined )
+                    {
+                        return 1;
+                    }
+                    return a.localeCompare(b);
+                };
+                if( lastSort != index )
                 {
-                    return 1;
+                    values.sort(function(a,b){
+                        return customsort(a[index],b[index]);
+                    });
+                    thisicon.addClass( 'ui-icon-arrowthick-1-s');
                 }
-                return a.localeCompare(b);
-            };
-            if( lastSort != index )
-            {
-                values.sort(function(a,b){
-                    return customsort(a[index],b[index]);
-                });
-            }
-            else
-            {
-                values.sort(function(a,b){
-                    return customsort(b[index],a[index]);
-                });
-                newSort = -1;
-            }
-            tempCache( cacheprefix + "-lastsort", newSort, clearRegion );
-            printCells( values, $("#" + cacheprefix + "tbl") );
-        });
+                else
+                {
+                    values.sort(function(a,b){
+                        return customsort(b[index],a[index]);
+                    });
+                    thisicon.addClass( 'ui-icon-arrowthick-1-n');
+                    newSort = -1;
+                }
+                tempCache( cacheprefix + "-lastsort", newSort, clearRegion );
+                printCells( values, $("#" + cacheprefix + "tbl") );
+            });
+        }
         headerrow.append( cell );
     }
     

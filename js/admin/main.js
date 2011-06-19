@@ -142,16 +142,15 @@ function admin_viewTempCache( force )
     var cacheValues = [];
     for( var ind in this.prototype.cacheValues )
     {
-        cacheValues.push( [ ind, this.prototype.cacheValues[ ind ],
-                            this.prototype.clearRegions[ ind ] ] );
+        if( ind.indexOf( "admin-tempcache" ) == -1 )
+        {
+            cacheValues.push( [ ind, this.prototype.cacheValues[ ind ],
+                                this.prototype.clearRegions[ ind ] ] );
+        }
     }
     
     obj.children().remove();
     obj.append( makeSortableTable( ["Name", "Value", "Region"],
-        cacheValues, "admin-tempcache", function(tbl){
-            var children = tbl.find("td:contains('admin-tempcache')");
-            var parent = children.parent();
-            parent.remove();
-    }));
+        cacheValues, "admin-tempcache" ));
     resizePopup( "Admin" );
 }
