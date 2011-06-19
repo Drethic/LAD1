@@ -266,11 +266,6 @@ function createWindow( name )
             'max-height': $("#center").height(),
             'max-width': $("#center").width()
         })
-        /*
-        .resize(function() {
-            moveResizeElement($('#' + name + ' .popup_body'));
-        })
-        */
         .resizable({
             'containment': '#center',
             'alsoResize': "#" + name + "pu",
@@ -294,82 +289,14 @@ function createWindow( name )
             $(this).css( 'z-index', 1001 );
             $(this).trigger( 'dragstart' ).trigger( 'drag' ).trigger( 'dragstop' );
         })
-        /*
-        .bind('dragstop', function(event, ui) {
-            resizeElement($(this).attr('id'));
-        })
-        */
         .appendTo($('#center'));
-}
-
-function resizeElement( element )
-{
-    //var div = $('#center #' + element);
-    if(element == undefined) {
-        var div = $(this);
-    } else {
-        div = $('#center #' + element);
-    }
-    var divpu = div.find('.popup_body');
-    var divtop = div.offset().top;
-    var centerh = $('#center').height();
-    var divminh = centerh - 200;
-    var divheight = centerh - divtop;
-    var sebottom = div.find('.ui-resizable-se').offset().top + 12;
-    if(sebottom > centerh) {
-        if(divtop > divminh) {
-            div.css('top', divminh);
-        }
-    div.css('height', divheight);
-    divpu.css('height', divheight-20);
-    }
-}
-
-function hasVertScrollBar( element )
-{
-    return element.get(0).scrollHeight > element.height();
-}
-
-function hasHorScrollBar( element )
-{
-    return element.get(0).scrollWidth > element.width();
-}
-
-function moveResizeVert( element ) {
-    if( hasVertScrollBar(element) == true )
-    {
-        //$('div.ui-resizable-se').css('right', '20px');
-    }
-    else
-    {
-        //$('div.ui-resizable-se').css('right', '1px');
-    }
-}
-
-function moveResizeHor( element )
-{
-    if( hasHorScrollBar(element) == true )
-    {
-        //$('div.ui-resizable-se').css('bottom', '20px');
-    }
-    else
-    {
-        //$('div.ui-resizable-se').css('bottom', '1px');
-    }
-}
-
-function moveResizeElement( element )
-{
-    moveResizeVert( element );
-    moveResizeHor( element );
 }
 
 function resizePopup( name )
 {
-    var elem = $('#' + name + 'pu');
+    var elem = getPopupContext( name );
     resizeHeight( elem );
     resizeWidth( elem );
-    //moveResizeElement( element );
 }
 
 function resizeHeight( element ) {
@@ -378,10 +305,10 @@ function resizeHeight( element ) {
     var elemtop = element.offset().top;
     var centerh = $('#center').height();
     var centertop = $('#center').offset().top;
-    var newHeight = '0';
+    var newHeight;
     if( element.hasClass('popup_body_max') || elemsh > centerh )
     {
-        newHeight = centerh;
+        newHeight = centerh - 22;
     }
     else
     {
@@ -389,13 +316,13 @@ function resizeHeight( element ) {
     }
     if(newHeight > elemh)
     {
-        element.parents('.popup').css('height', newHeight + 22);
+        element.parent().css('height', newHeight + 22);
         element.css('height', newHeight);
     }
 
     if( elemtop + newHeight > centerh + centertop )
     {
-        element.parents('.popup').css('top', centerh + centertop - elemh);
+        element.parent().css('top', centerh + centertop - newHeight - 22);
     }
 }
 
@@ -406,7 +333,7 @@ function resizeWidth( element )
     var elemleft = element.offset().left;
     var centerw = $('#center').width();
     var centerleft = $('#center').offset().left;
-    var newWidth = '0';
+    var newWidth;
     if(element.hasClass('popup_body_max') || elemsw > centerw)
     {
         newWidth = centerw;
@@ -417,13 +344,13 @@ function resizeWidth( element )
     }
     if(newWidth > elemw)
     {
-        element.parents('.popup').css('height', newWidth + 22);
-        element.css('height', newWidth);
+        element.parent().css('width', newWidth);
+        element.css('width', newWidth);
     }
 
     if( elemleft + elemw > centerw + centerleft )
     {
-        element.parents('.popup').css('left', centerw + centerleft - elemw);
+        element.parent().css('left', centerw + centerleft - newWidth);
     }
 }
 

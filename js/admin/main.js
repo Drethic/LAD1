@@ -26,7 +26,7 @@ addMenuButton( "Admin", "ui-icon-star", function(){
                     break;
                 case 2:
                     panel.html( "" );
-                    admin_viewTempCache();
+                    admin_viewTempCache( true );
             }
             return true;
         },
@@ -127,10 +127,10 @@ function admin_noTableView()
     view.html( "No values." );
 }
 
-function admin_viewTempCache()
+function admin_viewTempCache( force )
 {
     var obj = $("#admintab-Temp_Cache");
-    if( obj.length != 1 )
+    if( obj.length != 1 || obj.css( 'display' ) == 'none' && !force )
     {
         return;
     }
