@@ -52,12 +52,12 @@ jQuery.fn.jTaskBar = function (prop) {
 		});
 	}
 	// Give all '.winClass' elements the z-index attribute in order to create the illusion of depth.
-	$cwrapper.children(prop.winClass).css("z-index", "10000");
+	$cwrapper.children(prop.winClass).css("z-index", "1000");
 	// When a 'window' is clicked: 1. bring it to front. 2. mark its jTask as 'current'
 	$cwrapper.children(prop.winClass).mousedown(function() {
-		$cwrapper.children(prop.winClass).css("z-index", "10000");
+		$cwrapper.children(prop.winClass).css("z-index", "1000");
 		$jTaskBar.children('.jTask').removeClass('jTask-current');
-		$(this).css("z-index", "10001");
+		$(this).css("z-index", "1001");
 		$jTaskBar.children('.jTask#'+$(this).attr("id")).addClass('jTask-current');
 	});
         /*

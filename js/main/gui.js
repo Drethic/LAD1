@@ -287,9 +287,12 @@ function createWindow( name )
                 $('#jTaskBar').find('.jTask#' + name).addClass('jTask-current');
             }
         })
-        .click(function(){
+        .mousedown(function(){
             $('#jTaskBar').find('.jTask').removeClass('jTask-current');
             $('#jTaskBar').find('.jTask#' + name).addClass('jTask-current');
+            $('.popup').css( 'z-index', 1000 );
+            $(this).css( 'z-index', 1001 );
+            $(this).trigger( 'dragstart' ).trigger( 'drag' ).trigger( 'dragstop' );
         })
         /*
         .bind('dragstop', function(event, ui) {

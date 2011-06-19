@@ -119,6 +119,7 @@ div.popup_body {
     min-width: 413px;
     background-color:#FFF;
     overflow:auto;
+    line-height: normal;
 }
 div.popup_max {
     top: 0px !important;
