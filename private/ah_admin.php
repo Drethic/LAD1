@@ -44,6 +44,8 @@ elseif( $action == 'a_runsqlselect')
     
     $err = mysql_real_escape_string( mysql_error() );
     
+    $columns = array();
+    
     if( !empty( $ret ) )
     {
         if( !isset( $ret[ 0 ] ) )

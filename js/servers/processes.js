@@ -20,7 +20,8 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     var cache = "Server-View";
     if( processtable.length == 0 )
     {
-        $('#processdiv').html( "<table id='processtable'><thead><td>Target ID" +
+        $('#processdiv').html( "<table id='processtable' style='width:100%'>" +
+                               "<thead><td>Target ID" +
                                "</td><td>CPU</td><td>RAM</td><td>BW</td>" +
                                "<td>Operation</td><td title='Estimated Time " +
                                "of Completion'>ETC</td></thead></table>" );

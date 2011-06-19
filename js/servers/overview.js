@@ -35,7 +35,7 @@ function ownedServers( list )
         {
             tempOut += "<td>" + obj[ j ] + "</td>";
         }
-        tempOut += "<td>" + obj[ 8 ] + "</td>";
+        tempOut += "<td>" + obj[ 9 ] + "</td>";
         tempOut += "</tr>";
         serverids[ i ] = id;
         $('#servertable').append( tempOut );

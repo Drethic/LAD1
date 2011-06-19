@@ -153,6 +153,10 @@ function updateCache( win, cache )
 {
     prepareThis();
     var old = this.prototype.windowClearRegions[ win ];
+    if( old == cache )
+    {
+        return;
+    }
     this.prototype.windowClearRegions[ win ] = cache;
     var arr = new Array();
     var i;

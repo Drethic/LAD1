@@ -147,7 +147,7 @@ abstract class MySQLObject
 
     /**
      * Simplifies performing an UPDATE statement
-     * @param array values The key/values to update
+     * @param array values The key/values to update (strings need to be escaped)
      * @param array conditions The filter (@see arrayToFilterString)
      * @return int Number of rows affected
      */
@@ -162,10 +162,6 @@ abstract class MySQLObject
       {
          $valueKey = $valueKeys[ $i ];
          $value = $values[ $valueKey ];
-         if( is_string( $value ) )
-         {
-             $value = "\"" . mysql_real_escape_string( $value ) . "\"";
-         }
          $sql .= "$valueKey=$value ";
          if( $i < count( $values ) - 1 )
          {
@@ -175,7 +171,7 @@ abstract class MySQLObject
 
       // Add conditions
       $sql .= $this->arrayToFilterString( $conditions );
-
+      
       $result = mysql_query( $sql );
 
       if( !$result )
