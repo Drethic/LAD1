@@ -60,6 +60,40 @@ require_once( 'private/servers.php' );
 require_once( 'private/programs.php' );
 require_once( 'private/processes.php' );
 
+/**
+ * Validates that a server belongs to the user requesting the information
+ * @param int serverid The ID of the server
+ * @param Servers servers The Servers object
+ * @return array Server info from @see Servers::getServerByID
+ */
+function validateServerOwnership( $serverid, $servers )
+{
+    $serverInfo = $servers->getServerByID( $serverid );
+    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
+    {
+        ahdie( 'You don\'t own this server nutmeg.' );
+    }
+    
+    return $serverInfo;
+}
+
+/**
+ * Validates that a program belongs to the user requesting the information
+ * @param int programid The ID of the program
+ * @param Programs programs The Programs object
+ * @return array Program info from @see Programs::getProgramOwnerAndServerByID
+ */
+function validateProgramOwnership( $programid, $programs )
+{
+    $programInfo = $programs->getProgramOwnerAndServerByID( $programid );
+    if( $programInfo[ 'USER_ID' ] != $_SESSION[ 'ID' ] )
+    {
+        ahdie( 'Performing action on program not owning.' );
+    }
+
+    return $programInfo;
+}
+
 /*********************************** STEP 1 ***********************************/
 if( $action == 'requestservers' )
 {
@@ -101,14 +135,8 @@ elseif( $action == 'viewserver' )
 {
     $id = $_REQUEST[ 'SERVER_ID' ];
     $servers = new Servers();
-    $serverInfo = $servers->getServerByID( $id );
-
-/*********************************** STEP 3a **********************************/
-    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
-    {
-        ahdie( 'You don\'t own this server nutmeg.' );
-    }
-
+    $serverInfo = validateServerOwnership( $id, $servers );
+    
     // General Server Information plus layout the screen for programs/processes
     echo 'beginServerView(' . cleanupRowForJS( $serverInfo ) . ');';
 
@@ -130,15 +158,9 @@ elseif( $action == 'freeprograms' )
 {
     $serverid = $_REQUEST[ 'SERVER_ID' ];
     $servers = new Servers();
-    $serverInfo = $servers->getServerByID( $serverid );
+    $serverInfo = validateServerOwnership( $serverid, $servers );
 
     $programs = new Programs();
-
-/*********************************** STEP 4a **********************************/
-    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
-    {
-        ahdie( 'Getting free programs for somebody else?' );
-    }
 
     $serverPrograms = $programs->getProgramsByServer( $serverid );
 
@@ -220,16 +242,10 @@ elseif( $action == 'startresearch' )
     $programs = new Programs();
     $servers = new Servers();
     $processes = new Processes();
-    $programInfo = $programs->getProgramOwnerAndServerByID( $programid );
+    $programInfo = validateProgramOwnership( $programid, $programs );
     $userid = $programInfo[ 'USER_ID' ];
     $serverid = $programInfo[ 'SERVER_ID' ];
     $programtype = $programInfo[ 'TYPE' ];
-
-/*********************************** STEP 5a **********************************/
-    if( $userid != $_SESSION[ 'ID' ] )
-    {
-        ahdie( 'Researching for other people are we?' );
-    }
 
     $serverInfo = $servers->getServerByID( $serverid );
     $serverConsumption = $processes->getConsumptionByServer( $serverid );
@@ -305,13 +321,7 @@ elseif( $action == 'finishprocess' )
     // Get information about the server owning the process
     $serverid = $processInfo[ 'OWNING_SERVER' ];
     $servers = new Servers();
-    $serverInfo = $servers->getServerByID( $serverid );
-
-/*********************************** STEP 6a **********************************/
-    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
-    {
-        ahdie( 'Finishing a process for someone else = bad.' );
-    }
+    $serverInfo = validateServerOwnership( $serverid, $servers );
 
     // Look up the current HDD usage
     $programid = $processInfo[ 'TARGET_PROGRAM' ];
@@ -362,13 +372,7 @@ elseif( $action == 'cancelprocess' )
     // Get information about the server owning the process
     $serverid = $processInfo[ 'OWNING_SERVER' ];
     $servers = new Servers();
-    $serverInfo = $servers->getServerByID( $serverid );
-
-/*********************************** STEP 7a **********************************/
-    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
-    {
-        ahdie( 'Cancelling a process for someone else = bad...for now.' );
-    }
+    $serverInfo = validateServerOwnership( $serverid, $servers );
 
     $processes->deleteProcess( $processid, $serverid );
 
@@ -383,13 +387,7 @@ elseif( $action == 'startdelete' )
     $serverid = $programInfo[ 'SERVER_ID' ];
 
     $servers = new Servers();
-    $serverInfo = $servers->getServerByID( $serverid );
-    $serverOwner = $serverInfo[ 'OWNER_ID' ];
-/*********************************** STEP 8a **********************************/
-    if( $serverOwner != $_SESSION[ 'ID' ] )
-    {
-        ahdie( 'Can\'t delete stuff for other people yet.' );
-    }
+    $serverInfo = validateServerOwnership( $serverid, $servers );
 
     $processes = new Processes();
     $serverProcesses = $processes->getProcessesByProgram( $programid );
@@ -415,16 +413,10 @@ elseif( $action == 'exchangeprograms' )
 
     $programs = new Programs();
     $servers = new Servers();
-    $programInfo = $programs->getProgramOwnerAndServerByID( $programid );
+    $programInfo = validateProgramOwnership( $programid, $programs );
     $userid = $programInfo[ 'USER_ID' ];
     $serverid = $programInfo[ 'SERVER_ID' ];
     $version = $programInfo[ 'VERSION' ];
-
-/*********************************** STEP 5a **********************************/
-    if( $userid != $_SESSION[ 'ID' ] )
-    {
-        ahdie( 'Exchanging programs for other people are we?' );
-    }
 
     $cpuUp = $_REQUEST[ 'CPU_UP' ];
     $ramUp = $_REQUEST[ 'RAM_UP' ];
@@ -445,12 +437,7 @@ else if( $action == 'changeservername' )
 {
     $id = $_REQUEST[ 'SERVER_ID' ];
     $servers = new Servers();
-    $serverInfo = $servers->getServerByID( $id );
-
-    if( $serverInfo[ 'OWNER_ID' ] != $_SESSION[ 'ID' ] )
-    {
-        ahdie( 'No changing names of servers you don\'t own.' );
-    }
+    $serverInfo = validateServerOwnership( $serverid, $servers );
 
     $name = $_REQUEST[ 'NAME' ];
     $servers->updateName( $id, $name );

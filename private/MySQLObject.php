@@ -25,18 +25,29 @@
 
 abstract class MySQLObject
 {
-   abstract protected function getColumns();
-   abstract protected function getTableName();
+    /**
+     * Overload to provide low level with all of the columns
+     * @return array Names for each column
+     */
+    abstract protected function getColumns();
+    /**
+     * Overload to provide low level with the name of the table
+     * @return string Table name
+     */
+    abstract protected function getTableName();
 
-   // Filters = key/value for columnName/columnValue
-   // Orders = key for each columnName, value is ASC/DESC
-   // Limit = integer
-   // onlyColumns = value for each columnName
-   // All except limit expect an array
-   // Offset = integer
-   public function get( $filters = NULL, $orders = NULL, $limit = 0,
+    /**
+     * Simplifies performing a SELECT statement
+     * @param array filters key/value for column name/value
+     * @param array orders key for each column, value is ASC or DESC
+     * @param int limit Integer to limit the number of results
+     * @parram array onlyColumns Set for only specific column, NULL means *
+     * @param int offset Integer to offset the results by
+     * @return array @see getTypedResult
+     */
+    public function get( $filters = NULL, $orders = NULL, $limit = 0,
                         $onlyColumns = NULL, $offset = 0 )
-   {
+    {
        $sql = 'SELECT ';
        // Only specific columns to pull
        if( !is_array( $onlyColumns ) )
@@ -89,10 +100,17 @@ abstract class MySQLObject
        }
 
        return $this->getTypedResult( $result );
-   }
+    }
 
-   public function insert( $values )
-   {
+    /**
+     * Simplifies performing an INSERT statement.
+     * Values are not checked for consistency, instead an error will be thrown
+     * if the insert fails.
+     * @param array values The values to insert
+     * @return int The last insert ID
+     */
+    public function insert( $values )
+    {
       $sql = 'INSERT INTO ' . $this->getTableName() . ' VALUES(' .
              implode( ', ', $values ) . ')';
 
@@ -104,10 +122,15 @@ abstract class MySQLObject
       }
 
       return mysql_insert_id();
-   }
+    }
 
-   public function delete( $filters )
-   {
+    /**
+     * Simplifies performing a DELETE statement
+     * @param array filters Uses @see arrayToFilterString, NULL is *bad*
+     * @return int Number of rows deleted
+     */
+    public function delete( $filters )
+    {
       $sql = 'DELETE FROM ' . $this->getTableName();
 
       $sql .= $this->arrayToFilterString( $filters );
@@ -120,14 +143,21 @@ abstract class MySQLObject
       }
 
       return mysql_affected_rows();
-   }
+    }
 
-   public function update( $values, $conditions = NULL )
-   {
+    /**
+     * Simplifies performing an UPDATE statement
+     * @param array values The key/values to update
+     * @param array conditions The filter (@see arrayToFilterString)
+     * @return int Number of rows affected
+     */
+    public function update( $values, $conditions = NULL )
+    {
       $sql = 'UPDATE ' . $this->getTableName() . ' SET ';
       $valueKeys = array_keys( $values );
       $conditionKeys = array_keys( $conditions );
 
+      // Build the update sequence
       for( $i = 0; $i < count( $values ); $i++ )
       {
          $valueKey = $valueKeys[ $i ];
@@ -154,10 +184,15 @@ abstract class MySQLObject
       }
 
       return mysql_affected_rows();
-   }
+    }
 
-   public function getSingle( $value )
-   {
+    /**
+     * Utilizes @see getColumns to get a row based on the first column.
+     * @param int value The ID in the first column to search for
+     * @return array The row with the ID in the first column
+     */
+    public function getSingle( $value )
+    {
        $columns = $this->getColumns();
        $columnStr = $columns[ 0 ];
        $ret = $this->get( array( $columnStr => $value ), NULL, 1 );
@@ -166,16 +201,29 @@ abstract class MySQLObject
            return false;
        }
        return $ret[ 0 ];
-   }
+    }
 
-   protected function escapifyString( $input )
-   {
+    /**
+     * Transforms a string into a MySQL friendly string
+     * @param string input String to escapify
+     * @return string Escapified string (includes quotes 'input')
+     */
+    protected function escapifyString( $input )
+    {
        return "'" . mysql_real_escape_string( $input ) . "'";
-   }
+    }
 
-   public function getOnlyColumn( $columnName, $order = 'DESC', $limit = 0,
+    /**
+     * Gets only a single column from the table
+     * @param string columnName Name of the column to retrieve from the table
+     * @param string order ASC or DESC
+     * @param int limit Limit the number of results, 0 for no limit
+     * @param array filters The key/values to filter on
+     * @return array Single array with each column's value
+     */
+    public function getOnlyColumn( $columnName, $order = 'DESC', $limit = 0,
                                   $filters = NULL )
-   {
+    {
        $sql = "SELECT `$columnName` from `" . $this->getTableName() . '` ';
 
        // Add filters
@@ -211,10 +259,15 @@ abstract class MySQLObject
        }
 
        return $ret;
-   }
+    }
 
-   public static function getCustom( $sql )
-   {
+    /**
+     * Performs a custom SQL statement
+     * @param string sql Query to perform
+     * @return array Piped through @see getTypedResult
+     */
+    public static function getCustom( $sql )
+    {
        $result = mysql_query( $sql );
 
        if( !$result )
@@ -229,10 +282,17 @@ abstract class MySQLObject
            $ret = $ret[ 0 ];
        }
        return $ret;
-   }
+    }
 
-   private function arrayToFilterString( $filters )
-   {
+    /**
+     * Converts an array of filters into a string.  Takes a key/value array as
+     * input and returns a WHERE key=value clause.  Accepts arrays as values
+     * and appropriately converts clause to key IN (values...).
+     * @param array filters Key/values to filter on
+     * @return string WHERE clause or empty string
+     */
+    private function arrayToFilterString( $filters )
+    {
        // Filters
        if( is_array( $filters ) && count( $filters ) > 0 )
        {
@@ -259,23 +319,40 @@ abstract class MySQLObject
            return $sql;
        }
        return '';
-   }
+    }
 
-   protected function adjustSingleByID( $id, $field, $amount )
-   {
+    /**
+     * Adjusts a single values based on its rows' ID.
+     * @param int id The value to search for in the first column
+     * @param string field The field to update
+     * @param int amount The amount to increase the field's value by
+     * @return array @see update
+     */
+    protected function adjustSingleByID( $id, $field, $amount )
+    {
        $columns = $this->getColumns();
        $indexStr = $columns[ 0 ];
        return $this->update( array( $field => "$field+$amount" ),
                              array( $indexStr => $id ) );
-   }
-   
-   public static function getAll( $tableName )
-   {
+    }
+
+    /**
+     * Gets all values from a table
+     * @param string tableName The name of the table to retrieve
+     * @return array @see getCustom
+     */
+    public static function getAll( $tableName )
+    {
        return MySQLObject::getCustom( "SELECT * FROM `$tableName`" );
-   }
-   
-   public static function getAllAsJS( $tableName )
-   {
+    }
+
+    /**
+     * Utility function to return an array properly formatted as a JS string
+     * @param string tableName The name of the table to retreive
+     * @return string [[values...],...]
+     */
+    public static function getAllAsJS( $tableName )
+    {
        $arr = MySQLObject::getAll( $tableName );
        $ret = '[';
        $rcount = count( $arr );
@@ -309,10 +386,17 @@ abstract class MySQLObject
        }
        $ret .= ']';
        return $ret;
-   }
-   
-   public static function getTypedResult( $result )
-   {
+    }
+
+    /**
+     * Ensures that each result is the proper type before returning it.
+     * Checks the table to make sure floats and ints are properly converted
+     * to such rather than returning them as strings.
+     * @param object result The row of MySQL data to work with
+     * @return array Array of properly typed results
+     */
+    public static function getTypedResult( $result )
+    {
        $ret = array();
        $columnInfo = array();
        $columns = mysql_num_fields( $result );
@@ -341,7 +425,7 @@ abstract class MySQLObject
            $ret[] = $row;
        }
        return $ret;
-   }
+    }
 }
 
 ?>
