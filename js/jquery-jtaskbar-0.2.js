@@ -124,6 +124,7 @@ jQuery.fn.jTaskBar = function (prop) {
 jQuery.fn.updatejTaskBar = function() {
     $wrapper = $(this);
     $cwrapper = $("#center");
+    $jTaskBar = $('#jTaskBar');
     $jTaskBar.find('.jTask').each( function() {
         $this = $cwrapper.find('.popup#'+$(this).attr('id'));
         if ($this.css('display') == "none") {
@@ -151,6 +152,9 @@ jQuery.fn.updatejTaskBar = function() {
                 {
                     $jTaskBar.find( '.jTask#' + $(this).attr('id') ).addClass( "jTask-current" );
                 }
+                // NO clue why but for some reason resizeability requires
+                // this here or the menu items won't show. Semi-ugly hack
+                $(this).trigger('resizestart').trigger('resize').trigger('resizestop');
             }
         });
     });

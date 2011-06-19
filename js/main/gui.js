@@ -92,6 +92,11 @@ function addMenuButton( name, icon, fn )
                 fn();
                 return;
             }
+            // Make sure it's a popup
+            if( !obj.hasClass( "popup" ) )
+            {
+                obj.addClass('popup');
+            }
             // Show the window
             if( obj.css('display') == 'none' )
             {
@@ -102,11 +107,6 @@ function addMenuButton( name, icon, fn )
                 });
                 getPopupContext( id ).empty();
                 fn();
-            }
-            // Make sure it's a popup
-            if( !obj.hasClass( "popup" ) )
-            {
-                obj.addClass('popup');
             }
             // Fade in the taskbar entry
             if( $('#jTaskBar').find('div#'+id).hasClass('jTask-hidden') )
@@ -138,7 +138,6 @@ function createWindow( name )
                       "</span></div>")
                 .click( function() {
                     refreshCurrent( name );
-                    //resizeElement($(this).parents('.popup').attr('id'));
                 })
             )
             .append($("<div class='min_popup' title='Minimize'><span class='ui-icon " +
@@ -197,9 +196,6 @@ function createWindow( name )
                             'alsoResize': "#" + name + "pu",
                             'containment': '#center'
                         });
-                        div.bind('dragstop', function(event, ui) {
-                            resizeElement($(this).attr('id'));
-                        });
                         div.find('.popup_header').css( "cursor", "move" );
                         div.removeClass('popup_max')
                             .removeAttr('style')
@@ -239,7 +235,6 @@ function createWindow( name )
                         $(this).dequeue();
                     });
                     window.location.hash = '';
-                    $(this).updatejTaskBar();
                 })
             )
             .css( "cursor", "move" )
@@ -256,25 +251,40 @@ function createWindow( name )
 	})
         .css({
             'display': 'none',
+            'position': 'absolute',
             'max-height': $("#center").height(),
             'max-width': $("#center").width()
         })
+        /*
         .resize(function() {
             moveResizeElement($('#' + name + ' .popup_body'));
         })
+        */
         .resizable({
             'containment': '#center',
-            'alsoResize': "#" + name + "pu"
+            'alsoResize': "#" + name + "pu",
+            'handles': "n, e, s, w, ne, nw, se, sw"
         })
         .draggable({
             'opacity': '0.7',
             'cancel': '.popup_body',
             'cursor': 'move',
-            'containment': '#center'
+            'containment': '#center',
+            'stack': '.popup',
+            start: function(event,ui){
+                $('#jTaskBar').find('.jTask').removeClass('jTask-current');
+                $('#jTaskBar').find('.jTask#' + name).addClass('jTask-current');
+            }
         })
+        .click(function(){
+            $('#jTaskBar').find('.jTask').removeClass('jTask-current');
+            $('#jTaskBar').find('.jTask#' + name).addClass('jTask-current');
+        })
+        /*
         .bind('dragstop', function(event, ui) {
             resizeElement($(this).attr('id'));
         })
+        */
         .appendTo($('#center'));
 }
 
@@ -314,11 +324,11 @@ function hasHorScrollBar( element )
 function moveResizeVert( element ) {
     if( hasVertScrollBar(element) == true )
     {
-        $('div.ui-resizable-se').css('right', '20px');
+        //$('div.ui-resizable-se').css('right', '20px');
     }
     else
     {
-        $('div.ui-resizable-se').css('right', '1px');
+        //$('div.ui-resizable-se').css('right', '1px');
     }
 }
 
@@ -326,11 +336,11 @@ function moveResizeHor( element )
 {
     if( hasHorScrollBar(element) == true )
     {
-        $('div.ui-resizable-se').css('bottom', '20px');
+        //$('div.ui-resizable-se').css('bottom', '20px');
     }
     else
     {
-        $('div.ui-resizable-se').css('bottom', '1px');
+        //$('div.ui-resizable-se').css('bottom', '1px');
     }
 }
 
@@ -345,6 +355,7 @@ function resizePopup( name )
     var elem = $('#' + name + 'pu');
     resizeHeight( elem );
     resizeWidth( elem );
+    //moveResizeElement( element );
 }
 
 function resizeHeight( element ) {
@@ -368,11 +379,10 @@ function resizeHeight( element ) {
         element.css('height', newHeight);
     }
 
-    if( elemtop + elemh > centerh + centertop )
+    if( elemtop + newHeight > centerh + centertop )
     {
         element.parents('.popup').css('top', centerh + centertop - elemh);
     }
-    moveResizeElement( element );
 }
 
 function resizeWidth( element )
@@ -401,8 +411,6 @@ function resizeWidth( element )
     {
         element.parents('.popup').css('left', centerw + centerleft - elemw);
     }
-
-    moveResizeElement( element );
 }
 
 function getPopupContext( name )
