@@ -22,14 +22,24 @@ class Errors extends MySQLObject
     
     function addError( $description )
     {
-        $post = cleanupRowForJS( $_POST );
-        $session = cleanupRowForJS( $_SESSION );
+        $post = cleanupRowForJS( $_REQUEST );
+        $len = count( $_SESSION );
+        $sessKeys = array_keys( $_SESSION );
+        $sess = '[';
+        for( $i = 0; $i < $len; $i++ )
+        {
+            $sess .= '"' . $sessKeys[ $i ];
+            $sess .= '" => "' . $_SESSION[ $sessKeys[ $i ] ];
+            $sess .= '"    ';
+        }
+        $sess .= ']';
+        $sess = mysql_real_escape_string( $sess );
         $description = mysql_real_escape_string( $description );
         return $this->insert( 
                    array( 'NOW()',
                    "\"$description\"",
                    "\"$post\"",
-                   "\"$session\"",
+                   "\"$sess\"",
                    "\"{$_SERVER['REMOTE_ADDR']}\"" ) );
     }
 }
