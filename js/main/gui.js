@@ -1,5 +1,15 @@
+/**
+ * Called upon successful login.  Sets up everything about the GUI and prepares
+ * the client for user input.  Creates the layout, adds the taskbar to the
+ * layout.  Also adds a center section for performing the main views.  Creates
+ * several windows that are used for distinct views.  Finally sets up the start
+ * menu so that each button is associated with a specific event.
+ * 
+ * @param id Unused really...
+ */
 function validLogin( id )
 {
+    // Setup the basic layout
     $("body").html("")
       .css( "padding", "0px" )
       .append(
@@ -8,6 +18,8 @@ function validLogin( id )
             .append("<div id='east' class='ui-layout-east'>Chat(closeable)</div>")
             .append("<div id='center' class='ui-layout-center'></div>")
       );
+    
+    // Make the layout into a useable one
     $("#layout-container").layout({
         south: {
            closable: false
@@ -19,19 +31,25 @@ function validLogin( id )
         ,   resizable: false
         }}).sizePane("south", 44);
 
+    // Create each of our windows
     createWindow( "Explorer" );
     createWindow( "Servers" );
     createWindow( "Options" );
+    
+    // Set up the taskbar to identify with the popup class
     $("#taskbar")
         .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
 
+    // Add the start menu
     $("#taskbar")
         .addClass("slide")
         .append("<div id='start' class='start-menu-button'></div>")
         .append("<div id='menu' class='inner'>LAD Task Menu</div>");
 
+    // Start the start menu hidden
     $("#menu").css({"display" : "none"});
 
+    // Open the start menu on click
     $('#start').live("click",function(){
         if($(this).hasClass('active'))
         {
@@ -48,6 +66,7 @@ function validLogin( id )
         }
     });
     
+    // Add several buttons to the start menu
     addMenuButton( "Servers", "ui-icon-image", requestServers);
     addMenuButton( "Explorer", "ui-icon-locked", function(){} );
     addMenuButton( "Options", "ui-icon-gear" );
@@ -55,6 +74,8 @@ function validLogin( id )
         window.location = '';
         doLogin();
     });
+    
+    // Ensure that each popup is sized properly whenever the window resizes
     $(window).resize(function() {
         $('div.popup')
             .css( "max-height", $("#center").height() )
@@ -65,6 +86,9 @@ function validLogin( id )
         resizeHeight($('div.popup_body'));
         resizeWidth($('div.popup_body'));
     });
+    
+    // Setup the start menu to hide if something other than it is clicked and
+    // it is open
     $('#center, #east, #taskbar :not(#start,#menu)').click(function(){
         var start = $('#start');
         if( start.hasClass( 'active' ) )

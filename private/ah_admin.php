@@ -5,23 +5,45 @@
  *
  * Basic concept: Handle admin related ajax commands
  *
- * 
+ * Handled actions:
+ *     a_gettables : Gets tables that are available
+ *      a_gettable : Prints out a specific table
+ *  a_runsqlselect : Executes a SQL select statement
+ *   a_runsqlother : Executes a SQL insert/update/delete statement
  */
+
+require_once( 'defs.php' );
 
 if( $action == 'a_gettables' )
 {
-    echo 'admin_addTables([' .
-         cleanupRowForJS( array( 'errors', 'processes', 'programs', 'servers', 
-                                 'users' ) ) .
-         ']);';
+    // Get the list of tables from the DB directly
+    require_once( 'MySQLObject.php' );
+    $allTables = MySQLObject::getCustom( 'SHOW TABLES' );
+    
+    // The result is a column that has to be changed to a row
+    $count = count( $allTables );
+    $row = array();
+    $keys = array_keys( $allTables[ 0 ] );
+    $key = $keys[ 0 ];
+    
+    for( $i = 0; $i < $count; $i++ )
+    {
+        $row[] = $allTables[ $i ][ $key ];
+    }
+    
+    // Echo it out
+    echo 'admin_addTables([' . cleanupRowForJS( $row ) . ']);';
 }
 elseif( $action == 'a_gettable' )
 {
+    // Interface with MySQLObject directly
+    require_once( 'MySQLObject.php' );
     $table = $_REQUEST[ 'TABLE' ];
     
-    require_once( 'MySQLObject.php' );
-    
+    // Get all the entries
     $ret = MySqlObject::getAll( $table );
+    
+    // If there aren't any entries, skip adding headers
     if( !empty( $ret ) )
     {
         if( !isset( $ret[ 0 ] ) )
@@ -29,14 +51,17 @@ elseif( $action == 'a_gettable' )
             $ret = array( $ret );
         }
     
+        // There are entries, add the headers
         $columns = array_keys( $ret[ 0 ] );
         array_unshift( $ret, $columns );
     }
     
+    // Echo it out
     echo2DArray('admin_tableView', 'admin_noTableView', $ret );
 }
 elseif( $action == 'a_runsqlselect')
 {
+    // First thing first, run the SQL the admin wants
     require_once( 'MySQLObject.php' );
     $sql = $_REQUEST[ 'SQL' ];
     
@@ -46,8 +71,10 @@ elseif( $action == 'a_runsqlselect')
     
     $columns = array();
     
+    // ret will be empty if there are no entries
     if( !empty( $ret ) )
     {
+        // Just in case it managed to get an array of empty arrays
         if( !isset( $ret[ 0 ] ) )
         {
             $ret = array( $ret );
@@ -56,8 +83,10 @@ elseif( $action == 'a_runsqlselect')
         $columns = array_keys( $ret[ 0 ] );
     }
     
+    // Check if there was an error
     if( $err == '' )
     {
+        // Format the table for output
         echo( "admin_selectSQLResult([" . cleanupRowForJS( $columns ) . '],[' );
         for( $i = 0; $i < count( $ret ); $i++ )
         {
@@ -76,6 +105,7 @@ elseif( $action == 'a_runsqlselect')
 }
 elseif( $action == 'a_runsqlother')
 {
+    // Other SQL is a lot easier, run it
     require_once( 'MySQLObject.php' );
     $sql = $_REQUEST[ 'SQL' ];
     
@@ -84,6 +114,7 @@ elseif( $action == 'a_runsqlother')
     $err = mysql_real_escape_string( mysql_error() );
     $rows = mysql_affected_rows();
     
+    // If there was an error, spit it out, otherwise print affected rows
     if( $err == '' )
     {
         echo( "admin_otherSQLResult($rows);" );

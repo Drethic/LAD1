@@ -32,6 +32,11 @@
 require_once( 'private/defs.php' );
 require_once( 'private/errors.php' );
 
+/**
+ * Call to add an error entry to the DB.  This will also force the user's
+ * client to reset back to the home page.  Aborts the script.
+ * @param string $reason Reason why the script is dying
+ */
 function ahdie( $reason )
 {
     $errors = new Errors;
