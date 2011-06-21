@@ -22,7 +22,7 @@ function updateServerConsumptionCPU( )
             $(elem).html(getProcessCount() + " @ " + ratio);
         }
     );
-    tempCache( "servercpuratio", ratio );
+    tempCache( "servercpuratio", ratio, "Server-View" );
     runTimeUpdater( undefined, undefined, undefined, undefined, true );
 }
 
@@ -91,7 +91,7 @@ function updateServerDetail( type, value, oldvalue )
 
 function lastServerUpdateTime( lastTime )
 {
-    tempCache( "lastServerUpdateTime", lastTime );
+    tempCache( "lastServerUpdateTime", lastTime, "Server-View" );
     updateServerConsumptionCPU();
 }
 
@@ -109,12 +109,13 @@ function generateServerDetailRow( type, title )
 
 function changedServerName( id, name )
 {
-    tempCache( "server-" + id + "-customname", name );
+    tempCache( "server-" + id + "-customname", name, "Server-View" );
 }
 
 function beginServerView( id, owner, ip, customname, cpu, ram, hdd, bw,
                           lastUpdate )
 {
+    var cache = "Server-View";
     if( customname == "" )
     {
         customname = "Server #" + id;
@@ -157,19 +158,19 @@ function beginServerView( id, owner, ip, customname, cpu, ram, hdd, bw,
         }
     });
 
-    tempCache( "currentserver", id );
-    tempCache( "serverowner", owner );
-    tempCache( "serverip", ip, function(elem, val) {
+    tempCache( "currentserver", id, cache );
+    tempCache( "serverowner", owner, cache );
+    tempCache( "serverip", ip, cache, function(elem, val) {
         $(elem).html( intToIP( val ) );
     });
-    tempCache( "server-" + id + "-customname", customname );
-    tempCache( "servercpu", cpu );
-    tempCache( "serverram", ram );
-    tempCache( "serverhdd", hdd );
-    tempCache( "serverbw", bw );
+    tempCache( "server-" + id + "-customname", customname, cache );
+    tempCache( "servercpu", cpu, cache );
+    tempCache( "serverram", ram, cache );
+    tempCache( "serverhdd", hdd, cache );
+    tempCache( "serverbw", bw, cache );
     tempCache( "processes" );
     tempCache( "programs" );
-    tempCache( "lastServerUpdateTime", lastUpdate );
+    tempCache( "lastServerUpdateTime", lastUpdate, cache );
 }
 
 function endServerView()
@@ -180,6 +181,7 @@ function endServerView()
     updateServerDetail( "hdd", getTempCache( "serverhdd" ) );
     updateServerDetail( "bw", getTempCache( "serverbw" ) );
     updateServerDetail( "cpu", getTempCache( "servercpu" ) );
+    updateCache( "Servers", "Server-View" );
 }
 
 function noServerPrograms()
@@ -190,7 +192,8 @@ function noServerPrograms()
 
 function serverPrograms( list )
 {
-    $('#programdiv').html( "<table id='programtable'><thead><td>Program Type" +
+    $('#programdiv').html( "<table id='programtable' style='width:100%'>" +
+                           "<thead><td>Program Type" +
                            "</td><td>Size (MB)</td><td>Version</td><td>" +
                            "Operation</td></thead></table>" );
 
@@ -270,6 +273,7 @@ function enableFreePrograms()
 
 function addServerProgram( id, serverid, type, size, version )
 {
+    var cache = "Server-View";
     var tempOut = "<tr id='program-" + id + "-row'>";
     tempOut += "<td id='program-" + id + "-type' name='type'>" +
                intToProgramType( type ) + "</td>";
@@ -280,6 +284,7 @@ function addServerProgram( id, serverid, type, size, version )
                "<option id='research-" + id + "'>Research</option>" +
                "<option id='delete-" + id + "'>Delete</option>" +
                "<option id='exchange-" + id + "'>Exchange</option>" +
+               "<option id='execute-" + id + "'>Execute</option>" +
                "</select></td>";
     tempOut += "</tr>";
     $('#programtable').append( tempOut );
@@ -308,19 +313,29 @@ function addServerProgram( id, serverid, type, size, version )
         checker( "Exchange", function(){
             startExchangeProgram( id );
         });
+        checker( "Execute", function(){
+            doAjax( "executeprogram", {
+                PROGRAM_ID: id
+            });
+        });
+        checker( "Halt", function(){
+            doAjax( "haltprogram", {
+                PROGRAM_ID: id
+            });
+        });
         if( value != "Select one..." )
         {
             $(this).val( "Select one..." );
         }
     });
-    tempCache( "program-" + id + "-server", serverid );
-    tempCache( "program-" + id + "-type", type, function(elem,val){
+    tempCache( "program-" + id + "-server", serverid, cache );
+    tempCache( "program-" + id + "-type", type, cache, function(elem,val){
         $(elem).html( intToProgramType( val ) );
     });
-    tempCache( "program-" + id + "-size", size, true );
-    tempCache( "program-" + id + "-version", version, true );
+    tempCache( "program-" + id + "-size", size, cache, true );
+    tempCache( "program-" + id + "-version", version, cache, true );
 
-    addTempCacheList( "programs", id );
+    addTempCacheList( "programs", id, cache );
     checkFreePrograms();
 }
 
@@ -340,7 +355,7 @@ function removeServerProgram( id, callback, postcallback )
         tempCache( "program-" + id + "-size" );
         tempCache( "program-" + id + "-version" );
 
-        removeTempCacheList( "programs", id );
+        removeTempCacheList( "programs", id, "Server-View" );
         
         if( postcallback != undefined )
         {
