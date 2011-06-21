@@ -22,19 +22,25 @@
  * Todo:
  *  Expand get to allow OR in the WHERE
  */
-
 abstract class MySQLObject
 {
+
     /**
      * Overload to provide low level with all of the columns
      * @return array Names for each column
      */
     abstract protected function getColumns();
+
     /**
      * Overload to provide low level with the name of the table
      * @return string Table name
      */
     abstract protected function getTableName();
+
+    /**
+     * Determines if SQL statements should die on failure
+     */
+    public static $dieOnFailure = True;
 
     /**
      * Simplifies performing a SELECT statement
@@ -46,60 +52,64 @@ abstract class MySQLObject
      * @return array @see getTypedResult
      */
     public function get( $filters = NULL, $orders = NULL, $limit = 0,
-                        $onlyColumns = NULL, $offset = 0 )
+                         $onlyColumns = NULL, $offset = 0 )
     {
-       $sql = 'SELECT ';
-       // Only specific columns to pull
-       if( !is_array( $onlyColumns ) )
-       {
-           $sql .= '* ';
-       }
-       else
-       {
+        $sql = 'SELECT ';
+        // Only specific columns to pull
+        if( !is_array( $onlyColumns ) )
+        {
+            $sql .= '* ';
+        }
+        else
+        {
             $sql .= implode( ', ', $onlyColumns ) . ' ';
-       }
+        }
 
-       // Table name
-       $sql .= 'FROM `' . $this->getTableName() . '` ';
+        // Table name
+        $sql .= 'FROM `' . $this->getTableName() . '` ';
 
-       // Filters
-       $sql .= $this->arrayToFilterString( $filters );
+        // Filters
+        $sql .= $this->arrayToFilterString( $filters );
 
-       // Ordering
-       if( is_array( $orders ) && count( $orders ) > 0 )
-       {
-           $sql .= 'ORDER BY ';
-           $orderNames = array_keys( $orders );
-           for( $i = 0; $i < count( $orders ); $i++ )
-           {
-               $orderName = $orderNames[ $i ];
-               $sql .= "$orderName {$orders[ $orderName ]} ";
-               if( $i < count( $orders ) - 1 )
-               {
-                   $sql .= ', ';
-               }
-           }
-       }
+        // Ordering
+        if( is_array( $orders ) && count( $orders ) > 0 )
+        {
+            $sql .= 'ORDER BY ';
+            $orderNames = array_keys( $orders );
+            for( $i = 0; $i < count( $orders ); $i++ )
+            {
+                $orderName = $orderNames[$i];
+                $sql .= "$orderName {$orders[$orderName]} ";
+                if( $i < count( $orders ) - 1 )
+                {
+                    $sql .= ', ';
+                }
+            }
+        }
 
-       // Offset/Limit
-       if( $limit || $offset )
-       {
-           $sql .= "LIMIT $offset";
-           if( $limit > 0 )
-           {
-               $sql .= ", $limit";
-           }
-       }
+        // Offset/Limit
+        if( $limit || $offset )
+        {
+            $sql .= "LIMIT $offset";
+            if( $limit > 0 )
+            {
+                $sql .= ", $limit";
+            }
+        }
 
-       // SQL statement is done, run it!
-       $result = mysql_query( $sql );
+        // SQL statement is done, run it!
+        $result = mysql_query( $sql );
 
-       if( !$result )
-       {
-           die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
-       }
+        if( !$result )
+        {
+            if( MySQLObject::$dieOnFailure )
+            {
+                die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
+            }
+            return array( );
+        }
 
-       return $this->getTypedResult( $result );
+        return $this->getTypedResult( $result );
     }
 
     /**
@@ -111,17 +121,21 @@ abstract class MySQLObject
      */
     public function insert( $values )
     {
-      $sql = 'INSERT INTO ' . $this->getTableName() . ' VALUES(' .
-             implode( ', ', $values ) . ')';
+        $sql = 'INSERT INTO ' . $this->getTableName() . ' VALUES(' .
+                implode( ', ', $values ) . ')';
 
-      $result = mysql_query( $sql );
+        $result = mysql_query( $sql );
 
-      if( !$result )
-      {
-         die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
-      }
+        if( !$result )
+        {
+            if( MySQLObject::$dieOnFailure )
+            {
+                die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
+            }
+            return array();
+        }
 
-      return mysql_insert_id();
+        return mysql_insert_id();
     }
 
     /**
@@ -131,18 +145,22 @@ abstract class MySQLObject
      */
     public function delete( $filters )
     {
-      $sql = 'DELETE FROM ' . $this->getTableName();
+        $sql = 'DELETE FROM ' . $this->getTableName();
 
-      $sql .= $this->arrayToFilterString( $filters );
+        $sql .= $this->arrayToFilterString( $filters );
 
-      $result = mysql_query( $sql );
+        $result = mysql_query( $sql );
 
-      if( !$result )
-      {
-         die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
-      }
+        if( !$result )
+        {
+            if( MySQLObject::$dieOnFailure )
+            {
+                die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
+            }
+            return array( );
+        }
 
-      return mysql_affected_rows();
+        return mysql_affected_rows();
     }
 
     /**
@@ -153,33 +171,37 @@ abstract class MySQLObject
      */
     public function update( $values, $conditions = NULL )
     {
-      $sql = 'UPDATE ' . $this->getTableName() . ' SET ';
-      $valueKeys = array_keys( $values );
-      $conditionKeys = array_keys( $conditions );
+        $sql = 'UPDATE ' . $this->getTableName() . ' SET ';
+        $valueKeys = array_keys( $values );
+        $conditionKeys = array_keys( $conditions );
 
-      // Build the update sequence
-      for( $i = 0; $i < count( $values ); $i++ )
-      {
-         $valueKey = $valueKeys[ $i ];
-         $value = $values[ $valueKey ];
-         $sql .= "$valueKey=$value ";
-         if( $i < count( $values ) - 1 )
-         {
-            $sql .= ', ';
-         }
-      }
+        // Build the update sequence
+        for( $i = 0; $i < count( $values ); $i++ )
+        {
+            $valueKey = $valueKeys[$i];
+            $value = $values[$valueKey];
+            $sql .= "$valueKey=$value ";
+            if( $i < count( $values ) - 1 )
+            {
+                $sql .= ', ';
+            }
+        }
 
-      // Add conditions
-      $sql .= $this->arrayToFilterString( $conditions );
-      
-      $result = mysql_query( $sql );
+        // Add conditions
+        $sql .= $this->arrayToFilterString( $conditions );
 
-      if( !$result )
-      {
-         die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
-      }
+        $result = mysql_query( $sql );
 
-      return mysql_affected_rows();
+        if( !$result )
+        {
+            if( MySQLObject::$dieOnFailure )
+            {
+                die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
+            }
+            return array( );
+        }
+
+        return mysql_affected_rows();
     }
 
     /**
@@ -189,14 +211,14 @@ abstract class MySQLObject
      */
     public function getSingle( $value )
     {
-       $columns = $this->getColumns();
-       $columnStr = $columns[ 0 ];
-       $ret = $this->get( array( $columnStr => $value ), NULL, 1 );
-       if( count( $ret ) == 0 )
-       {
-           return false;
-       }
-       return $ret[ 0 ];
+        $columns = $this->getColumns();
+        $columnStr = $columns[0];
+        $ret = $this->get( array( $columnStr => $value ), NULL, 1 );
+        if( count( $ret ) == 0 )
+        {
+            return false;
+        }
+        return $ret[0];
     }
 
     /**
@@ -206,7 +228,7 @@ abstract class MySQLObject
      */
     protected function escapifyString( $input )
     {
-       return "'" . mysql_real_escape_string( $input ) . "'";
+        return "'" . mysql_real_escape_string( $input ) . "'";
     }
 
     /**
@@ -218,43 +240,47 @@ abstract class MySQLObject
      * @return array Single array with each column's value
      */
     public function getOnlyColumn( $columnName, $order = 'DESC', $limit = 0,
-                                  $filters = NULL )
+                                   $filters = NULL )
     {
-       $sql = "SELECT `$columnName` from `" . $this->getTableName() . '` ';
+        $sql = "SELECT `$columnName` from `" . $this->getTableName() . '` ';
 
-       // Add filters
-       $sql .= $this->arrayToFilterString( $filters );
+        // Add filters
+        $sql .= $this->arrayToFilterString( $filters );
 
-       // Add ordering
-       $sql .= " ORDER BY `$columnName` ";
-       if( $order == 'ASC' )
-       {
-           $sql .= $order;
-       }
-       else
-       {
-           $sql .= 'DESC';
-       }
+        // Add ordering
+        $sql .= " ORDER BY `$columnName` ";
+        if( $order == 'ASC' )
+        {
+            $sql .= $order;
+        }
+        else
+        {
+            $sql .= 'DESC';
+        }
 
-       if( $limit > 0 )
-       {
-           $sql .= " LIMIT $limit";
-       }
+        if( $limit > 0 )
+        {
+            $sql .= " LIMIT $limit";
+        }
 
-       $result = mysql_query( $sql );
+        $result = mysql_query( $sql );
 
-       if( !$result )
-       {
-           die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
-       }
+        if( !$result )
+        {
+            if( MySQLObject::$dieOnFailure )
+            {
+                die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
+            }
+            return array();
+        }
 
-       $ret = array();
-       while( $row = mysql_fetch_assoc( $result ) )
-       {
-           $ret[] = $row[ 0 ];
-       }
+        $ret = array( );
+        while( $row = mysql_fetch_assoc( $result ) )
+        {
+            $ret[] = $row[0];
+        }
 
-       return $ret;
+        return $ret;
     }
 
     /**
@@ -264,20 +290,24 @@ abstract class MySQLObject
      */
     public static function getCustom( $sql )
     {
-       $result = mysql_query( $sql );
+        $result = mysql_query( $sql );
 
-       if( !$result )
-       {
-           die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
-       }
+        if( !$result )
+        {
+            if( MySQLObject::$dieOnFailure )
+            {
+                die( 'MySQL Query Error: ' . mysql_error() . "\n$sql" );
+            }
+            return array();
+        }
 
-       $ret = MySQLObject::getTypedResult( $result );
+        $ret = MySQLObject::getTypedResult( $result );
 
-       if( count( $ret ) == 1 )
-       {
-           $ret = $ret[ 0 ];
-       }
-       return $ret;
+        if( count( $ret ) == 1 )
+        {
+            $ret = $ret[0];
+        }
+        return $ret;
     }
 
     /**
@@ -289,32 +319,32 @@ abstract class MySQLObject
      */
     private function arrayToFilterString( $filters )
     {
-       // Filters
-       if( is_array( $filters ) && count( $filters ) > 0 )
-       {
-           $sql = ' WHERE ';
-           $filterKeys = array_keys( $filters );
-           for( $i = 0; $i < count( $filters ); $i++ )
-           {
-               $filterKey = $filterKeys[ $i ];
-               $filter = $filters[ $filterKey ];
+        // Filters
+        if( is_array( $filters ) && count( $filters ) > 0 )
+        {
+            $sql = ' WHERE ';
+            $filterKeys = array_keys( $filters );
+            for( $i = 0; $i < count( $filters ); $i++ )
+            {
+                $filterKey = $filterKeys[$i];
+                $filter = $filters[$filterKey];
 
-               if( is_array( $filter ) )
-               {
-                   $sql .= "$filterKey IN (" . implode( ',', $filter ) . ") ";
-               }
-               else
-               {
-                   $sql .= "$filterKey=$filter ";
-               }
-               if( $i < count( $filters ) - 1 )
-               {
-                   $sql .= 'AND ';
-               }
-           }
-           return $sql;
-       }
-       return '';
+                if( is_array( $filter ) )
+                {
+                    $sql .= "$filterKey IN (" . implode( ',', $filter ) . ") ";
+                }
+                else
+                {
+                    $sql .= "$filterKey=$filter ";
+                }
+                if( $i < count( $filters ) - 1 )
+                {
+                    $sql .= 'AND ';
+                }
+            }
+            return $sql;
+        }
+        return '';
     }
 
     /**
@@ -326,10 +356,10 @@ abstract class MySQLObject
      */
     protected function adjustSingleByID( $id, $field, $amount )
     {
-       $columns = $this->getColumns();
-       $indexStr = $columns[ 0 ];
-       return $this->update( array( $field => "$field+$amount" ),
-                             array( $indexStr => $id ) );
+        $columns = $this->getColumns();
+        $indexStr = $columns[0];
+        return $this->update( array( $field => "$field+$amount" ),
+                              array( $indexStr => $id ) );
     }
 
     /**
@@ -339,7 +369,7 @@ abstract class MySQLObject
      */
     public static function getAll( $tableName )
     {
-       return MySQLObject::getCustom( "SELECT * FROM `$tableName`" );
+        return MySQLObject::getCustom( "SELECT * FROM `$tableName`" );
     }
 
     /**
@@ -349,39 +379,39 @@ abstract class MySQLObject
      */
     public static function getAllAsJS( $tableName )
     {
-       $arr = MySQLObject::getAll( $tableName );
-       $ret = '[';
-       $rcount = count( $arr );
-       for( $r = 0; $r < $rcount; $r++ )
-       {
-           $row = $arr[ $r ];
-           $ret .= '[';
-           $ccount = count( $row );
-           $keys = array_keys( $row );
-           for( $c = 0; $c < $ccount; $c++ )
-           {
-               $column = $row[ $keys[ $c ] ];
-               if( is_string( $column ) )
-               {
-                   $ret .= "'$column'";
-               }
-               else
-               {
-                   $ret .= $column;
-               }
-               if( $c < $ccount - 1 )
-               {
-                   $ret .= ',';
-               }
-           }
-           $ret .= ']';
-           if( $r < $rcount - 1 )
-           {
-               $ret .= ',';
-           }
-       }
-       $ret .= ']';
-       return $ret;
+        $arr = MySQLObject::getAll( $tableName );
+        $ret = '[';
+        $rcount = count( $arr );
+        for( $r = 0; $r < $rcount; $r++ )
+        {
+            $row = $arr[$r];
+            $ret .= '[';
+            $ccount = count( $row );
+            $keys = array_keys( $row );
+            for( $c = 0; $c < $ccount; $c++ )
+            {
+                $column = $row[$keys[$c]];
+                if( is_string( $column ) )
+                {
+                    $ret .= "'$column'";
+                }
+                else
+                {
+                    $ret .= $column;
+                }
+                if( $c < $ccount - 1 )
+                {
+                    $ret .= ',';
+                }
+            }
+            $ret .= ']';
+            if( $r < $rcount - 1 )
+            {
+                $ret .= ',';
+            }
+        }
+        $ret .= ']';
+        return $ret;
     }
 
     /**
@@ -393,35 +423,36 @@ abstract class MySQLObject
      */
     public static function getTypedResult( $result )
     {
-       $ret = array();
-       $columnInfo = array();
-       $columns = mysql_num_fields( $result );
-       for( $i = 0; $i < $columns; $i++ )
-       {
-           $rowInfo = mysql_fetch_field( $result );
-           if( !$rowInfo->blob )
-           {
-               $columnInfo[ $rowInfo->name ] = $rowInfo->type;
-           }
-       }
-       while( $row = mysql_fetch_assoc( $result ) )
-       {
-           foreach( $columnInfo as $colIndex => $colValue )
-           {
-               //echo "\n//{$colValue}\n";
-               if( $colValue == 'int' || $colValue == 'datetime' )
-               {
-                   $row[ $colIndex ] = intval( $row[ $colIndex ] );
-               }
-               else if( $colValue == 'real' )
-               {
-                   $row[ $colIndex ] = floatval( $row[ $colIndex ] );
-               }
-           }
-           $ret[] = $row;
-       }
-       return $ret;
+        $ret = array( );
+        $columnInfo = array( );
+        $columns = mysql_num_fields( $result );
+        for( $i = 0; $i < $columns; $i++ )
+        {
+            $rowInfo = mysql_fetch_field( $result );
+            if( !$rowInfo->blob )
+            {
+                $columnInfo[$rowInfo->name] = $rowInfo->type;
+            }
+        }
+        while( $row = mysql_fetch_assoc( $result ) )
+        {
+            foreach( $columnInfo as $colIndex => $colValue )
+            {
+                //echo "\n//{$colValue}\n";
+                if( $colValue == 'int' || $colValue == 'datetime' )
+                {
+                    $row[$colIndex] = intval( $row[$colIndex] );
+                }
+                else if( $colValue == 'real' )
+                {
+                    $row[$colIndex] = floatval( $row[$colIndex] );
+                }
+            }
+            $ret[] = $row;
+        }
+        return $ret;
     }
+
 }
 
 ?>

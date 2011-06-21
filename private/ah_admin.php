@@ -13,11 +13,11 @@
  */
 
 require_once( 'defs.php' );
+require_once( 'MySQLObject.php' );
 
 if( $action == 'a_gettables' )
 {
     // Get the list of tables from the DB directly
-    require_once( 'MySQLObject.php' );
     $allTables = MySQLObject::getCustom( 'SHOW TABLES' );
     
     // The result is a column that has to be changed to a row
@@ -36,8 +36,6 @@ if( $action == 'a_gettables' )
 }
 elseif( $action == 'a_gettable' )
 {
-    // Interface with MySQLObject directly
-    require_once( 'MySQLObject.php' );
     $table = $_REQUEST[ 'TABLE' ];
     
     // Get all the entries
@@ -62,7 +60,7 @@ elseif( $action == 'a_gettable' )
 elseif( $action == 'a_runsqlselect')
 {
     // First thing first, run the SQL the admin wants
-    require_once( 'MySQLObject.php' );
+    MySQLObject::$dieOnFailure = false;
     $sql = $_REQUEST[ 'SQL' ];
     
     $ret = MySqlObject::getCustom( $sql );
@@ -106,7 +104,7 @@ elseif( $action == 'a_runsqlselect')
 elseif( $action == 'a_runsqlother')
 {
     // Other SQL is a lot easier, run it
-    require_once( 'MySQLObject.php' );
+    MySQLObject::$dieOnFailure = false;
     $sql = $_REQUEST[ 'SQL' ];
     
     $ret = mysql_query( $sql );
