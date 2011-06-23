@@ -44,15 +44,17 @@ abstract class MySQLObject
 
     /**
      * Simplifies performing a SELECT statement
-     * @param array filters key/value for column name/value
-     * @param array orders key for each column, value is ASC or DESC
-     * @param int limit Integer to limit the number of results
-     * @parram array onlyColumns Set for only specific column, NULL means *
-     * @param int offset Integer to offset the results by
+     * 
+     * @param array $filters key/value for column name/value
+     * @param array $orders key for each column, value is ASC or DESC
+     * @param int $limit Integer to limit the number of results
+     * @parram array $onlyColumns Set for only specific column, NULL means *
+     * @param int $offset Integer to offset the results by
+     * @param array $groupby Array of values to group on
      * @return array @see getTypedResult
      */
     public function get( $filters = NULL, $orders = NULL, $limit = 0,
-                         $onlyColumns = NULL, $offset = 0 )
+                         $onlyColumns = NULL, $offset = 0, $groupby = NULL )
     {
         $sql = 'SELECT ';
         // Only specific columns to pull
@@ -71,6 +73,12 @@ abstract class MySQLObject
         // Filters
         $sql .= $this->arrayToFilterString( $filters );
 
+        // Grouping
+        if( is_array( $groupby ) )
+        {
+            $sql .= 'GROUP BY ' . implode( ', ', $groupby ) . ' ';
+        }
+        
         // Ordering
         if( is_array( $orders ) && count( $orders ) > 0 )
         {
@@ -115,15 +123,29 @@ abstract class MySQLObject
     /**
      * Simplifies performing an INSERT statement.
      * Values are not checked for consistency, instead an error will be thrown
-     * if the insert fails.
-     * @param array values The values to insert
+     * if the insert fails. An optional parameter exists that allows for a
+     * 'ON DUPLICATE KEY UPDATE' clause to be appended to the INSERT clause.
+     * If the parameter is set then the UPDATE clause is populated by the
+     * key/value pairs from the parameter.
+     * 
+     * @param array $values The values to insert
+     * @param array $duplicatepairs If set, will fill ON DUPLICATE KEY UPDATE
      * @return int The last insert ID
      */
-    public function insert( $values )
+    public function insert( $values, $duplicatepairs = NULL )
     {
+        // Build the statement
         $sql = 'INSERT INTO ' . $this->getTableName() . ' VALUES(' .
                 implode( ', ', $values ) . ')';
+        
+        // Check if UPDATE clause requested
+        if( is_array( $duplicatepairs ) && count( $duplicatepairs ) )
+        {
+            $sql .= ' ON DUPLICATE KEY UPDATE ' .
+                    $this->createPairString( $duplicatepairs, ',' );
+        }
 
+        // Execute the query
         $result = mysql_query( $sql );
 
         if( !$result )
@@ -140,7 +162,7 @@ abstract class MySQLObject
 
     /**
      * Simplifies performing a DELETE statement
-     * @param array filters Uses @see arrayToFilterString, NULL is *bad*
+     * @param array $filters Uses @see arrayToFilterString, NULL is *bad*
      * @return int Number of rows deleted
      */
     public function delete( $filters )
@@ -165,8 +187,8 @@ abstract class MySQLObject
 
     /**
      * Simplifies performing an UPDATE statement
-     * @param array values The key/values to update (strings need to be escaped)
-     * @param array conditions The filter (@see arrayToFilterString)
+     * @param array $values The key/values to update (strings must be escaped)
+     * @param array $conditions The filter (@see arrayToFilterString)
      * @return int Number of rows affected
      */
     public function update( $values, $conditions = NULL )
@@ -206,7 +228,8 @@ abstract class MySQLObject
 
     /**
      * Utilizes @see getColumns to get a row based on the first column.
-     * @param int value The ID in the first column to search for
+     * 
+     * @param int $value The ID in the first column to search for
      * @return array The row with the ID in the first column
      */
     public function getSingle( $value )
@@ -223,7 +246,8 @@ abstract class MySQLObject
 
     /**
      * Transforms a string into a MySQL friendly string
-     * @param string input String to escapify
+     * 
+     * @param string $input String to escapify
      * @return string Escapified string (includes quotes 'input')
      */
     protected function escapifyString( $input )
@@ -233,10 +257,11 @@ abstract class MySQLObject
 
     /**
      * Gets only a single column from the table
-     * @param string columnName Name of the column to retrieve from the table
-     * @param string order ASC or DESC
-     * @param int limit Limit the number of results, 0 for no limit
-     * @param array filters The key/values to filter on
+     * 
+     * @param string $columnName Name of the column to retrieve from the table
+     * @param string $order ASC or DESC
+     * @param int $limit Limit the number of results, 0 for no limit
+     * @param array $filters The key/values to filter on
      * @return array Single array with each column's value
      */
     public function getOnlyColumn( $columnName, $order = 'DESC', $limit = 0,
@@ -285,7 +310,8 @@ abstract class MySQLObject
 
     /**
      * Performs a custom SQL statement
-     * @param string sql Query to perform
+     * 
+     * @param string $sql Query to perform
      * @return array Piped through @see getTypedResult
      */
     public static function getCustom( $sql )
@@ -314,7 +340,8 @@ abstract class MySQLObject
      * Converts an array of filters into a string.  Takes a key/value array as
      * input and returns a WHERE key=value clause.  Accepts arrays as values
      * and appropriately converts clause to key IN (values...).
-     * @param array filters Key/values to filter on
+     * 
+     * @param array $filters Key/values to filter on
      * @return string WHERE clause or empty string
      */
     private function arrayToFilterString( $filters )
@@ -322,7 +349,26 @@ abstract class MySQLObject
         // Filters
         if( is_array( $filters ) && count( $filters ) > 0 )
         {
-            $sql = ' WHERE ';
+            return ' WHERE ' . $this->createPairString( $filters, 'AND', true );
+        }
+        return '';
+    }
+    
+    /** 
+     * Converts an array of key/value pairs into a string.  Takes a key/value
+     * arrary as input and returns a key=value clause.  If key IN(values...) is
+     * required set the second parameter to non-NULL.
+     * 
+     * @param array $pairs Key/values to populate string with
+     * @param string $delimiter Delimiter to go between each pair
+     * @param boolean $parseIn Set to true to parse key IN(values...)
+     * @return string Constructed clause
+     */
+    private function createPairString( $pairs, $delimiter, $parseIn = NULL )
+    {
+        
+        if( is_array( $filters ) && count( $filters ) > 0 )
+        {
             $filterKeys = array_keys( $filters );
             for( $i = 0; $i < count( $filters ); $i++ )
             {
@@ -331,7 +377,11 @@ abstract class MySQLObject
 
                 if( is_array( $filter ) )
                 {
-                    $sql .= "$filterKey IN (" . implode( ',', $filter ) . ") ";
+                    if( $parseIn )
+                    {
+                        $imploded = implode( ',', $filter );
+                        $sql .= "$filterKey IN ($imploded) ";
+                    }
                 }
                 else
                 {
@@ -339,7 +389,7 @@ abstract class MySQLObject
                 }
                 if( $i < count( $filters ) - 1 )
                 {
-                    $sql .= 'AND ';
+                    $sql .= "$delimiter ";
                 }
             }
             return $sql;
@@ -349,9 +399,9 @@ abstract class MySQLObject
 
     /**
      * Adjusts a single values based on its rows' ID.
-     * @param int id The value to search for in the first column
-     * @param string field The field to update
-     * @param int amount The amount to increase the field's value by
+     * @param int $id The value to search for in the first column
+     * @param string $field The field to update
+     * @param int $amount The amount to increase the field's value by
      * @return array @see update
      */
     protected function adjustSingleByID( $id, $field, $amount )
@@ -364,7 +414,8 @@ abstract class MySQLObject
 
     /**
      * Gets all values from a table
-     * @param string tableName The name of the table to retrieve
+     * 
+     * @param string $tableName The name of the table to retrieve
      * @return array @see getCustom
      */
     public static function getAll( $tableName )
@@ -374,22 +425,31 @@ abstract class MySQLObject
 
     /**
      * Utility function to return an array properly formatted as a JS string
-     * @param string tableName The name of the table to retreive
+     * 
+     * @param string $tableName The name of the table to retreive
      * @return string [[values...],...]
      */
     public static function getAllAsJS( $tableName )
     {
+        // Set up some basic variables
         $arr = MySQLObject::getAll( $tableName );
         $ret = '[';
         $rcount = count( $arr );
+        // Iterate over every row in the array
         for( $r = 0; $r < $rcount; $r++ )
         {
+            // The current row
             $row = $arr[$r];
             $ret .= '[';
             $ccount = count( $row );
+            
+            // The keys for the current row (this shouldn't change...)
             $keys = array_keys( $row );
+            
+            // Iterate over every column
             for( $c = 0; $c < $ccount; $c++ )
             {
+                // If it's a string, enclose it in quotes otherwise append it
                 $column = $row[$keys[$c]];
                 if( is_string( $column ) )
                 {
@@ -399,17 +459,21 @@ abstract class MySQLObject
                 {
                     $ret .= $column;
                 }
+                
+                // Add a comma if its not the last column
                 if( $c < $ccount - 1 )
                 {
                     $ret .= ',';
                 }
             }
+            // Close the row and add a comma if its not the last row
             $ret .= ']';
             if( $r < $rcount - 1 )
             {
                 $ret .= ',';
             }
         }
+        // Close the array and return
         $ret .= ']';
         return $ret;
     }
@@ -418,7 +482,8 @@ abstract class MySQLObject
      * Ensures that each result is the proper type before returning it.
      * Checks the table to make sure floats and ints are properly converted
      * to such rather than returning them as strings.
-     * @param object result The row of MySQL data to work with
+     * 
+     * @param object $result The row of MySQL data to work with
      * @return array Array of properly typed results
      */
     public static function getTypedResult( $result )
@@ -426,6 +491,7 @@ abstract class MySQLObject
         $ret = array( );
         $columnInfo = array( );
         $columns = mysql_num_fields( $result );
+        // Iterate over every column and determine if it's a string
         for( $i = 0; $i < $columns; $i++ )
         {
             $rowInfo = mysql_fetch_field( $result );
@@ -434,11 +500,13 @@ abstract class MySQLObject
                 $columnInfo[$rowInfo->name] = $rowInfo->type;
             }
         }
+        // Iterate over the mysql result and fetch each row
         while( $row = mysql_fetch_assoc( $result ) )
         {
             foreach( $columnInfo as $colIndex => $colValue )
             {
-                //echo "\n//{$colValue}\n";
+                // If the row is an int or datetime convert it to an integer
+                // Or if its a float convert it to a float
                 if( $colValue == 'int' || $colValue == 'datetime' )
                 {
                     $row[$colIndex] = intval( $row[$colIndex] );
@@ -448,6 +516,7 @@ abstract class MySQLObject
                     $row[$colIndex] = floatval( $row[$colIndex] );
                 }
             }
+            // Add the row to the resulting array
             $ret[] = $row;
         }
         return $ret;
