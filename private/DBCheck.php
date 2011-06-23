@@ -101,6 +101,8 @@ $version[ 24 ] = "CREATE TABLE `SOLVED_MATH` (\n" .
                  "`COUNT` int(10) unsigned NOT NULL,\n" .
                  "PRIMARY KEY(USER_ID, DIFFICULTY, DATE_ACCOMPLISHED," .
                  "HOUR_ACCOMPLISHED)) ENGINE = MyISAM DEFAULT CHARSET=latin1";
+$version[ 25 ] = "ALTER TABLE `SOLVED_MATH` ADD UNIQUE INDEX (USER_ID," .
+                 "DIFFICULTY,DATE_ACCOMPLISHED,HOUR_ACCOMPLISHED)";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);
