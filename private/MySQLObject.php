@@ -366,28 +366,28 @@ abstract class MySQLObject
      */
     private function createPairString( $pairs, $delimiter, $parseIn = NULL )
     {
-        
-        if( is_array( $filters ) && count( $filters ) > 0 )
+        $sql = '';
+        if( is_array( $pairs ) && count( $pairs ) > 0 )
         {
-            $filterKeys = array_keys( $filters );
-            for( $i = 0; $i < count( $filters ); $i++ )
+            $pairKeys = array_keys( $pairs );
+            for( $i = 0; $i < count( $pairs ); $i++ )
             {
-                $filterKey = $filterKeys[$i];
-                $filter = $filters[$filterKey];
+                $pairKey = $pairKeys[$i];
+                $pair = $pairs[$pairKey];
 
-                if( is_array( $filter ) )
+                if( is_array( $pair ) )
                 {
                     if( $parseIn )
                     {
-                        $imploded = implode( ',', $filter );
-                        $sql .= "$filterKey IN ($imploded) ";
+                        $imploded = implode( ',', $pair );
+                        $sql .= "$pairKey IN (" . implode( ',', $pairs ) . ') ';
                     }
                 }
                 else
                 {
-                    $sql .= "$filterKey=$filter ";
+                    $sql .= "$pairKey=$pair ";
                 }
-                if( $i < count( $filters ) - 1 )
+                if( $i < count( $pairs ) - 1 )
                 {
                     $sql .= "$delimiter ";
                 }
