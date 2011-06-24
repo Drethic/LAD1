@@ -72,6 +72,13 @@ define('ENCRYPTOR_SIZE', 40);
 define('DECRYPTOR_SIZE', 40);
 define('MALWARE_SIZE', 25);
 
+// Difficulty levels for math problems
+define('MATH_DIFF_ADD', 1);
+define('MATH_DIFF_SUB', 2);
+define('MATH_DIFF_MULT', 3);
+define('MATH_DIFF_DIV', 4);
+define('MATH_DIFF_ROOT', 5);
+
 // Forces an array to be 2D
 function force2DArray( $val )
 {
@@ -111,7 +118,12 @@ function getClientSideDefines()
         'STEP_CPU' => STEP_CPU,
         'STEP_RAM' => STEP_RAM,
         'STEP_HDD' => STEP_HDD,
-        'STEP_BW' => STEP_BW
+        'STEP_BW' => STEP_BW,
+        'MATH_DIFF_ADD' => MATH_DIFF_ADD,
+        'MATH_DIFF_SUB' => MATH_DIFF_SUB,
+        'MATH_DIFF_MULT' => MATH_DIFF_MULT,
+        'MATH_DIFF_DIV' => MATH_DIFF_DIV,
+        'MATH_DIFF_ROOT' => MATH_DIFF_ROOT
     );
 }
 

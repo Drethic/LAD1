@@ -35,6 +35,7 @@ require_once( 'private/errors.php' );
 /**
  * Call to add an error entry to the DB.  This will also force the user's
  * client to reset back to the home page.  Aborts the script.
+ * 
  * @param string $reason Reason why the script is dying
  */
 function ahdie( $reason )
@@ -70,7 +71,9 @@ $actionRequirements =
          'a_gettables' => array( ADMIN_ONLY, 'ah_admin', array()),
          'a_gettable' => array( ADMIN_ONLY, 'ah_admin', array('TABLE')),
          'a_runsqlselect' => array( ADMIN_ONLY, 'ah_admin', array('SQL')),
-         'a_runsqlother' => array( ADMIN_ONLY, 'ah_admin', array('SQL')));
+         'a_runsqlother' => array( ADMIN_ONLY, 'ah_admin', array('SQL')),
+         'nextmathquestion' => array( 0, 'ah_math', array('DIFFICULTY',
+                                      'MODIFIERS')));
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
