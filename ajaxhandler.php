@@ -18,6 +18,7 @@
  *       startdelete = User wants to delete a file
  *  exchangeprograms = User wants to exchange programs for hardware upgrade
  *  changeservername = User wants to change the name of their server
+ *   a_runcssjsclear = Links to ah_admin.php; process clearing of CSS & JS cache
  *
  * Session vars:
  *  ID          = Sets the ID into session to help control authorization
@@ -70,7 +71,8 @@ $actionRequirements =
          'a_gettables' => array( ADMIN_ONLY, 'ah_admin', array()),
          'a_gettable' => array( ADMIN_ONLY, 'ah_admin', array('TABLE')),
          'a_runsqlselect' => array( ADMIN_ONLY, 'ah_admin', array('SQL')),
-         'a_runsqlother' => array( ADMIN_ONLY, 'ah_admin', array('SQL')));
+         'a_runsqlother' => array( ADMIN_ONLY, 'ah_admin', array('SQL')),
+         'a_runcssjsclear' => array( ADMIN_ONLY, 'ah_admin', array()));
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
