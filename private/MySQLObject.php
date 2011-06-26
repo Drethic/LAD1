@@ -367,26 +367,32 @@ abstract class MySQLObject
     private function createPairString( $pairs, $delimiter, $parseIn = NULL )
     {
         $sql = '';
+        // Make sure $pairs is a valid array or just return blank
         if( is_array( $pairs ) && count( $pairs ) > 0 )
         {
+            // Extract the keys for easier use then iterate over the array
             $pairKeys = array_keys( $pairs );
             for( $i = 0; $i < count( $pairs ); $i++ )
             {
-                $pairKey = $pairKeys[$i];
-                $pair = $pairs[$pairKey];
+                // Get the key and the value
+                $pairKey = $pairKeys[ $i ];
+                $pair = $pairs[ $pairKey ];
 
+                // If the sub key is an array and parseIn is set to true, then
+                // add a IN() clause, otherwise skip it
                 if( is_array( $pair ) )
                 {
                     if( $parseIn )
                     {
                         $imploded = implode( ',', $pair );
-                        $sql .= "$pairKey IN (" . implode( ',', $pairs ) . ') ';
+                        $sql .= "$pairKey IN (" . join( ',', $pair ) . ') ';
                     }
                 }
                 else
                 {
                     $sql .= "$pairKey=$pair ";
                 }
+                // Add a comma if this isn't the last element
                 if( $i < count( $pairs ) - 1 )
                 {
                     $sql .= "$delimiter ";
