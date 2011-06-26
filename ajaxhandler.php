@@ -68,6 +68,8 @@ $actionRequirements =
                                       'CPU_UP', 'RAM_UP', 'HDD_UP', 'BW_UP' )),
          'changeservername' => array( 0, 'ah_server', array('SERVER_ID',
                                       'NAME' )),
+         'changeprogramname' => array( 0, 'ah_server', array('PROGRAM_ID',
+                                       'NAME' )),
          'a_gettables' => array( ADMIN_ONLY, 'ah_admin', array()),
          'a_gettable' => array( ADMIN_ONLY, 'ah_admin', array('TABLE')),
          'a_runsqlselect' => array( ADMIN_ONLY, 'ah_admin', array('SQL')),

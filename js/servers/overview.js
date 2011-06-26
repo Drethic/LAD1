@@ -24,6 +24,9 @@ function ownedServers( list )
     {
         var obj = list[ i ];
         var id = obj[ 0 ];
+        var row = $("<tr></tr>");
+        var customname = verifyServerName( id, obj[ 3 ] );
+        /*
         var tempOut = "<tr>";
         tempOut += "<td><button href='#server-" + id + "' " +
                    "title='View Server' id='server-" + id + "-link'>" +
@@ -37,8 +40,23 @@ function ownedServers( list )
         }
         tempOut += "<td>" + obj[ 9 ] + "</td>";
         tempOut += "</tr>";
+        */
+        row.append( "<td><button href='#server-" + id + "' " +
+                    "title='View Server' id='server-" + id + "-link'>" +
+                    intToIP( obj[ 2 ] ) + "</button></td>" );
+        row.append( $("<td></td>").append(
+          createUpdateableInput( "server-" + id + "-customname",
+                     customname, "changeservername", "SERVER_ID", id )
+        ));
+        for( var j = 4; j < 8; j++ )
+        {
+            row.append( "<td>" + obj[ j ] + "</td>" );
+        }
+        row.append( "<td>" + obj[ 9 ] + "</td>" );
+
         serverids[ i ] = id;
-        $('#servertable').append( tempOut );
+        $('#servertable').append( row );
+        /*
         $('#server-' + id + '-customname').val( obj[ 3 ] )
             .hover(function(){
                 $(this).addClass("semihiddenhover");
@@ -48,7 +66,7 @@ function ownedServers( list )
                 $(this).addClass("semihiddenactive");
             }).blur(function(){
                 $(this).removeClass("semihiddenactive");
-                var oldVal = getTempCache( "servercustomname" );
+                var oldVal = getTempCache( $(this).attr( "id" ) );
                 var newVal = $(this).val();
                 if( oldVal != newVal )
                 {
@@ -58,6 +76,7 @@ function ownedServers( list )
                     });
                 }
             });
+        */
         tempCache( "server-" + id + "-ip", obj[ 2 ], cache );
         tempCache( "server-" + id + "-customname", obj[ 3 ], cache );
         tempCache( "server-" + id + "-cpu", obj[ 4 ], cache );
@@ -142,4 +161,17 @@ function animateServerStatModification( obj, objname, newvalue, cb )
         .queue(function(){
             tempCache( objname, newvalue, "Server-View", cb );
         });
+}
+
+/**
+ * Verifies that the server name is valid.  The name is not allowed to be blank
+ * so replace it with a valid string if it is.
+ */
+function verifyServerName( id, name )
+{
+    if( name == "" )
+    {
+        return "Server #" + id;
+    }
+    return name;
 }

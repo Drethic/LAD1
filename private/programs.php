@@ -13,7 +13,8 @@ class Programs extends MySQLObject
 {
     function getColumns( )
     {
-        return array( 'ID', 'SERVER_ID', 'TYPE', 'SIZE', 'VERSION' );
+        return array( 'ID', 'SERVER_ID', 'CUSTOM_NAME', 'TYPE', 'SIZE',
+                      'VERSION' );
     }
 
     function getTableName( )
@@ -23,8 +24,15 @@ class Programs extends MySQLObject
 
     function addProgram( $serverid, $type, $size, $version )
     {
-        return $this->insert( array( 'NULL', $serverid, $type, $size,
+        return $this->insert( array( 'NULL', $serverid, '""', $type, $size,
                                      $version ) );
+    }
+    
+    function updateName( $programid, $newname )
+    {
+        $newname = '"' . mysql_real_escape_string( $newname ) . '"';
+        return $this->update( array( 'CUSTOM_NAME' => $newname ),
+                              array( 'ID' => $programid ) );
     }
 
     function getProgramsByServer( $serverid )

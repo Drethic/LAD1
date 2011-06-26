@@ -57,6 +57,7 @@ class Servers extends MySQLObject
     
     function updateName( $serverid, $newname )
     {
+        $newname = '"' . mysql_real_escape_string( $newname ) . '"';
         return $this->update( array( 'CUSTOM_NAME' => $newname ),
                               array( 'ID' => $serverid ) );
     }

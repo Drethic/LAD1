@@ -229,7 +229,27 @@ function generateServerDetailRow( type, title )
  */
 function changedServerName( id, name )
 {
-    tempCache( "server-" + id + "-customname", name, "Server-View" );
+    if( name == '' )
+    {
+        name = "Server #" + id;
+    }
+    tempCache( "server-" + id + "-customname", name, "Server-View", true );
+}
+
+/**
+ * Update the temp cache for a program's name
+ * 
+ * @param id ID of the program
+ * @param name The new name of the program
+ */
+function changedProgramName( id, name )
+{
+    if( name == '' )
+    {
+        name = intToProgramType( getTempCache( "program-" + id + "-type" ) ) +
+               " #" + id;
+    }
+    tempCache( "program-" + id + "-customname", name, "Server-View", true );
 }
 
 /**
@@ -259,18 +279,20 @@ function beginServerView( id, owner, ip, customname, cpu, ram, hdd, bw,
      * Cache region for the temp cache
      */
     var cache = "Server-View";
+    
     // If the custom name is not set, set it.
-    if( customname == "" )
-    {
-        customname = "Server #" + id;
-    }
+    customname = verifyServerName( id, customname );
+    
     // Set up the server view table
     var context = getPopupContext( "Servers" );
     context.html( "" );
     context.append( $("<table style='width:100%'></table>")
-        .append( "<tr><th colspan=4><input type='text' id='servercustomname' " +
-                 "class='semihidden' title='Click to Edit' />" +
-                 "&nbsp;&nbsp;&nbsp;IP: <span id='serverip'></span></th></tr>")
+        .append( $( "<tr></tr>" )
+           .append( $( "<th colspan=3></th>" )
+             .append( createUpdateableInput( "server-" + id + "-customname",
+                        customname, "changeservername", "SERVER_ID", id ) ) )
+           .append( $( "<th></th>" )
+              .append( "&nbsp;&nbsp;&nbsp;IP: <span id='serverip'></span>" ) ) )
         .append( "<tr><th>Region</th><th>Current</th><th></th><th>Total</th></tr>" )
         .append( generateServerDetailRow( "cpu", "Distributed to each " +
                  "running program.  Determines the rate at which processes " +
@@ -286,26 +308,6 @@ function beginServerView( id, owner, ip, customname, cpu, ram, hdd, bw,
     context.append("<div id='programdiv'></div>");
     context.append("<div id='processdiv'></div>");
     
-    // Make sure the custom server name colors and behaves correctly
-    $("#servercustomname").val( customname ).hover(function(){
-        $(this).addClass("semihiddenhover");
-    }, function(){
-        $(this).removeClass("semihiddenhover");
-    }).focus(function(){
-        $(this).addClass("semihiddenactive");
-    }).blur(function(){
-        $(this).removeClass("semihiddenactive");
-        var oldVal = getTempCache( "servercustomname" );
-        var newVal = $(this).val();
-        if( oldVal != newVal )
-        {
-            doAjax( "changeservername", {
-                SERVER_ID: id,
-                NAME: newVal
-            });
-        }
-    });
-
     // Set all the temp cache values
     tempCache( "currentserver", id, cache );
     tempCache( "serverowner", owner, cache );
@@ -360,7 +362,8 @@ function serverPrograms( list )
     for( var i = 0; i < list.length; i++ )
     {
         var pro = list[ i ];
-        addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ] );
+        addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ],
+                          pro[ 5 ] );
     }
     resizePopup( "Servers" );
 }
@@ -445,73 +448,90 @@ function enableFreePrograms()
  * 
  * @param id Unique ID of the program
  * @param serverid ID of the server the program belongs to
+ * @param customname Custom name of the program (defaults to Type #ID)
  * @param type Type of programs, text from @see intToProgramType
  * @param size Size of the program, calculated from server defs
  * @param version Version of the program
  */
-function addServerProgram( id, serverid, type, size, version )
+function addServerProgram( id, serverid, customname, type, size, version )
 {
+    // Set a good custom name if it is emtpy
+    if( customname == '' )
+    {
+        customname = intToProgramType( type ) + " #" + id;
+    }
     var cache = "Server-View";
-    // HTML to add to the programs table
-    var tempOut = "<tr id='program-" + id + "-row'>";
-    tempOut += "<td id='program-" + id + "-type' name='type'>" +
-               intToProgramType( type ) + "</td>";
-    tempOut += "<td id='program-" + id + "-size' name='size'></td>";
-    tempOut += "<td id='program-" + id + "-version' name='version'></td>";
-    tempOut += "<td><select id='program-" + id + "-select'>" +
-               "<option>Select one...</option>" +
-               "<option id='research-" + id + "'>Research</option>" +
-               "<option id='delete-" + id + "'>Delete</option>" +
-               "<option id='exchange-" + id + "'>Exchange</option>" +
-               "<option id='execute-" + id + "'>Execute</option>" +
-               "</select></td>";
-    tempOut += "</tr>";
-    $('#programtable').append( tempOut );
-    
-    // Setup the dropdown change event
-    $('#program-' + id + '-select').change(function(evt){
-        var value = $(this).val();
-        var checker = function(name,callback) {
-            name = name.toString();
-            
-            if( value == name && $("#" + name.toLowerCase() + "-" + id)
-                .hasClass( "doableOperation" ) )
-            {
-                callback();
-            }
-        };
-        checker( "Research", function(){
-            doAjax( "startresearch", {
-                PROGRAM_ID: id
-            });
-        });
-        checker( "Delete", function(){
-            doAjax( "startdelete", {
-                PROGRAM_ID: id
-            });
-        });
-        checker( "Exchange", function(){
-            startExchangeProgram( id );
-        });
-        checker( "Execute", function(){
-            doAjax( "executeprogram", {
-                PROGRAM_ID: id
-            });
-        });
-        checker( "Halt", function(){
-            doAjax( "haltprogram", {
-                PROGRAM_ID: id
-            });
-        });
-        if( value != "Select one..." )
-        {
-            $(this).val( "Select one..." );
-        }
-    });
+    // DOM Object to add to the programs table
+    $("<tr></tr>").attr( "id", "program-" + id + "-row" ).append(
+      // Program name/type
+      $("<td></td>").append(
+        createUpdateableInput( "program-" + id + "-customname",
+          customname, "changeprogramname", "PROGRAM_ID", id )
+        .attr("name", "type"))
+    ).append(
+        $("<td></td>").attr({
+            id: "program-" + id + "-size",
+            name: "size"
+        })
+    ).append(
+        $("<td></td>").attr({
+            id: "program-" + id + "-version",
+            name: "version"
+        })
+    ).append(
+        $("<td></td>").append(
+          $("<select></select>").attr( "id", "program-" + id + "-select")
+            .append( "<option>Select one...</option>" +
+                     "<option id='research-" + id + "'>Research</option>" +
+                     "<option id='delete-" + id + "'>Delete</option>" +
+                     "<option id='exchange-" + id + "'>Exchange</option>" +
+                     "<option id='execute-" + id + "'>Execute</option>" )
+            .change(function(evt){
+                var value = $(this).val();
+                var checker = function(name,callback) {
+                    name = name.toString();
+
+                    if( value == name && $("#" + name.toLowerCase() + "-" + id)
+                        .hasClass( "doableOperation" ) )
+                    {
+                        callback();
+                    }
+                };
+                checker( "Research", function(){
+                    doAjax( "startresearch", {
+                        PROGRAM_ID: id
+                    });
+                });
+                checker( "Delete", function(){
+                    doAjax( "startdelete", {
+                        PROGRAM_ID: id
+                    });
+                });
+                checker( "Exchange", function(){
+                    startExchangeProgram( id );
+                });
+                checker( "Execute", function(){
+                    doAjax( "executeprogram", {
+                        PROGRAM_ID: id
+                    });
+                });
+                checker( "Halt", function(){
+                    doAjax( "haltprogram", {
+                        PROGRAM_ID: id
+                    });
+                });
+                if( value != "Select one..." )
+                {
+                    $(this).val( "Select one..." );
+                }
+            })
+        )
+    ).appendTo( $( "#programtable" ) );
     tempCache( "program-" + id + "-server", serverid, cache );
     tempCache( "program-" + id + "-type", type, cache, function(elem,val){
         $(elem).html( intToProgramType( val ) );
     });
+    tempCache( "program-" + id + "-customname", customname, cache );
     tempCache( "program-" + id + "-size", size, cache, true );
     tempCache( "program-" + id + "-version", version, cache, true );
 
@@ -589,22 +609,22 @@ function grantedFreePrograms( fwdid, fwbid, pwdid, pwbid )
     // Add the Firewall Defender if it was added
     if( fwdid != 0 )
     {
-        addServerProgram( fwdid, serverid, 1, getProgramSize( 1, 1 ), 1 );
+        addServerProgram( fwdid, serverid, "", 1, getProgramSize( 1, 1 ), 1 );
     }
     // Add the Firewall Breaker if it was added
     if( fwbid != 0 )
     {
-        addServerProgram( fwbid, serverid, 2, getProgramSize( 2, 1 ), 1 );
+        addServerProgram( fwbid, serverid, "", 2, getProgramSize( 2, 1 ), 1 );
     }
     // Add the Password Defender if it was added
     if( pwdid != 0 )
     {
-        addServerProgram( pwdid, serverid, 3, getProgramSize( 3, 1 ), 1 );
+        addServerProgram( pwdid, serverid, "", 3, getProgramSize( 3, 1 ), 1 );
     }
     // Add the Password Breaker if it was added
     if( pwbid != 0 )
     {
-        addServerProgram( pwbid, serverid, 4, getProgramSize( 4, 1 ), 1 );
+        addServerProgram( pwbid, serverid, "", 4, getProgramSize( 4, 1 ), 1 );
     }
 
     // Update available program operations and all detail rows.

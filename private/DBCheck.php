@@ -103,6 +103,8 @@ $version[ 24 ] = "CREATE TABLE `SOLVED_MATH` (\n" .
                  "HOUR_ACCOMPLISHED)) ENGINE = MyISAM DEFAULT CHARSET=latin1";
 $version[ 25 ] = "ALTER TABLE `SOLVED_MATH` ADD UNIQUE INDEX (USER_ID," .
                  "DIFFICULTY,DATE_ACCOMPLISHED,HOUR_ACCOMPLISHED)";
+$version[ 26 ] = "ALTER TABLE PROGRAMS ADD COLUMN `CUSTOM_NAME` varchar(15) " .
+                 "NOT NULL AFTER `SERVER_ID`";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);

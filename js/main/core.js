@@ -270,6 +270,10 @@ function tempCache( ind, val, clearRegions, updateScreen )
             {
                 updateScreen( obj, val, old );
             }
+            else if( obj.is( "input" ) )
+            {
+                obj.val( val );
+            }
             else
             {
                 obj.html( val );
@@ -547,4 +551,44 @@ function stringify(obj) {
         }
         return (arr ? "[" : "{") + String(j) + (arr ? "]" : "}");
     }
+}
+
+/**
+ * Creates an updateable input.  Whenever the user has finished updating the
+ * input it will automatically request the server to update it.  Sends an ajax
+ * request with the action along with two parameters.  The first is NAME which
+ * is the new value of the input.  The second puts together the values of the
+ * two parameters.
+ * 
+ * @param id ID of the input
+ * @param val Original value of the input
+ * @param action Action to send in the ajax call
+ * @param ajaxpara Name of the custom ajax parameter
+ * @param ajaxval Name of the custom ajax value
+ */
+function createUpdateableInput( id, val, action, ajaxpara, ajaxval )
+{
+    return $("<input type='text'>").addClass( "semihidden" )
+      .attr( "title", "Click to edit" ).attr( "id", id ).val( val )
+    .hover(function(){
+        $(this).addClass("semihiddenhover");
+    }, function(){
+        $(this).removeClass("semihiddenhover");
+    }).focus(function(){
+        $(this).addClass("semihiddenactive");
+    }).blur(function(){
+        $(this).removeClass("semihiddenactive");
+        var oldVal = getTempCache( id );
+        var newVal = $(this).val();
+        if( oldVal != newVal )
+        {
+            var paras = {};
+            paras[ "NAME" ] = newVal;
+            if( ajaxpara != undefined && ajaxval != undefined )
+            {
+                paras[ ajaxpara ] = ajaxval;
+            }
+            doAjax( action, paras );
+        }
+    });
 }
