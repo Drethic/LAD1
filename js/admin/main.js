@@ -15,10 +15,12 @@ addMenuButton( "Admin", "ui-icon-star", function(){
               "<li><a href='#admintab-Tables'>Tables</a></li>" +
               "<li><a href='#admintab-Run_SQL'>Run SQL</a></li>" +
               "<li><a href='#admintab-Temp_Cache'>View Temp Cache</a></li>" +
+              "<li><a href='#admintab-Mx'>Maintenance</a></li>" + 
             "</ul>" +
             "<div id='admintab-Tables'></div>" +
             "<div id='admintab-Run_SQL'></div>" +
             "<div id='admintab-Temp_Cache'></div>" +
+            "<div id='admintab-Mx'></div>" +
             "</div>" );
     
     // Setup the actual tabs
@@ -68,6 +70,37 @@ addMenuButton( "Admin", "ui-icon-star", function(){
         }).button()
       )
       .append("<br><br>Result:<div id='admin_sqlresult'></div>");
+      
+      // This is the options for the Maintenance Tab
+      var mxtab = $("#admintab-Mx");
+      mxtab.append( "CSS & JS Cache: " ).
+          append($("<div>Clear</div>").
+        click(function(){
+            // a workaround for a flaw in the demo system (http://dev.jqueryui.com/ticket/4375), ignore!
+            $( "#dialog:ui-dialog" ).dialog( "destroy" );
+
+            $("body").append('<div id="dialog-confirm" ' +
+                'title="Do you wish to clear the CSS and JS Cache?"><p>These ' +
+                'items will be permanently deleted and cannot be recovered. ' +
+                'Are you sure?</p></div>');
+
+            $( "#dialog-confirm" ).dialog({
+		resizable: false,
+		height:165,
+                width:360,
+		modal: true,
+		buttons: {
+			"Delete all items": function() {
+				doAjax( "a_runcssjsclear" );
+                                $( this ).dialog( "close" );
+			},
+			Cancel: function() {
+				$( this ).dialog( "close" );
+			}
+            	}
+            });
+        }).button()
+      );
 });
 
 /**
