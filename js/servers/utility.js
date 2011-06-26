@@ -74,16 +74,38 @@ function getServerDetailAvailable( type )
 }
 
 /**
+ * Calculates the remaining time for a process to complete based on the
+ * remaining cycles and its 1.0 operating frequency
+ * 
  * @param cpu             The 1.0 operating frequency of the program
  * @param remainingCycles The number of cycles that are remaining
+ * @return Remaining time for the process
  */
 function calculateETIC( cpu, remainingCycles )
 {
+    /**
+     * The rate at which the process is running with server OR multiplied
+     */ 
     var rate = cpu * toNumber( getTempCache( "servercpuratio" ) );
+    /**
+     * The last time the server was updated
+     */
     var lastupdate = toNumber( getTempCache( "lastServerUpdateTime") );
+    /**
+     * The object for now
+     */
     var nowDate = new Date();
+    /**
+     * The seconds for now
+     */
     var nowsecs = Math.round( nowDate.getTime() / 1000 );
+    /**
+     * Time since the last update (now - lastupdate) in seconds
+     */
     var sinceupdate = nowsecs - lastupdate;
+    /**
+     * Remaining time for the process ( cycles / rate ) - lastupdate
+     */
     var remainingtime = Math.round( remainingCycles / rate ) - sinceupdate;
     return remainingtime;
 }

@@ -23,6 +23,7 @@ class Errors extends MySQLObject
     function addError( $description )
     {
         $post = cleanupRowForJS( $_REQUEST );
+        $post = mysql_real_escape_string( $post );
         $len = count( $_SESSION );
         $sessKeys = array_keys( $_SESSION );
         $sess = '[';

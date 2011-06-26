@@ -437,13 +437,24 @@ elseif( $action == 'exchangeprograms' )
 }
 else if( $action == 'changeservername' )
 {
-    $id = $_REQUEST[ 'SERVER_ID' ];
+    $serverid = $_REQUEST[ 'SERVER_ID' ];
     $servers = new Servers();
     $serverInfo = validateServerOwnership( $serverid, $servers );
 
     $name = $_REQUEST[ 'NAME' ];
-    $servers->updateName( $id, $name );
-    echo( "changedServerName($id," . cleanupRowForJS( array( $name ) ) . ");" );
+    $servers->updateName( $serverid, $name );
+    echo( "changedServerName($serverid," . cleanupRowForJS( array( $name ) ) . ");" );
+}
+else if( $action == 'changeprogramname' )
+{
+    $programid = $_REQUEST[ 'PROGRAM_ID' ];
+    $programs = new Programs();
+    $programInfo = validateProgramOwnership( $programid, $programs );
+    
+    $name = $_REQUEST[ 'NAME' ];
+    $programs->updateName( $programid, $name );
+    echo( "changedProgramName($programid," . 
+          cleanupRowForJS( array( $name ) ) . ");" );
 }
 
 // Update the processes and the server accordingly

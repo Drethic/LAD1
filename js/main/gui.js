@@ -1,4 +1,11 @@
 /**
+ * @file gui.js
+ * 
+ * @todo On window resize, ensure popup height is less than max
+ * @todo Sort start menu buttons as added
+ */
+
+/**
  * Called upon successful login.  Sets up everything about the GUI and prepares
  * the client for user input.  Creates the layout, adds the taskbar to the
  * layout.  Also adds a center section for performing the main views.  Creates
