@@ -355,9 +355,9 @@ function noServerPrograms()
 function serverPrograms( list )
 {
     $('#programdiv').html( "<table id='programtable' style='width:100%'>" +
-                           "<thead><td>Program Type" +
-                           "</td><td>Size (MB)</td><td>Version</td><td>" +
-                           "Operation</td></thead></table>" );
+                           "<thead><th>Program Type" +
+                           "</th><th>Size (MB)</th><th>Version</th><th>" +
+                           "Operation</th></thead></table>" );
 
     for( var i = 0; i < list.length; i++ )
     {
