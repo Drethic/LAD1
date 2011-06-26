@@ -49,7 +49,7 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
         $(elem).html( intToProcessOperation( val ) );
     });
     
-    var etic = calculateETIC( cyclesremain );
+    var etic = calculateETIC( cpu, cyclesremain );
     tempCache( "process-" + id + "-cyclescomplete", cyclescomplete, cache );
     tempCache( "process-" + id + "-cyclesremain", cyclesremain, cache );
     tempCache( "process-" + id + "-completetime", etic, cache );
