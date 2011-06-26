@@ -7,7 +7,7 @@
  *
  */
 
-require_once( 'MySqlObject.php' );
+require_once( 'MySQLObject.php' );
 
 class Servers extends MySQLObject
 {
@@ -30,7 +30,7 @@ class Servers extends MySQLObject
                                   'OPERATING_RATIO', 'ID' ) );
     }
 
-    static function getAvailableIP( )
+    function getAvailableIP( )
     {
         // Get what IPs are already taken
         $takenIPs = $this->getOnlyColumn( 'IP' );
@@ -50,9 +50,9 @@ class Servers extends MySQLObject
     function addServer( $ownerid )
     {
         $randomIP = $this->getAvailableIP();
-        return $this->insert( array( 'NULL', $ownerid, $randomIP, DEFAULT_CPU,
-                                     DEFAULT_RAM, DEFAULT_HDD, DEFAULT_BW,
-                                     'NOW()', '1.0' ) );
+        return $this->insert( array( 'NULL', $ownerid, $randomIP, "''",
+                                     DEFAULT_CPU, DEFAULT_RAM, DEFAULT_HDD,
+                                     DEFAULT_BW, 'NOW()', '1.0' ) );
     }
     
     function updateName( $serverid, $newname )
