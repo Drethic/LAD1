@@ -48,6 +48,9 @@ addMenuButton( "Admin", "ui-icon-star", function(){
         idPrefix: "admintab-"
     });
     
+    // Stylize the tabs a little better
+    $("#admintabs li a").css( "padding", "0.2em" );
+    
     // The SQL tab only deals directly with user input and thus does not
     // need to be updated ever, set it up now
     var sqltab = $("#admintab-Run_SQL");
@@ -71,36 +74,40 @@ addMenuButton( "Admin", "ui-icon-star", function(){
       )
       .append("<br><br>Result:<div id='admin_sqlresult'></div>");
       
-      // This is the options for the Maintenance Tab
-      var mxtab = $("#admintab-Mx");
-      mxtab.append( "CSS & JS Cache: " ).
-          append($("<div>Clear</div>").
+    // This is the options for the Maintenance Tab
+    var mxtab = $("#admintab-Mx");
+    mxtab.append( "<div id='adminmx-status'>&nbsp;</div>" );
+    mxtab.append( "CSS & JS Cache: " ).append(
+      $("<div>Clear</div>").
         click(function(){
-            // a workaround for a flaw in the demo system (http://dev.jqueryui.com/ticket/4375), ignore!
-            $( "#dialog:ui-dialog" ).dialog( "destroy" );
+          // a workaround for a flaw in the demo system
+          // (http://dev.jqueryui.com/ticket/4375), ignore!
+          $( "#dialog:ui-dialog" ).dialog( "destroy" );
 
-            $("body").append('<div id="dialog-confirm" ' +
-                'title="Do you wish to clear the CSS and JS Cache?"><p>These ' +
-                'items will be permanently deleted and cannot be recovered. ' +
-                'Are you sure?</p></div>');
+          $("body").append('<div id="dialog-confirm" ' +
+            'title="Do you wish to clear the CSS and JS Cache?"><p>These ' +
+            'items will be permanently deleted and cannot be recovered. ' +
+            'Are you sure?</p></div>');
 
-            $( "#dialog-confirm" ).dialog({
-		resizable: false,
-		height:165,
-                width:360,
-		modal: true,
-		buttons: {
-			"Delete all items": function() {
-				doAjax( "a_runcssjsclear" );
-                                $( this ).dialog( "close" );
-			},
-			Cancel: function() {
-				$( this ).dialog( "close" );
-			}
-            	}
-            });
+          $( "#dialog-confirm" ).dialog({
+              resizable: false,
+              height:165,
+              width:360,
+              modal: true,
+              buttons: {
+                "Delete all items": function() {
+                    doAjax( "a_runcssjsclear" );
+                    $( this ).dialog( "close" );
+                },
+                Cancel: function() {
+                    $( this ).dialog( "close" );
+                }
+            }
+          });
         }).button()
-      );
+    );
+
+    resizePopup( "Admin" );  
 });
 
 /**
@@ -259,4 +266,10 @@ function admin_viewTempCache( force )
     obj.append( makeSortableTable( ["Name", "Value", "Region"],
         cacheValues, "admin-tempcache" ));
     resizePopup( "Admin" );
+}
+
+function admin_setMaintenanceStatus( txt )
+{
+    $('#adminmx-status').html( txt ).addClass( "ui-state-highlight" )
+      .addClass( "ui-corner-all" );
 }

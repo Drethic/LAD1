@@ -126,6 +126,7 @@ elseif( $action == 'a_runcssjsclear' )
 {
     deleteAll( 'js/cache', true );
     deleteAll( 'css/cache', true );
+    echo( 'admin_setMaintenanceStatus("Cache cleared successfully.");' );
 }
 
 function deleteAll( $directory, $empty = false )
