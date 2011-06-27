@@ -48,6 +48,7 @@ html, body {
     padding: 6px;
     /*background-color: #000;*/
     color: #FFF;
+    cursor: default;
     background-image: -webkit-gradient(
         linear,
         left bottom,
@@ -82,15 +83,17 @@ html, body {
 }
 
 .start-menu-button {
-    height: 39px;
-    width: 46px;
-    background: url(images/StartButtonIcon.png) 0 -7px no-repeat;
+    float: left;
+    height: 42px;
+    width: 38px;
+    background: url(images/StartButtonIcon.png) -7px -7px no-repeat;
+    cursor: pointer;
 }
 .start-menu-button:hover {
-    background-position: 0px -61px;
+    background-position: -7px -61px;
 }
 .start-menu-button.active {
-    background-position: 0px -115px;
+    background-position: -7px -115px;
 }
 
 .ui-layout-pane-south {
@@ -193,9 +196,10 @@ div.refresh_popup {
     background-color:#888;
     background-color:rgb(180,180,180);
     border:solid #FFF 1px;
-    width:120px;
+    width:100%;
+    max-width:120px;
     height:20px;
-    margin:8px 3px 6px 3px;
+    margin:10px 5px 10px 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     border-radius: 5px;
@@ -222,22 +226,10 @@ div.refresh_popup {
 }
 /*jTaskbar*/
 #jTaskBar {
-    width:100%;
     height: inherit;
     overflow:hidden;
-    float: left;
-}
-.jTaskBar-Bottom {
-    position: fixed;
-    bottom:0;
-    left:50px;
-    right:0;
-}
-.jTaskBar-Top {
-    position: fixed;
-    top:0;
-    left:50px;
-    right:0;
+    margin-left: 38px;
+    padding-left: 10px;
 }
 
 .center {

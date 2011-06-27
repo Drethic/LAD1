@@ -41,15 +41,15 @@ function validLogin( id )
     // Create each of our windows
     createWindow( "Options" );
     
-    // Set up the taskbar to identify with the popup class
-    $("#taskbar")
-        .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
-
     // Add the start menu
     $("#taskbar")
         .addClass("slide")
-        .append("<div id='start' class='start-menu-button'></div>")
-        .append("<div id='menu' class='inner'>LAD Task Menu</div>");
+        .append("<div id='menu' class='inner ui-corner-tr'>LAD Task Menu</div>")
+        .append("<div id='start' class='start-menu-button'></div>");
+
+    // Set up the taskbar to identify with the popup class
+    $("#taskbar")
+        .jTaskBar({'winClass': '.popup', 'attach': 'bottom'});
 
     // Start the start menu hidden
     $("#menu").css({"display" : "none"});
