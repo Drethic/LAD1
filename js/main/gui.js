@@ -39,8 +39,6 @@ function validLogin( id )
         }}).sizePane("south", 44);
 
     // Create each of our windows
-    createWindow( "Explorer" );
-    createWindow( "Servers" );
     createWindow( "Options" );
     
     // Set up the taskbar to identify with the popup class
@@ -74,8 +72,6 @@ function validLogin( id )
     });
     
     // Add several buttons to the start menu
-    addMenuButton( "Servers", "ui-icon-image", requestServers);
-    addMenuButton( "Explorer", "ui-icon-locked", function(){} );
     addMenuButton( "Options", "ui-icon-gear" );
     addMenuButton( "Logout", "ui-icon-power", function(){
         window.location = '';
@@ -110,7 +106,25 @@ function validLogin( id )
 
 function addMenuButton( name, icon, fn )
 {
-    $("#menu").append( "<button id='" + name + "'>" + name + "</button>" );
+    var buttonlist = $("#menu button");
+    var button = $( "<button id='" + name + "'>" + name + "</button>" );
+    if( buttonlist.length == 0 || name == "Logout" )
+    {
+        $("#menu").append( button );
+    }
+    else
+    {
+        $("#menu button").each(function(){
+            var tobj = $(this);
+            var text = tobj.text();
+            if( text.localeCompare( name ) > 0 || text == "Logout" )
+            {
+                button.insertBefore( tobj );
+                return false;
+            }
+            return true;
+        });
+    }
 
     var menuobj = $("button#" + name);
     if( icon != undefined )
@@ -121,7 +135,7 @@ function addMenuButton( name, icon, fn )
     if( fn == undefined )
     {
         enclosedfn = function(){
-            alert( name + "INW" );
+            alert( name + " INW" );
         };
     }
     else

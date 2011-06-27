@@ -507,9 +507,12 @@ function addScriptElement( url, callback )
     var script = $("<script>");
     script.attr( 'type', 'text/javascript' );
     script.attr( 'src', url );
-    script.load( function(){
-        eval( callback );
-    });
+    if( callback != undefined )
+    {
+        script.load( function(){
+            eval( callback );
+        });
+    }
     $("head").append( script );
     //var head = document.getElementsByTagName( "head" )[ 0 ];
     //head.appendChild( script );

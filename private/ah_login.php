@@ -81,8 +81,10 @@ if( $action == 'login' )
         if( $isAdmin )
         {
             echo 'addScriptElement("' .
-                 clientfile_buildRequest( 'J', 'admin' ) . '","initAdmin();");';
+                 clientfile_buildRequest( 'J', 'admin' ) . '");';
         }
+        echo 'addScriptElement("' . clientfile_buildRequest( 'J', 'servers' ) .
+             '");';
     }
 }
 /*********************************** STEP 2 ***********************************/

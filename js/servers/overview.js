@@ -1,3 +1,8 @@
+createWindow( "Explorer" );
+createWindow( "Servers" );
+addMenuButton( "Servers", "ui-icon-image", requestServers);
+addMenuButton( "Explorer", "ui-icon-locked", function(){} );
+
 function noOwnedServers()
 {
     getPopupContext( "Servers" ).html( "You don't have any servers!" )
