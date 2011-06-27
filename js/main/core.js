@@ -354,11 +354,11 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
             this.updateItem( i );
         }
     };
-    this.calculateRemaining = function(object){
+    this.calculateRemaining = function(object, id){
         var targetTime;
         if( typeof object == 'function' )
         {
-            targetTime = object();
+            targetTime = object( id );
         }
         else
         {
@@ -367,7 +367,7 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
             eticObject.setTime( etic );
             targetTime = eticObject.getTime() / 1000;
             var timestamp = Date.now() / 1000;
-            targetTime = ( eticObject.getTime() / 1000 ) - ( Date.now() / 1000 );
+            targetTime = ( eticObject.getTime() / 1000 ) - timestamp;
         }
         return targetTime > 0 ? targetTime : 0;
     };
@@ -382,7 +382,7 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
             if( typeof this.objects[ i ] == 'function' )
             {
                 this.remaining[ i ] =
-                    this.calculateRemaining( this.objects[ i ] );
+                    this.calculateRemaining( this.objects[ i ], this.ids[ i ] );
                 this.updateItem( i );
             }
         }
@@ -429,7 +429,7 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
         this.callbacks[ this.callbacks.length ] = callback;
         this.objects[ this.objects.length ] = object;
 
-        var secsremaining = this.calculateRemaining( object );
+        var secsremaining = this.calculateRemaining( object, id );
         this.remaining[ this.remaining.length ] = secsremaining;
 
         if( this.timer == undefined || this.timer == -1 )

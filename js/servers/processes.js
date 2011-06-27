@@ -56,7 +56,7 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
 
     addTempCacheList( "processes", id, cache );
 
-    runTimeUpdater( "process-" + id + "-completetime", function(){
+    runTimeUpdater( "process-" + id + "-completetime", function(id){
             return calculateETIC( cpu, getTempCache( "process-" + id + 
                                                      "-cyclesremain" ) );
         }, id, function(id,domEl) {
