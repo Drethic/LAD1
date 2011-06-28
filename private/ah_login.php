@@ -82,6 +82,8 @@ if( $action == 'login' )
         {
             echo 'addScriptElement("' .
                  clientfile_buildRequest( 'J', 'admin' ) . '");';
+            echo 'addStylesheet("' .
+                 clientfile_buildRequest( 'C', 'admin' ) . '");';
         }
         echo 'addScriptElement("' . clientfile_buildRequest( 'J', 'servers' ) .
              '");';

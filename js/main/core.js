@@ -656,6 +656,34 @@ function addScriptElement( url, callback )
 }
 
 /**
+ * Adds a stylesheet to the HTML essentially causing it to be loaded. The
+ * optional callback may be added to be called when the stylesheet has finished
+ * loading.
+ * 
+ * @param url URL to load from
+ * @param callback Optional callback to run after the stylesheet has been loaded
+ */
+function addStylesheet( url, callback )
+{
+    // Create the element
+    var ss = $("<link />");
+    ss.attr({
+        'rel': 'stylesheet',
+        'type': 'text/css',
+        'href': url
+    });
+    // If the callback is set, call it after it is loaded
+    if( callback != undefined )
+    {
+        ss.load( function(){
+            eval( callback );
+        });
+    }
+    // Add it to the head
+    $("head").append( ss );
+}
+
+/**
  * Extend string to convert to camel case.
  * 
  * @return Returns The Camel Case Version

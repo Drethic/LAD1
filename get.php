@@ -25,7 +25,7 @@
 require_once( 'private/defs.php' );
 
 // Setup admin only files
-$adminOnlyFiles = array();
+$adminOnlyFiles = array( 'js/admin.js', 'css/admin.css' );
 
 /*********************************** STEP 1 ***********************************/
 // Make sure we have each request var
