@@ -77,7 +77,7 @@ function doLogin()
     ];
     $("#username, #password").bind('keyup', function(){
         var passed = true;
-        var lE = lEv();
+        var lE = loginError;
         if( $("#username").val().substring( 0, 1 ).search( "[0-9]" ) > -1 )
         {
             lE( "#username", errorStrings[ 1 ] );
@@ -148,7 +148,7 @@ function loginError( field, reason )
 
 function usernameTaken()
 {
-    var lE = lEv();
+    var lE = loginError;
     lE( "#username", "Username is already taken." );
     lE( "#password", "" );
     restoreLoginForm();
@@ -172,7 +172,7 @@ function usernameAvailable()
 
     $("#cpassword, #email").bind('keyup', function(){
         var passed = true;
-        var lE = lEv();
+        var lE = loginError;
         var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
         var emailval = $("#email").val();
         if( $("#cpassword").val().length < 4 )
@@ -220,7 +220,7 @@ function usernameAvailable()
 
 function cpasswordInvalid()
 {
-    var lE = lEv();
+    var lE = loginError;
     lE( "#cpassword", "Passwords did not match." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
@@ -229,7 +229,7 @@ function cpasswordInvalid()
 }
 function emailTaken()
 {
-    var lE = lEv();
+    var lE = loginError;
     lE( "#email", "Email is already associated with an account." );
     restoreLoginForm();
     $( "#username, #password" ).attr( "disabled", "disabled" )
@@ -246,7 +246,7 @@ function accountCreated( id )
 function invalidLoginCombo()
 {
     var str = "Invalid login information.";
-    var lE = lEv();
+    var lE = loginError;
     lE( "#username", str );
     lE( "#password", str );
     restoreLoginForm();

@@ -415,6 +415,13 @@ function refreshCurrent( name )
     doAjax( undefined, undefined, name );
 }
 
+function restoreForm(frm)
+{
+    $("#" + frm + " input,#" + frm + " button").button( "enable" )
+      .button( "refresh" ).attr( "disabled", false )
+      .attr( "readonly", false );
+}
+
 /**
  * @param headers 1-D array of headers
  * @param values 2-D array of values

@@ -1,16 +1,8 @@
-function lEv()
-{
-    var lEv = loginError;
-    return lEv;
-}
-
-function restoreForm(frm)
-{
-    $("#" + frm + " input,#" + frm + " button").button( "enable" )
-      .button( "refresh" ).attr( "disabled", false )
-      .attr( "readonly", false );
-}
-
+/**
+ * Prepares the prototype that many of the other functions interface to.  Many
+ * functions use this.prototype to store data.  This function ensures that
+ * object is properly created.
+ */
 function prepareThis()
 {
     if( this.prototype == undefined )
@@ -25,15 +17,27 @@ function prepareThis()
     }
 }
 
+/**
+ * Performs an AJAX request to the server.  The action is the first parameter
+ * and all other parameters should be in an object in the second parameter.
+ * 
+ * @param actionPara Action parameter to send to the server
+ * @param outData Additional parameters to send to the server (optional)
+ * @param popup Popup that may reperform this request when refreshed
+ */
 function doAjax( actionPara, outData, popup )
 {
     prepareThis();
+    // If a popup is able to reperform this query then serialize it in a way
+    // we will be able to understand later.
     if( popup != undefined )
     {
         var request = "window-" + popup + "-request";
         var paras = "window-" + popup + "parameters";
         if( actionPara == undefined && outData == undefined )
         {
+            // If both the parameters are undefined then the popup is refreshing
+            // and we should set the parameters based on the stored values
             actionPara = this.prototype.popupdata[ request ];
             outData = this.prototype.popupdata[ paras ];
         }
@@ -43,6 +47,7 @@ function doAjax( actionPara, outData, popup )
             this.prototype.popupdata[ paras ] = outData;
         }
     }
+    // Put all the data into one object
     if( outData == undefined || outData == "" )
     {
         outData = {action: actionPara};
@@ -51,6 +56,7 @@ function doAjax( actionPara, outData, popup )
     {
         outData[ "action" ] = actionPara;
     }
+    // Perform the AJAX query
     $.ajax({
        url: "ajaxhandler.php",
        data: outData,
@@ -58,6 +64,13 @@ function doAjax( actionPara, outData, popup )
     });
 }
 
+/**
+ * Converts an integer to an IP address (string).  Integer is little-endian.
+ * 0-2^8 bits are 255.xxx.xxx.xxx 2^9-2^16 bits are xxx.256.xxx.xxx, etc.
+ * 
+ * @param val Value to convert to an IP address
+ * @return IP address (string)
+ */
 function intToIP( val )
 {
     val = toNumber( val );
@@ -78,6 +91,12 @@ function intToIP( val )
     return ret;
 }
 
+/**
+ * Utility function to convert an int value to a process operation (string)
+ * 
+ * @param val Value to convert to a process operation
+ * @return String representing the given int's process operation
+ */
 function intToProcessOperation( val )
 {
     var nval = toNumber( val );
@@ -104,6 +123,12 @@ function intToProcessOperation( val )
     return "";
 }
 
+/**
+ * Utility function to convert an int value to a program type (string)
+ * 
+ * @param val Value to convert to a program type
+ * @return String representing the given int's program type
+ */
 function intToProgramType( val )
 {
     var nval = toNumber( val );
@@ -128,6 +153,13 @@ function intToProgramType( val )
     return "";
 }
 
+/**
+ * Utility function to get a program's size
+ * 
+ * @param type Type of program to lookup
+ * @param version Version of the program
+ * @return Total size of the program
+ */
 function getProgramSize( type, version )
 {
     switch( toNumber( type ) )
@@ -149,17 +181,31 @@ function getProgramSize( type, version )
     }
 }
 
+/**
+ * Updates the cache and clears out any old values from a given window.  Temp
+ * cache values are only stored in a given state (clear region).  Once the
+ * window leaves that clear region (or is closed) all of the temp cache values
+ * associated with that region are also cleared out.
+ * 
+ * @param win Window that has changed its clear region (or closed)
+ * @param cache New cache region the window has gone to
+ */
 function updateCache( win, cache )
 {
     prepareThis();
     var old = this.prototype.windowClearRegions[ win ];
+    // If the region hasn't actually changed, don't do anything
     if( old == cache )
     {
         return;
     }
+    
+    // Set the new clear region
     this.prototype.windowClearRegions[ win ] = cache;
     var arr = new Array();
     var i;
+    // Iterate over all the temp cache entries and find which ones had the old
+    // clear region
     for( i in this.prototype.clearRegions )
     {
         if( this.prototype.clearRegions[ i ] == old )
@@ -167,12 +213,19 @@ function updateCache( win, cache )
             arr.push( i );
         }
     }
+    // Iterate over the new list and set the new value to undefined (delete it)
     for( i in arr )
     {
         tempCache( arr[ i ] );
     }
 }
 
+/**
+ * Gets the length of a temp cache list.
+ * 
+ * @param ind Index of the temp cache entry to get the length of
+ * @return Number of entries in the temp cache list
+ */
 function getTempCacheListLength( ind )
 {
     var indstring = getTempCache( ind ).toString();
@@ -184,6 +237,15 @@ function getTempCacheListLength( ind )
     return elems.length;
 }
 
+/**
+ * Adds an item to the temp cache list.  Every time this function is called the
+ * temp cache entry with the given index gets appended with the given value.
+ * @see removeTempCacheList
+ * 
+ * @param ind Index in the temp cache
+ * @param val Value to add to the temp cache entry
+ * @param clearRegion Region that will cause this list to be cleared out
+ */
 function addTempCacheList( ind, val, clearRegion )
 {
     var curr = getTempCache( ind );
@@ -198,6 +260,16 @@ function addTempCacheList( ind, val, clearRegion )
     tempCache( ind, joined, clearRegion );
 }
 
+/**
+ * Removes an item from a temp cache list.  Temp cache lists are simply
+ * serialized lists that are stored in the temp cache.  If a temp cache already
+ * exists for the given index the new value is appended to the list.
+ * @see addTempCacheList
+ * 
+ * @param ind Index to put into the temp cache
+ * @param val Value to add to the list
+ * @param clearRegion Region that will cause this list to be cleared out
+ */
 function removeTempCacheList( ind, val, clearRegion )
 {
     var curr = getTempCache( ind );
@@ -216,6 +288,13 @@ function removeTempCacheList( ind, val, clearRegion )
     }
 }
 
+/**
+ * Gets a value from the temp cache
+ * 
+ * @param ind Index to retrieve from the temp cache.  If there is no entry
+ *            then an empty string is returned.
+ * @return Value in the temp cache for the given index
+ */
 function getTempCache( ind )
 {
     var ret = tempCache( ind, 0 );
@@ -284,6 +363,18 @@ function tempCache( ind, val, clearRegions, updateScreen )
 }
 
 /**
+ * Used in creating a countdown.  The first parameter specifies which DOM
+ * element is being updated.  If the last parameter is set to true then every
+ * second the target time is recalculated from the second parameter otherwise
+ * it is simply stored.  It can be either a function or a value.  So long as
+ * the target time is greater than now, then the countdown decreases.  The third
+ * parameter specifies a unique ID for storing the updater entry.  After the
+ * timer reaches 0 the fourth parameter (function) will be run if it is passed.
+ * The function is passed the ID and the DOM element as parameters.  Fifth
+ * parameter may be sent as true, if it is all other values are ignored, to
+ * force all of the ETICs to be reclculated either by the function or the temp
+ * cache value in parameter two.
+ *
  * @param objectname Name of the object
  * @param object     Name of the temp cache that has the target time or a
                      function to calculate it
@@ -293,23 +384,27 @@ function tempCache( ind, val, clearRegions, updateScreen )
  */
 function runTimeUpdater( objectname, object, id, callback, recalc )
 {
+    // Performs the actual updates to the DOM element
     this.updateItem = function( i ){
         var entry = this.values[ i ];
         var remain = this.remaining[ i ];
         var obj = $("#" + entry);
 
+        // If the DOM element has been lost then delete this entry and abort
         if( obj.length == 0 )
         {
             this.deletions[ this.deletions.length ] = i;
             return;
         }
 
+        // Decrement
         if( remain > 0 )
         {
             remain--;
             this.remaining[ i ] = remain;
         }
 
+        // Calculate seconds, minutes, hours, days?
         var seconds = Math.floor( remain % 60 );
         remain -= seconds;
         remain /= 60;
@@ -321,6 +416,7 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
         remain /= 24;
         var days = Math.floor( remain );
 
+        // If there is 0 seconds left delete this and run the callback
         if( days == 0 && hours == 0 && minutes == 0 && seconds == 0 )
         {
             this.callbacks[ i ]( this.ids[ i ], obj );
@@ -328,6 +424,7 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
         }
         else
         {
+            // Echo out the remaining time to the DOM element
             var output = "";
             if( days > 0 )
             {
@@ -346,6 +443,7 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
             obj.html( output );
         }
     };
+    // Function that gets called every second and simply updates every item
     this.actualUpdater = function(){
         var i;
         this.deletions = new Array();
@@ -354,6 +452,8 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
             this.updateItem( i );
         }
     };
+    // Calculates the remaining amount for each object based on its ID
+    // Guarantueed to return a positive value
     this.calculateRemaining = function(object, id){
         var targetTime;
         if( typeof object == 'function' )
@@ -371,12 +471,15 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
         }
         return targetTime > 0 ? targetTime : 0;
     };
+    // Forces the ETICs to be recalculated
     this.recalculateEtics = function(){
         if( this.values == undefined )
         {
             return;
         }
         var i;
+        // Iterate over each value and set the remaining to the new amount
+        // Also update the item
         for( i = 0; i < this.values.length; i++ )
         {
             if( typeof this.objects[ i ] == 'function' )
@@ -390,11 +493,16 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
 
     this.deletions = new Array();
     var i;
+    // If recalc parameter is true, ignore all other parameters
     if( recalc == true )
     {
         this.recalculateEtics();
+        return;
     }
-    else if( object != undefined )
+    
+    // If object was undefined then this function is being run from the
+    // timeout.  But it wasn't...so add it to the list.
+    if( object != undefined )
     {
         // Stores the name of the object
         if( this.values == undefined )
@@ -438,60 +546,83 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
         }
 
         this.updateItem( this.values.length - 1 );
+        return;
     }
-    else
-    {
-        this.actualUpdater();
+    
+    // Alright...this function was called from the timeout...or somebody fucked
+    // up. Perform the updates.
+    this.actualUpdater();
 
-        if( this.deletions.length )
+    // If deletions has elements then we need to delete some stuff.
+    if( this.deletions.length )
+    {
+        // Everything needs to be deleted...simply recreate them
+        if( this.deletions.length == this.values.length )
         {
-            if( this.deletions.length == this.values.length )
-            {
-                this.values = new Array();
-                this.remaining = new Array();
-                this.ids = new Array();
-                this.callbacks = new Array();
-                clearInterval( this.timer );
-                this.timer = -1;
-            }
-            else
-            {
-                this.deleteItem = function( i ){
-                    var len = this.values.length;
-                    for( ; i < len - 1; i++ )
-                    {
-                        this.values[ i ] = this.values[ i + 1 ];
-                        this.remaining[ i ] = this.remaining[ i + 1 ];
-                        this.ids[ i ] = this.ids[ i ];
-                        this.callbacks[ i ] = this.callbacks[ i + 1 ];
-                    }
-                };
-                // Delete deletions from all arrays
-                var offset = 0;
-                for( i = 0; i < this.deletions.length; i++ )
+            this.values = new Array();
+            this.remaining = new Array();
+            this.ids = new Array();
+            this.callbacks = new Array();
+            clearInterval( this.timer );
+            this.timer = -1;
+        }
+        else
+        {
+            // Specific ones need to be deleted
+            // This function will delete individual entries in this function
+            this.deleteItem = function( i ){
+                var len = this.values.length;
+                for( ; i < len - 1; i++ )
                 {
-                    this.deleteItem( this.deletions[ i ] - offset );
-                    offset++;
-                    this.values.pop();
-                    this.remaining.pop();
-                    this.ids.pop();
-                    this.callbacks.pop();
+                    this.values[ i ] = this.values[ i + 1 ];
+                    this.remaining[ i ] = this.remaining[ i + 1 ];
+                    this.ids[ i ] = this.ids[ i ];
+                    this.callbacks[ i ] = this.callbacks[ i + 1 ];
                 }
+            };
+            // Delete deletions from all arrays
+            var offset = 0;
+            for( i = 0; i < this.deletions.length; i++ )
+            {
+                this.deleteItem( this.deletions[ i ] - offset );
+                offset++;
+                this.values.pop();
+                this.remaining.pop();
+                this.ids.pop();
+                this.callbacks.pop();
             }
         }
     }
 }
 
+/**
+ * Forces the window refresh causing the server to be reasked for the index
+ * page.
+ */
 function forceRefresh()
 {
     window.location.reload();
 }
 
+/**
+ * Converts a value to a number (int not the Object).  The string/Object should
+ * be in a workable state because it is simply passed to the Number constructor.
+ * 
+ * @param val Value to covnert to integer
+ * @return int representing the value
+ */
 function toNumber( val )
 {
     return new Number( val ).valueOf();
 }
 
+/**
+ * Many elements end up getting a 3 part id.  Class-id-property (server-1-type)
+ * This function will return the id portion of the element.
+ * 
+ * @param obj jQuery Object to extract the ID from
+ * @return ID of the object
+ */
 function getSimpleID( obj )
 {
     var longid = obj.attr( "id" ).toString();
@@ -499,32 +630,51 @@ function getSimpleID( obj )
     return arr[ 1 ];
 }
 
+/**
+ * Adds a script element to the HTML essentially causing it to be loaded.
+ * The optional callback may be added to be called when the script has finished
+ * loading.
+ * 
+ * @param url URL to load from
+ * @param callback Optional callback to run after the script has been loaded
+ */
 function addScriptElement( url, callback )
 {
-    //var script = document.createElement( 'script' );
-    //script.type = 'text/javascript';
-    //script.src = url;
-    var script = $("<script>");
+    // Create the script element
+    var script = $("<script></script>");
     script.attr( 'type', 'text/javascript' );
     script.attr( 'src', url );
+    // If the callback is set, call it after it is loaded
     if( callback != undefined )
     {
         script.load( function(){
             eval( callback );
         });
     }
+    // Add it to the head
     $("head").append( script );
-    //var head = document.getElementsByTagName( "head" )[ 0 ];
-    //head.appendChild( script );
-    //$("body").append( script );
 }
 
+/**
+ * Extend string to convert to camel case.
+ * 
+ * @return Returns The Camel Case Version
+ */
 String.prototype.toCamelCase = function(){
     return this.replace(/(?:^|\s)\w/g, function(match){
         return match.toUpperCase();
     });
 };
 
+/**
+ * Converts any object into a string.  Strings themselves are enclosed in
+ * quotes.  If it is a number it is simply returned.  Objects are treated as
+ * arrays with each of their properties being elements.  Arrays have each
+ * element stringified and have commas insert in between each.
+ * 
+ * @param obj Object to convert to a string
+ * @return String representation of the object
+ */
 function stringify(obj) {
     var t = typeof obj;
     if( t != "object" || obj === null )
