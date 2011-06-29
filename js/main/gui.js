@@ -37,9 +37,6 @@ function validLogin( id )
             initClosed: true
         ,   resizable: false
         }}).sizePane("south", 44);
-
-    // Create each of our windows
-    createWindow( "Options" );
     
     // Add the start menu
     $("#taskbar")
@@ -71,8 +68,7 @@ function validLogin( id )
         }
     });
     
-    // Add several buttons to the start menu
-    addMenuButton( "Options", "ui-icon-gear" );
+    // Add the logout button to the start menu
     addMenuButton( "Logout", "ui-icon-power", function(){
         window.location = '';
         doLogin();
@@ -101,7 +97,10 @@ function validLogin( id )
                 $("#layout-container").layout().resetOverflow('south');
             });
         }
-    })
+    });
+    
+    // Initialize the options window
+    initOptions();
 }
 
 function addMenuButton( name, icon, fn )

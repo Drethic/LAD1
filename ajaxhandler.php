@@ -47,37 +47,37 @@ function ahdie( $reason )
 }
 
 /*********************************** STEP 1 ***********************************/
+// NO_LOGIN flag - User does not have to be logged in to access
 define( 'NO_LOGIN',   0x01 );
+// ADMIN_ONLY flag - Only admin users allowed to access
 define( 'ADMIN_ONLY', 0x02 );
 
-$actionRequirements =
-  array( 'login' => array( NO_LOGIN, 'ah_login',
-                    array( 'username', 'password' ) ),
-         'newuser1' => array( NO_LOGIN, 'ah_login',
-                       array( 'username', 'password' ) ),
-         'newuser2' => array( NO_LOGIN, 'ah_login',
-                       array( 'email', 'cpassword' ) ),
-         'requestservers' => array( 0, 'ah_server', array() ),
-         'requestfreeserver' => array( 0, 'ah_server', array() ),
-         'viewserver' => array( 0, 'ah_server', array( 'SERVER_ID' ) ),
-         'freeprograms' => array( 0, 'ah_server', array( 'SERVER_ID' ) ),
-         'startresearch' => array( 0, 'ah_server', array( 'PROGRAM_ID' ) ),
-         'finishprocess' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ),
-         'cancelprocess' => array( 0, 'ah_server', array( 'PROCESS_ID' ) ),
-         'startdelete' => array( 0, 'ah_server', array( 'PROGRAM_ID' ) ),
-         'exchangeprograms' => array( 0, 'ah_server', array( 'PROGRAM_ID',
-                                      'CPU_UP', 'RAM_UP', 'HDD_UP', 'BW_UP' )),
-         'changeservername' => array( 0, 'ah_server', array('SERVER_ID',
-                                      'NAME' )),
-         'changeprogramname' => array( 0, 'ah_server', array('PROGRAM_ID',
-                                       'NAME' )),
-         'a_gettables' => array( ADMIN_ONLY, 'ah_admin', array()),
-         'a_gettable' => array( ADMIN_ONLY, 'ah_admin', array('TABLE')),
-         'a_runsqlselect' => array( ADMIN_ONLY, 'ah_admin', array('SQL')),
-         'a_runsqlother' => array( ADMIN_ONLY, 'ah_admin', array('SQL')),
-         'nextmathquestion' => array( 0, 'ah_math', array('DIFFICULTY',
-                                      'MODIFIERS')),
-         'a_runcssjsclear' => array( ADMIN_ONLY, 'ah_admin', array()));
+$actionRequirements = array(
+  'login' => array( NO_LOGIN, 'login', array( 'username', 'password' ) ),
+  'newuser1' => array( NO_LOGIN, 'login', array( 'username', 'password' ) ),
+  'newuser2' => array( NO_LOGIN, 'login', array( 'email', 'cpassword' ) ),
+  'requestservers' => array( 0, 'server' ),
+  'requestfreeserver' => array( 0, 'server' ),
+  'viewserver' => array( 0, 'server', array( 'SERVER_ID' ) ),
+  'freeprograms' => array( 0, 'server', array( 'SERVER_ID' ) ),
+  'startresearch' => array( 0, 'server', array( 'PROGRAM_ID' ) ),
+  'finishprocess' => array( 0, 'server', array( 'PROCESS_ID' ) ),
+  'cancelprocess' => array( 0, 'server', array( 'PROCESS_ID' ) ),
+  'startdelete' => array( 0, 'server', array( 'PROGRAM_ID' ) ),
+  'exchangeprograms' => array( 0, 'server', array( 'PROGRAM_ID', 'CPU_UP',
+                               'RAM_UP', 'HDD_UP', 'BW_UP' ) ),
+  'changeservername' => array( 0, 'server', array( 'SERVER_ID', 'NAME' ) ),
+  'changeprogramname' => array( 0, 'server', array( 'PROGRAM_ID', 'NAME' ) ),
+  'a_gettables' => array( ADMIN_ONLY, 'admin' ),
+  'a_gettable' => array( ADMIN_ONLY, 'admin', array( 'TABLE' ) ),
+  'a_runsqlselect' => array( ADMIN_ONLY, 'admin', array( 'SQL' ) ),
+  'a_runsqlother' => array( ADMIN_ONLY, 'admin', array( 'SQL' ) ),
+  'a_runcssjsclear' => array( ADMIN_ONLY, 'admin' ),
+  'nextmathquestion' => array( 0, 'math', array( 'DIFFICULTY', 'MODIFIERS')),
+  'opt_request' => array( 0, 'options' ),
+  'opt_disablemodules' => array( 0, 'options', array( 'MODULES' ) ),
+  'opt_enablemodules' => array( 0, 'options', array( 'MODULES' ) )
+);
 
 // First of all make sure the action is set
 /*********************************** STEP 2 ***********************************/
@@ -112,16 +112,19 @@ if( isset( $_REQUEST['action'] ) )
         // Now we check if there are bad parameters. The third column of the
         // requirements is an array of required parameters.  Check make sure
         // each exists
-        foreach( $currReq[ 2 ] as $parameter )
+        if( isset( $currReq[ 2 ] ) && is_array( $currReq[ 2 ] ) )
         {
-            if( !isset( $_REQUEST[ $parameter ] ) )
+            foreach( $currReq[ 2 ] as $parameter )
             {
-                ahdie( "Missing request parameter $parameter." );
+                if( !isset( $_REQUEST[ $parameter ] ) )
+                {
+                    ahdie( "Missing request parameter $parameter." );
+                }
             }
         }
 
         // Include the sub-file
-        require_once( 'private/' . $currReq[ 1 ] . '.php' );
+        require_once( 'private/ah_' . $currReq[ 1 ] . '.php' );
     }
 }
 else

@@ -363,6 +363,47 @@ function tempCache( ind, val, clearRegions, updateScreen )
 }
 
 /**
+ * Converts an int into a time string based on the length of the time. Negative
+ * values are converted to 0.  All other values are converted to numbers.
+ * 
+ * @param val Value to convert to string
+ * @return String formatted as ##d ##h ##m ##s
+ */
+function intToTimeString( val )
+{
+    var remain = toNumber( val );
+    // Calculate seconds, minutes, hours, days?
+    var seconds = Math.floor( remain % 60 );
+    remain -= seconds;
+    remain /= 60;
+    var minutes = Math.floor( remain % 60 );
+    remain -= minutes;
+    remain /= 60;
+    var hours = Math.floor( remain % 24 );
+    remain -= hours;
+    remain /= 24;
+    var days = Math.floor( remain );
+    
+    // Construct the string
+    var output = "";
+    if( days > 0 )
+    {
+        output = days.toString() + "d ";
+    }
+    if( hours > 0 || output != "" )
+    {
+        output += hours.toString() + "h ";
+    }
+    if( minutes > 0 || output != "" )
+    {
+        output += minutes.toString() + "m ";
+    }
+    output += seconds.toString() + "s ";
+
+    return output;
+}
+
+/**
  * Used in creating a countdown.  The first parameter specifies which DOM
  * element is being updated.  If the last parameter is set to true then every
  * second the target time is recalculated from the second parameter otherwise
@@ -404,20 +445,8 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
             this.remaining[ i ] = remain;
         }
 
-        // Calculate seconds, minutes, hours, days?
-        var seconds = Math.floor( remain % 60 );
-        remain -= seconds;
-        remain /= 60;
-        var minutes = Math.floor( remain % 60 );
-        remain -= minutes;
-        remain /= 60;
-        var hours = Math.floor( remain % 24 );
-        remain -= hours;
-        remain /= 24;
-        var days = Math.floor( remain );
-
         // If there is 0 seconds left delete this and run the callback
-        if( days == 0 && hours == 0 && minutes == 0 && seconds == 0 )
+        if( remain == 0 )
         {
             this.callbacks[ i ]( this.ids[ i ], obj );
             this.deletions[ this.deletions.length ] = i;
@@ -425,22 +454,7 @@ function runTimeUpdater( objectname, object, id, callback, recalc )
         else
         {
             // Echo out the remaining time to the DOM element
-            var output = "";
-            if( days > 0 )
-            {
-                output = days.toString() + "d ";
-            }
-            if( hours > 0 || output != "" )
-            {
-                output += hours.toString() + "h ";
-            }
-            if( minutes > 0 || output != "" )
-            {
-                output += minutes.toString() + "m ";
-            }
-            output += seconds.toString() + "s ";
-
-            obj.html( output );
+            obj.html( intToTimeString( remain ) );
         }
     };
     // Function that gets called every second and simply updates every item
@@ -772,4 +786,21 @@ function createUpdateableInput( id, val, action, ajaxpara, ajaxval )
             doAjax( action, paras );
         }
     });
+}
+
+/**
+ * Ensures that all DOM elements (and script elements) that contain the given ID
+ * are deleted
+ * 
+ * @param ID ID of elements to delete
+ */
+function deleteAllElementsById( ID )
+{
+    var elem = $("#" + ID);
+    while( elem.length )
+    {
+        elem.remove();
+        elem = $("#" + ID);
+    }
+    $("script[href~='" + ID.toLowerCase() + "']").remove();
 }

@@ -73,6 +73,7 @@ if( $action == 'login' )
 /*********************************** STEP 1b **********************************/
     else
     {
+        require_once( 'userdisabledmodules.php' );
         $id = $result[ 'ID' ];
         $_SESSION['ID'] = $id;
         $_SESSION['username'] = $result[ 'NICK' ];
@@ -85,8 +86,28 @@ if( $action == 'login' )
             echo 'addStylesheet("' .
                  clientfile_buildRequest( 'C', 'admin' ) . '");';
         }
-        echo 'addScriptElement("' . clientfile_buildRequest( 'J', 'servers' ) .
-             '");';
+        
+        $validModules = opt_getValidModules();
+        $userdisabledmodules = new UserDisabledModules();
+        $disabledModules = $userdisabledmodules->getDisabledModules( $id );
+        
+        function moduleWalker( $var, $key, $modules )
+        {
+            $varupper = strtoupper( $var );
+            foreach( $modules as $module )
+            {
+                if( $varupper == $module[ 'MODULE_NAME' ] )
+                {
+                    return;
+                }
+            }
+            $request = clientfile_buildRequest( 'J', strtolower( $var ) );
+            echo "addScriptElement('$request');";
+        }
+        echo( "/*\n" );
+        print_r( $disabledModules );
+        echo( "*/\n" );
+        array_walk( $validModules, "moduleWalker", $disabledModules );
     }
 }
 /*********************************** STEP 2 ***********************************/

@@ -150,8 +150,17 @@ function getProgramSize( $type )
 }
 
 /**
- * @param $row The row to cleanup for viewing
- * @return Similar to implode except that strings are properly handled
+ * Returns an array with all of the current valid modules.
+ * @return array Array of [SERVERS,MATH]
+ */
+function opt_getValidModules()
+{
+    return array( 'SERVERS', 'MATH' );
+}
+
+/**
+ * @param array $row 1-D row to cleanup for viewing
+ * @return string Similar to implode except that strings are properly handled
  */
 function cleanupRowForJS( $row )
 {

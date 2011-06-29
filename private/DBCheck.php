@@ -105,6 +105,12 @@ $version[ 25 ] = "ALTER TABLE `SOLVED_MATH` ADD UNIQUE INDEX (USER_ID," .
                  "DIFFICULTY,DATE_ACCOMPLISHED,HOUR_ACCOMPLISHED)";
 $version[ 26 ] = "ALTER TABLE PROGRAMS ADD COLUMN `CUSTOM_NAME` varchar(15) " .
                  "NOT NULL AFTER `SERVER_ID`";
+$version[ 27 ] = "CREATE TABLE `USER_DISABLED_MODULES` (\n" .
+                 "`USER_ID` int(10) unsigned NOT NULL,\n" .
+                 "`MODULE_NAME` varchar(20) NOT NULL,\n" .
+                 "`DISABLE_TIME` bigint unsigned NOT NULL\n," .
+                 "UNIQUE KEY(USER_ID,MODULE_NAME)" .
+                 ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);

@@ -48,7 +48,7 @@ abstract class MySQLObject
      * @param array $filters key/value for column name/value
      * @param array $orders key for each column, value is ASC or DESC
      * @param int $limit Integer to limit the number of results
-     * @parram array $onlyColumns Set for only specific column, NULL means *
+     * @param array $onlyColumns Set for only specific column, NULL means *
      * @param int $offset Integer to offset the results by
      * @param array $groupby Array of values to group on
      * @return array @see getTypedResult
