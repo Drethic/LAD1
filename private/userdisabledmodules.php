@@ -47,7 +47,7 @@ class UserDisabledModules extends MySQLObject
     {
         foreach( $modules as $module )
         {
-            $this->insert( array( $userid, "UPPER('$module')", 'NOW()' ),
+            $this->insert( array( $userid, "UPPER('$module')", time() ),
                            array( 'DISABLE_TIME' => time() ) );
         }
         return count( $modules );
@@ -62,8 +62,12 @@ class UserDisabledModules extends MySQLObject
      */
     public function enableModules( $userid, $modules )
     {
+        foreach( $modules as $key => &$value )
+        {
+            $value = "UPPER('$value')";
+        }
         return $this->delete( array( 'USER_ID' => $userid,
-                                     'MODULE_NAME' => "UPPER('$modules')" ) );
+                                     'MODULE_NAME' => $modules ) );
     }
 }
 ?>

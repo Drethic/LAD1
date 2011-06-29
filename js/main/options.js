@@ -49,8 +49,9 @@ function opt_modules( enabled, disabled )
         w.append( "<br />" );
     }
     w.append(
-      $("<button>Submit Changes</button>").css( "float", "right" )
-        .click(function(){
+      $("<button>Submit Changes</button>").css({
+          "float": "right"
+      }).click(function(){
             var radios = getCheckedModules();
             var nenabled = new Array();
             var ndisabled = new Array();
@@ -63,10 +64,12 @@ function opt_modules( enabled, disabled )
                     var module = name.slice( name.indexOf( '-' ) + 1 );
                     if( nstatus == "enabled" )
                     {
+                        $(this).siblings('input').removeAttr( "title" );
                         nenabled.push( module );
                     }
                     else
                     {
+                        $(this).attr( "title", "Disabled now." );
                         eval( "disableModule" + module + "();" );
                         ndisabled.push( module );
                     }
@@ -86,14 +89,13 @@ function opt_modules( enabled, disabled )
             }
         }).attr( "id", "opt-module-submit" ).button()
     ).append(
-      $("<div id='opt-modulesenabled-status'></div>")
-        .addClass( "ui-state-highlight ui-corner-all" )
-        .css( "visibility", "hidden" )
-    ).append(
-      $("<div id='opt-modulesdisabled-status'></div>")
-        .addClass( "ui-state-highlight ui-corner-all" )
-        .css( "visibility", "hidden" )
+        "<div id='opt-modulesenabled-status'></div>" +
+        "<div id='opt-modulesdisabled-status'></div>"
     );
+    $("#opt-modulesdisabled-status, #opt-modulesenabled-status").css({
+        "visibility": "hidden",
+        "display": "inline"
+    }).addClass( "ui-state-highlight ui-corner-all" );
     checkModuleSubmitChanges();
 }
 
@@ -111,13 +113,14 @@ function opt_modules( enabled, disabled )
  */
 function createModuleRow( name, enabled, timedisabled )
 {
-    tempCache( "opt-" + name + "-enabled", enabled == true ? 
-               "enabled" : "disabled", "Modules" );
+    tempCache( "opt-" + name + "-enabled", enabled ? "enabled" : "disabled",
+               "Modules" );
     return $("<div></div>").append(
-      $("<div></div>").append( name ).css( "float", "left" )
+      $("<div></div>").append( name.toCamelCase() ).css( "float", "left" )
     ).append(
       $( "<input type='radio' />" ).css( "float", "right" )
         .attr({
+            "id": "opt-" + name + "-enabled",
             "name": "opt-" + name,
             "checked": enabled ? "checked" : undefined,
             "value": "enabled"
@@ -128,10 +131,12 @@ function createModuleRow( name, enabled, timedisabled )
     ).append(
       $( "<input type='radio' />" ).css( "float", "right" )
         .attr({
+            "id": "opt-" + name + "-disabled",
             "name": "opt-" + name,
             "checked": enabled ? undefined : "checked",
             "title": enabled ? undefined : "Disabled " +
-                intToTimeString( timedisabled ) + " ago.",
+                intToTimeString( ( Date.now() / 1000 ) - timedisabled ) +
+                " ago.",
             "value": "disabled"
         }).change(function(){checkModuleSubmitChanges();})
     ).append(
@@ -185,8 +190,12 @@ function checkModuleSubmitChanges()
  */
 function enabledModules( count )
 {
-    $("#opt-modulesenabled-status").html( count + " modules enabled." )
-      .fadeIn( ).delay( 2000 ).fadeOut( "slow" );
+    $("#opt-modulesenabled-status").html( count + " modules enabled.<br />" )
+      .css( "visibility", "visible" ).fadeIn( ).delay( 2000 ).fadeOut( "slow" )
+      .queue(function(){
+          $(this).css( "visibility", "hidden" );
+          $(this).dequeue();
+      });
     checkModuleSubmitChanges();
 }
 
@@ -197,7 +206,11 @@ function enabledModules( count )
  */
 function disabledModules( count )
 {
-    $("#opt-modulesdisabled-status").html( count + " modules disabled." )
-      .fadeIn( ).delay( 2000 ).fadeOut( "slow" );
+    $("#opt-modulesdisabled-status").html( count + " modules disabled.<br />" )
+      .css( "visibility", "visible" ).fadeIn( ).delay( 2000 ).fadeOut( "slow" )
+      .queue(function(){
+          $(this).css( "visibility", "hidden" );
+          $(this).dequeue();
+      });
     checkModuleSubmitChanges();
 }
