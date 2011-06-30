@@ -45,11 +45,14 @@ class UserDisabledModules extends MySQLObject
      */
     public function disableModules( $userid, $modules )
     {
+        // Insert each value as upper case
+        $values = array();
         foreach( $modules as $module )
         {
-            $this->insert( array( $userid, "UPPER('$module')", time() ),
-                           array( 'DISABLE_TIME' => time() ) );
+            array_push( $values, array( $userid, '"' . strtoupper( $module ) .
+                        '"', time()));
         }
+        $this->insert( $values, array( 'DISABLE_TIME' => time() ) );
         return count( $modules );
     }
     
@@ -62,10 +65,12 @@ class UserDisabledModules extends MySQLObject
      */
     public function enableModules( $userid, $modules )
     {
+        // Convert every value to upper case
         foreach( $modules as $key => &$value )
         {
-            $value = "UPPER('$value')";
+            $value = '"' . strtoupper( $value ) . '"';
         }
+        // Then delete the values
         return $this->delete( array( 'USER_ID' => $userid,
                                      'MODULE_NAME' => $modules ) );
     }
