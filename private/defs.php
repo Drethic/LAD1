@@ -53,6 +53,10 @@ define('PROCESS_OP_DELETE', 5);
 define('PROCESS_OP_COPY', 6);
 define('PROCESS_OP_INSTALL', 7);
 define('PROCESS_OP_UNINSTALL', 8);
+define('PROCESS_OP_FIREWALL', 9);
+define('PROCESS_OP_FIREWALLBREAKER', 9);
+define('PROCESS_OP_PASSWORD', 9);
+define('PROCESS_OP_PASSWORDBREAKER', 9);
 
 // Basic program types
 define('PROGRAM_TYPE_FIREWALL', 1);
@@ -115,6 +119,10 @@ function getClientSideDefines()
         'OP_COPY' => PROCESS_OP_COPY,
         'OP_INSTALL' => PROCESS_OP_INSTALL,
         'OP_UNINSTALL' => PROCESS_OP_UNINSTALL,
+        'OP_FIREWALL' => PROCESS_OP_FIREWALL,
+        'OP_FIREWALLBREAKER' => PROCESS_OP_FIREWALLBREAKER,
+        'OP_PASSWORD' => PROCESS_OP_PASSWORD,
+        'OP_PASSWORDBREAKER' => PROCESS_OP_PASSWORDBREAKER,
         'STEP_CPU' => STEP_CPU,
         'STEP_RAM' => STEP_RAM,
         'STEP_HDD' => STEP_HDD,
@@ -456,8 +464,7 @@ function clientfile_cache( $type, $base )
     $modifiedTime = filemtime( $actualFileName );
     $modifiedTiem = date( DateTime::RFC2822, $modifiedTime );
     
-    $timeString = "/* File Last Modified: $modifiedTime */\n";
-    file_put_contents( $cacheFileName, $timeString . $outBuffer );
+    file_put_contents( $cacheFileName, $outBuffer );
 }
 
 /*************** END OF FUNCTIONS - BEGIN INIT ********************************/
