@@ -363,6 +363,73 @@ function tempCache( ind, val, clearRegions, updateScreen )
 }
 
 /**
+ * Gets a value from the perm cache
+ * 
+ * @param ind Index to retrieve from the perm cache.  If there is no entry
+ *            then an empty string is returned.
+ * @return Value in the perm cache for the given index
+ */
+function getPermCache( ind )
+{
+    var ret = localStorage.getItem( ind );
+    if( ret == undefined )
+    {
+        return "";
+    }
+    return ret;
+}
+
+/**
+ * @param ind          Index to set
+ * @param val          Value to set
+ * @param updateScreen calls Function(ind, val, old) or updates screen with \
+ *                     the object that has ID of ind with value of val
+ */
+function permCache( ind, val, updateScreen )
+{
+    prepareThis();
+    if( ind == undefined )
+    {
+        alert( "Undefined index for perm cache." );
+        return 0;
+    }
+    ind = ind.toString();
+    if( val != undefined )
+    {
+        val = val.toString();
+    }
+    var old = localStorage.getItem( ind );
+    if( val != undefined )
+    {
+        localStorage.setItem( ind, val );
+    }
+    else
+    {
+        localStorage.removeItem( ind );
+    }
+    if( updateScreen )
+    {
+        var obj = $("#" + ind);
+        if( obj.length )
+        {
+            if( typeof updateScreen === "function" )
+            {
+                updateScreen( obj, val, old );
+            }
+            else if( obj.is( "input" ) )
+            {
+                obj.val( val );
+            }
+            else
+            {
+                obj.html( val );
+            }
+        }
+    }
+    return old;
+}
+
+/**
  * Converts an int into a time string based on the length of the time. Negative
  * values are converted to 0.  All other values are converted to numbers.
  * 

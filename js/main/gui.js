@@ -408,6 +408,7 @@ function resizeWidth( element )
 
 function getPopupContext( name )
 {
+    name = name.toString().replace( " ", "_" );
     return $('#' + name + 'pu');
 }
 
