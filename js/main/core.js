@@ -792,10 +792,11 @@ function createUpdateableInput( id, val, action, ajaxpara, ajaxval )
  * Ensures that all DOM elements (and script elements) that contain the given ID
  * are deleted
  * 
- * @param ID ID of elements to delete
+ * @param name Name of elements to delete
  */
-function deleteAllElementsById( ID )
+function deleteAllElementsById( name )
 {
+    var ID = name.replace( /\s/, '_' );
     var elem = $("#" + ID);
     while( elem.length )
     {

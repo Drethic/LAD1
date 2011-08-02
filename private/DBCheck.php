@@ -111,6 +111,16 @@ $version[ 27 ] = "CREATE TABLE `USER_DISABLED_MODULES` (\n" .
                  "`DISABLE_TIME` bigint unsigned NOT NULL\n," .
                  "UNIQUE KEY(USER_ID,MODULE_NAME)" .
                  ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
+$version[ 28 ] = "ALTER TABLE `USERS` ADD COLUMN `GATHERING_POINTS` bigint " .
+                 "unsigned NOT NULL AFTER `EMAIL`";
+$version[ 29 ] = "CREATE TABLE `ITEM_TYPES` (\n" .
+                 "`ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
+                 "`NAME` varchar(20) NOT NULL,\n" .
+                 "`DESCRIPTION` TEXT NOT NULL,\n" .
+                 "`MIN_PROB` int(10) unsigned NOT NULL,\n" .
+                 "`MAX_PROB` int(10) unsigned NOT NULL,\n" .
+                 "PRIMARY KEY(`ID`)\n" .
+                 ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
 
 // Connect to MySQL
 $sqlConnection = mysql_pconnect('localhost', $dbUsername);

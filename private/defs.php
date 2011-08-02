@@ -83,6 +83,9 @@ define('MATH_DIFF_MULT', 3);
 define('MATH_DIFF_DIV', 4);
 define('MATH_DIFF_ROOT', 5);
 
+// Minimum crafting find chance
+define('MINIMUM_CRAFT_FIND', 20);
+
 // Forces an array to be 2D
 function force2DArray( $val )
 {
@@ -159,11 +162,11 @@ function getProgramSize( $type )
 
 /**
  * Returns an array with all of the current valid modules.
- * @return array Array of [SERVERS,MATH]
+ * @return array Array of [SERVERS,MATH,CRAFTING]
  */
 function opt_getValidModules()
 {
-    return array( 'SERVERS', 'MATH' );
+    return array( 'SERVERS', 'MATH', 'CRAFTING' );
 }
 
 /**
@@ -465,6 +468,48 @@ function clientfile_cache( $type, $base )
     $modifiedTiem = date( DateTime::RFC2822, $modifiedTime );
     
     file_put_contents( $cacheFileName, $outBuffer );
+}
+
+function getHighestBit( $number, $bit )
+{
+    if( $bit > 4 || $bit < 1 )
+    {
+        $bit = 1;
+    }
+    $number = $number >> ( ( 4 - $bit ) * 2 );
+    if( $number & 0x1 )
+    {
+        return 1;
+    }
+    if( $number & 0x2 )
+    {
+        return 2;
+    }
+    if( $number & 0x4 )
+    {
+        return 3;
+    }
+    if( $number & 0x8 )
+    {
+        return 4;
+    }
+    if( $number & 0x10 )
+    {
+        return 5;
+    }
+    if( $number & 0x20 )
+    {
+        return 6;
+    }
+    if( $number & 0x40 )
+    {
+        return 7;
+    }
+    if( $number & 0x80 )
+    {
+        return 8;
+    }
+    return 0;
 }
 
 /*************** END OF FUNCTIONS - BEGIN INIT ********************************/

@@ -1,7 +1,5 @@
-createWindow( "Explorer" );
 createWindow( "Servers" );
-addMenuButton( "Servers", "ui-icon-image", requestServers);
-addMenuButton( "Explorer", "ui-icon-locked", function(){} );
+addMenuButton( "Servers", "ui-icon-folder-open", requestServers);
 
 function disableModuleSERVERS()
 {

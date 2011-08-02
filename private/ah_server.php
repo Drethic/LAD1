@@ -86,7 +86,8 @@ function validateServerOwnership( $serverid, $servers )
 function validateProgramOwnership( $programid, $programs )
 {
     $programInfo = $programs->getProgramOwnerAndServerByID( $programid );
-    if( $programInfo[ 'USER_ID' ] != $_SESSION[ 'ID' ] )
+    if( !isset( $programInfo[ 'USER_ID' ] ) ||
+        $programInfo[ 'USER_ID' ] != $_SESSION[ 'ID' ] )
     {
         ahdie( 'Performing action on program not owning.' );
     }
@@ -413,6 +414,7 @@ elseif( $action == 'exchangeprograms' )
 
     $programs = new Programs();
     $servers = new Servers();
+    $users = new Users();
     $programInfo = validateProgramOwnership( $programid, $programs );
     $userid = $programInfo[ 'USER_ID' ];
     $serverid = $programInfo[ 'SERVER_ID' ];
@@ -422,8 +424,9 @@ elseif( $action == 'exchangeprograms' )
     $ramUp = $_REQUEST[ 'RAM_UP' ];
     $hddUp = $_REQUEST[ 'HDD_UP' ];
     $bwUp = $_REQUEST[ 'BW_UP' ];
+    $gpointUp = $_REQUEST[ 'GPOINTS_UP' ];
 
-    if( $cpuUp + $ramUp + $hddUp + $bwUp != $version - 1 )
+    if( $cpuUp + $ramUp + $hddUp + $bwUp + $gpointUp != $version - 1 )
     {
         ahdie( 'Upgrading something other than that file.' );
     }
@@ -432,6 +435,7 @@ elseif( $action == 'exchangeprograms' )
                               $ramUp * STEP_RAM, $hddUp * STEP_HDD,
                               $bwUp * STEP_BW );
     $programs->deleteProgram( $programid, $serverid );
+    $users->adjustGatheringPoints( $userid, $gpointUp );
 
     echo( "exchangedProgram($programid,$cpuUp,$ramUp,$hddUp,$bwUp);" );
 }

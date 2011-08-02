@@ -138,6 +138,10 @@ class Servers extends MySQLObject
         {
             $changes[ 'BANDWIDTH' ] = "BANDWIDTH+$bw";
         }
+        if( empty( $changes ) )
+        {
+            return 0;
+        }
         return $this->update( $changes, array( 'ID' => $server ) );
     }
     

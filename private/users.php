@@ -20,7 +20,8 @@ class Users extends MySQLObject
 
     function getColumns( )
     {
-        return array( 'ID', 'NICK', 'PASSWORD', 'EMAIL', 'FLAGS' );
+        return array( 'ID', 'NICK', 'PASSWORD', 'EMAIL', 'GATHERING_POINTS',
+                      'FLAGS' );
     }
 
     function getTableName( )
@@ -34,7 +35,7 @@ class Users extends MySQLObject
         $pass = $this->escapifyString( $pass );
         $email = $this->escapifyString( $email );
         return $this->insert( array( 'NULL', $nick, "PASSWORD($pass)",
-                                     $email, 0 ) );
+                                     $email, 0, 0 ) );
     }
 
     function checkCombo( $nick, $pass )
@@ -82,6 +83,13 @@ class Users extends MySQLObject
         }
 
         return $array[ 'FLAGS' ] & self::ADMIN_FLAG;
+    }
+    
+    function adjustGatheringPoints( $id, $amount )
+    {
+        return $this->update( array( 'GATHERING_POINTS' =>
+                                     'GATHERING_POINTS+' . $amount ),
+                              array( 'ID' => $id ) );
     }
 }
 

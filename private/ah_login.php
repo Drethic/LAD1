@@ -74,11 +74,16 @@ if( $action == 'login' )
     else
     {
         require_once( 'userdisabledmodules.php' );
-        $id = $result[ 'ID' ];
-        $_SESSION['ID'] = $id;
-        $_SESSION['username'] = $result[ 'NICK' ];
+        // Set up session vars
+        $_SESSION[ 'ID' ] = $id = $result[ 'ID' ];
+        $_SESSION[ 'username' ] = $result[ 'NICK' ];
+        $_SESSION[ 'GATHERING_POINTS' ] = $gpoints =
+          $result[ 'GATHERING_POINTS' ];
+        
+        // Check admin
         $isAdmin = $_SESSION['isAdmin'] = $user->isUserDataAdmin( $result );
-        echo "validLogin($id);";
+        echo "validLogin($id,$gpoints);";
+        // Add admin script/stylesheet if admin
         if( $isAdmin )
         {
             echo 'addScriptElement("' .
@@ -87,6 +92,7 @@ if( $action == 'login' )
                  clientfile_buildRequest( 'C', 'admin' ) . '");';
         }
         
+        // Walk over modules and add script elements for enabled ones
         $validModules = opt_getValidModules();
         $userdisabledmodules = new UserDisabledModules();
         $disabledModules = $userdisabledmodules->getDisabledModules( $id );
@@ -104,9 +110,6 @@ if( $action == 'login' )
             $request = clientfile_buildRequest( 'J', strtolower( $var ) );
             echo "addScriptElement('$request');";
         }
-        echo( "/*\n" );
-        print_r( $disabledModules );
-        echo( "*/\n" );
         array_walk( $validModules, "moduleWalker", $disabledModules );
     }
 }
