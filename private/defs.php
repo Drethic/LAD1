@@ -162,11 +162,11 @@ function getProgramSize( $type )
 
 /**
  * Returns an array with all of the current valid modules.
- * @return array Array of [SERVERS,MATH,CRAFTING]
+ * @return array Array of [SERVERS,MATH,CRAFTING,TOWERD]
  */
 function opt_getValidModules()
 {
-    return array( 'SERVERS', 'MATH', 'CRAFTING' );
+    return array( 'SERVERS', 'MATH', 'CRAFTING', 'TOWERD' );
 }
 
 /**

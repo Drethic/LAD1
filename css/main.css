@@ -274,3 +274,12 @@ th {
     cursor: pointer;
     font-size: 10px;
 }
+
+#tdHdrTbl {
+    width: 100%;
+    border: none;
+}
+
+#tdHdrTbl td {
+    text-align: center;
+}
