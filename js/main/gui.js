@@ -181,9 +181,27 @@ function addMenuButton( name, icon, fn )
     });
 }
 
-function createWindow( name )
+function createWindow( name, resizeProps )
 {
     var id = name.replace( /\s/, '_' );
+    // Setup resize options
+    if( resizeProps == undefined )
+    {
+        resizeProps = {};
+    }
+    if( !resizeProps.containment )
+    {
+        resizeProps.containment = '#center';
+    }
+    if( !resizeProps.alsoResize )
+    {
+        resizeProps.alsoResize = "#" + id + "pu";
+    }
+    if( !resizeProps.handles )
+    {
+        resizeProps.handles = "n, e, s, w, ne, nw, se, sw";
+    }
+    
     $($("<div class='popup' id='" + id + "'></div>"))
         .append($("<div class='popup_header' title='" + name + "'>")
             .append("<div class='popup_title'>" +
@@ -318,11 +336,7 @@ function createWindow( name )
             'max-height': $("#center").height(),
             'max-width': $("#center").width()
         })
-        .resizable({
-            'containment': '#center',
-            'alsoResize': "#" + id + "pu",
-            'handles': "n, e, s, w, ne, nw, se, sw"
-        })
+        .resizable( resizeProps )
         .draggable({
             'opacity': '0.7',
             'cancel': '.popup_body',
