@@ -1,9 +1,8 @@
-createWindow( "Tower D" );
+createWindow( "Tower D", {minWidth: 550} );
 addMenuButton( "Tower D", "ui-icon-image", function(){runTowerD();} );
 
 var td = {
     baddyhpstep: 5,
-    baddybasehp: 75,
     baddybasespawncount: 5,
     baddybasespawndistance: 300,
     baddybasespeed: 5,
@@ -14,7 +13,12 @@ var td = {
     towerrangestep: 10,
     towerbasemaxhp: 100,
     towerhpstep: 10,
-    towerhpstepcost: 50
+    towerhpstepcost: 50,
+    baddytypes: [
+        {
+            hp: 75
+        }
+    ]
 };
 
 function disableModuleTOWERD()
@@ -22,18 +26,36 @@ function disableModuleTOWERD()
     deleteAllElementsById( "Tower D" );
 }
 
-function getTowerInitial( key )
+function getTowerInitial( key, def )
 {
+    if( def == undefined )
+    {
+        def = 0;
+    }
     var initial = getPermCache( key );
     if( initial == "" )
     {
-        initial = 0;
+        initial = def;
+    }
+    initial = toNumber( initial );
+    if( isNaN( initial ) )
+    {
+        initial = def;
     }
     return initial;
 }
 
+function createAlterableButton( txt, spanid, buttonid )
+{
+    return txt + ": <span id='" + spanid + "'></span><button id='" +
+           buttonid + "'></button><div class='clear'></div>";
+}
+
 function runTowerD()
 {
+    // Cosmetics
+    $("#center #Tower_D");
+    
     // Unpack baddies
     var baddies, baddiesstr = getPermCache( "Baddies" );
     eval( "baddies=[" + baddiesstr + "]" );
@@ -66,7 +88,7 @@ function runTowerD()
     document.baseatkupgrades = getTowerInitial( "BaseAttackUpgrades" );
     document.baserangeupgrades = getTowerInitial( "BaseRangeUpgrades" );
     document.basemaxhpupgrades = getTowerInitial( "BaseHPUpgrades" );
-    document.basehp = getTowerInitial( "BaseHP" );
+    document.basehp = getTowerInitial( "BaseHP", td.towerbasemaxhp );
     
     // Unpack Baddy Upgrades
     document.baddyhpup = getTowerInitial( "BaddyHPUp" );
@@ -90,13 +112,15 @@ function runTowerD()
     $("#TowerTabs li a").css( "padding", "0.2em" );
     $("#TowerTabs").tabs({idPrefix: 'Tab'});
     $("#TabTower")
-      .append( "Base Attack: <span id='BaseAttack'></span><button id='tdIncreaseBaseAtk'></button><br />")
-      .append( "Base Range: <span id='BaseRange'></span><button id='tdIncreaseBaseRange'></button><br />")
-      .append( "Base Max HP: <span id='BaseMaxHPCopy'></span><button id='tdIncreaseBaseHP></button><br />");
+      .append( createAlterableButton( "Base Attack", "BaseAttack", "tdIncreaseBaseAtk" ) )
+      .append( createAlterableButton( "Base Range", "BaseRange", "tdIncreaseBaseRange" ) )
+      .append( createAlterableButton( "Base Max HP", "BaseMaxHPCopy", "tdIncreaseBaseHP" ) )
+      .append( "Base HP: <span id='BaseHPCopy'></span><button id='tdRestoreBaseHP'>Restore 1 HP</button>")
+        .append("<button id='tdRestoreBaseHPAll'></button><div class='clear'></div>");
     // Baddies Tab
     $("#TabBaddies")
-      .append( "Initial HP: <span id='InitialBaddyHP'></span><button id='tdIncreaseBaddyHP'></button><br />")
-      .append( "Initial Speed: <span id='InitialBaddySpeed'></span><button id='tdIncreaseBaddySpeed'></button><br />" )
+      .append( createAlterableButton( "Initial HP", "InitialBaddyHP", "tdIncreaseBaddyHP" ) )
+      .append( createAlterableButton( "Initial Speed", "InitialBaddySpeed", "tdIncreaseBaddySpeed" ) )
       .append( "Initial Spawn Distance: " + td.baddybasespawndistance );
     $("#tdIncreaseBaseAtk").button().click(function(){
         var cost = getIncreaseBaseAtkCost();
@@ -124,7 +148,26 @@ function runTowerD()
         }
         adjustGold( -cost );
         increaseBaseHP();
-    })
+    });
+    $("#tdRestoreBaseHP").button().click(function(){
+        if( document.gold < 1 || document.basehp == getMaxHP() )
+        {
+            return;
+        }
+        adjustGold( -1 );
+        document.basehp++;
+        updateHP();
+    });
+    $("#tdRestoreBaseHPAll").button().click(function(){
+        var cost = getMaxHP() - document.basehp;
+        if( document.gold < cost || cost == 0 )
+        {
+            return;
+        }
+        adjustGold( -cost );
+        document.basehp += cost;
+        updateHP();
+    });
     $("#tdIncreaseBaddyHP").button().click(function(){
         increaseBaddyHP();
     });
@@ -220,6 +263,7 @@ function getRange()
     return td.towerbaserange + ( document.baserangeupgrades * td.towerrangestep );
 }
 
+// HP
 function increaseBaseHP()
 {
     document.basehp += td.towerhpstep;
@@ -250,8 +294,10 @@ function getMaxHP()
 
 function updateHP()
 {
+    var cost = getMaxHP() - document.basehp;
     permCache( "BaseHP", document.basehp );
     $("#BaseHP,#BaseHPCopy").html( document.basehp );
+    $("#tdRestoreBaseHPAll").button( "option", "label", "Restore All HP(" + cost + " gold)" );
 }
 
 // Baddy HP
@@ -262,9 +308,14 @@ function increaseBaddyHP()
     updateIncreaseBaddyHPButton();
 }
 
-function getBaddyHP()
+function getBaddyHP( type )
 {
-    var sum = td.baddybasehp;
+    return td.baddytypes[ type ].hp + getBaddyHPAddAll();
+}
+
+function getBaddyHPAddAll()
+{
+    var sum = 0;
     var currentadd = td.baddyhpstep;
     for( var i = 0; i < document.baddyhpup; i++ )
     {
@@ -276,9 +327,9 @@ function getBaddyHP()
 
 function updateIncreaseBaddyHPButton()
 {
-    var initialhp = getBaddyHP();
+    var initialhp = getBaddyHPAddAll();
     var step = ( document.baddyhpup + 1 ) * td.baddyhpstep;
-    $("#InitialBaddyHP").html( initialhp + ",+" + document.baddyhpup * 0.02 + "% gold" );
+    $("#InitialBaddyHP").html( "+" + initialhp + ",+" + document.baddyhpup * 2 + "% gold" );
     $("#tdIncreaseBaddyHP").button( "option", "label", "Increase Baddy HP(+" + step + " HP,+2% gold)" );
 }
 
@@ -299,10 +350,11 @@ function updateIncreaseBaddySpeedButton()
 {
     var initialspeed = getBaddySpeed();
     var step = td.baddyspeedstep;
-    $("#InitialBaddySpeed").html( initialspeed + ",+" + document.baddyspeedup * 0.02 + "% gold" );
+    $("#InitialBaddySpeed").html( initialspeed + ",+" + document.baddyspeedup * 2 + "% gold" );
     $("#tdIncreaseBaddySpeed").button( "option", "label", "Increase Baddy Speed(+" + step + " Speed,+2% gold)" );
 }
 
+// Baddy Spawning
 function createBaddy( i_hp, i_multiplier, i_speed, i_distance )
 {
     return {
@@ -327,13 +379,14 @@ function spawnBaddyWave()
     for( var i = 0; i < getBaddySpawnCount(); i++ )
     {
         var multiplier = ( document.baddyhpup + document.baddyspeedup ) * 2;
-        document.baddies.push( createBaddy( getBaddyHP(), multiplier,
+        document.baddies.push( createBaddy( getBaddyHP( 0 ), multiplier,
                                getBaddySpeed(), td.baddybasespawndistance ) );
     }
     permCache( "Baddies", document.baddies );
     permCache( "BaddyCount", document.baddies.length, true );
 }
 
+// Baddy Damage
 function damageBaddies( damage, indexes )
 {
     // Apply damage
@@ -388,15 +441,28 @@ function towerDLoop()
     // Move each baddy closer and find the closest
     var closestbaddy = -1;
     var closestdistance = Number.MAX_VALUE;
+    var damagedbase = false;
     for( var i = 0; i < document.baddies.length; i++ )
     {
         var speed = document.baddies[ i ].speed;
         document.baddies[ i ].distance -= speed;
+        if( document.baddies[ i ].distance <= 0 )
+        {
+            document.baddies[ i ].distance = 0;
+            document.basehp--;
+            damagedbase = true;
+        }
         if( document.baddies[ i ].distance < closestdistance )
         {
             closestbaddy = i;
             closestdistance = document.baddies[ i ].distance;
         }
+    }
+    
+    // Update Base HP if damaged
+    if( damagedbase )
+    {
+        updateHP();
     }
     
     // Only attack if in range
