@@ -21,8 +21,9 @@ define('JQUERY_JTASKBAR', 'jquery-jtaskbar-' . JTASKBAR_VERSION);
 $GLOBALS['JQUERY_FILES'] = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS,
                                   JQUERY_JTASKBAR );
 
-define('DB_NAME', 'lad');
-define('DB_USERNAME', 'lad');
+define('DB_NAME', 'admin_lad');
+define('DB_USERNAME', 'admin_lad');
+define('DB_PASS', 'password');
 
 // Some default hardware for a computer
 define('DEFAULT_CPU', 350); // Expressed in MHz
@@ -463,7 +464,7 @@ function clientfile_cache( $type, $base )
 
 /*************** END OF FUNCTIONS - BEGIN INIT ********************************/
 // Connect to MySQL
-$sqlConnection = mysql_pconnect( 'localhost', DB_NAME );
+$sqlConnection = mysql_pconnect( 'localhost', DB_NAME, DB_PASS );
 
 if( !$sqlConnection )
 {
