@@ -34,7 +34,7 @@ class Users extends MySQLObject
         $pass = $this->escapifyString( $pass );
         $email = $this->escapifyString( $email );
         return $this->insert( array( 'NULL', $nick, "PASSWORD($pass)",
-                                     $email, 0 ) );
+                                     $email, 0, 0 ) );
     }
 
     function checkCombo( $nick, $pass )
