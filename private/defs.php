@@ -4,6 +4,7 @@ require_once( 'jsmin.php' );
 
 session_start();
 srand();
+date_default_timezone_set('America/Los_Angeles');
 
 define('JQUERY_VERSION', '1.6.1');
 define('JQUERY_UI_VERSION', '1.8.13');
