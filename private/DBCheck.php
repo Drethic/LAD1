@@ -10,8 +10,8 @@
  */
 
 // Initialize some variables
-$dbName = 'lad';
-$dbUsername = 'lad';
+$dbName = 'admin_lad';
+$dbUsername = 'admin_lad';
 
 /*********************************** STEP 1 ***********************************/
 require_once 'users.php';
@@ -111,9 +111,19 @@ $version[ 27 ] = "CREATE TABLE `USER_DISABLED_MODULES` (\n" .
                  "`DISABLE_TIME` bigint unsigned NOT NULL\n," .
                  "UNIQUE KEY(USER_ID,MODULE_NAME)" .
                  ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
+$version[ 28 ] = "ALTER TABLE `USERS` ADD COLUMN `GATHERING_POINTS` bigint " .
+                 "unsigned NOT NULL AFTER `EMAIL`";
+$version[ 29 ] = "CREATE TABLE `ITEM_TYPES` (\n" .
+                 "`ID` int(10) unsigned NOT NULL AUTO_INCREMENT,\n" .
+                 "`NAME` varchar(20) NOT NULL,\n" .
+                 "`DESCRIPTION` TEXT NOT NULL,\n" .
+                 "`MIN_PROB` int(10) unsigned NOT NULL,\n" .
+                 "`MAX_PROB` int(10) unsigned NOT NULL,\n" .
+                 "PRIMARY KEY(`ID`)\n" .
+                 ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
 
 // Connect to MySQL
-$sqlConnection = mysql_pconnect('localhost', $dbUsername);
+$sqlConnection = mysql_pconnect('localhost', 'admin_lad', 'password' );
 
 if( !$sqlConnection )
 {
@@ -121,7 +131,7 @@ if( !$sqlConnection )
 }
 
 // Select Database
-$dbSelection = mysql_select_db( $dbName );
+$dbSelection = mysql_select_db( 'admin_lad' );
 
 if( !$dbSelection )
 {
@@ -159,7 +169,7 @@ if( !$foundSystem )
 else
 {
     $versionResult = mysql_query( 'SELECT VERSION FROM SYSTEM' );
-
+    
     if( !$versionResult )
     {
         die( 'Failed to get version with system table available.' );
