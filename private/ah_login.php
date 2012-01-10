@@ -185,5 +185,32 @@ elseif( $action == 'newuser2' )
         }
     }
 }
-
+/*********************************** STEP 4 ***********************************/
+if( $action == 'passreset' )
+{
+    if(!isset($_REQUEST[ 'username' ]) || !isset($_REQUEST[ 'email' ]))
+    {
+        ahdie('Stupid Muppet! Invalid Username!');
+    }
+    $nick = $_REQUEST[ 'username' ];
+    $email = $_REQUEST['email'];
+    if( !isValidEmail( $email ) )
+    {
+        ahdie('Stupid muppet!  Your email isn\'t formatted right!');
+    }
+    $user = new Users();
+    $result = $user->checkEmailMatches( $nick, $email );
+/*********************************** STEP 4a **********************************/
+        if( $result == false )
+        {
+            echo "emailWrong()";
+        }
+/*********************************** STEP 4b **********************************/
+        else
+        {
+            $id = $result[ 'ID' ];
+            $nick = $result[ 'USER' ];
+            $user->changePass($id, $nick, $email);
+        }
+}
 ?>

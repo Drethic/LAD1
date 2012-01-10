@@ -8,6 +8,7 @@
  *          newuser1 = Step 1 in user creation process
  *          newuser2 = Step 2 in user creation process
  *             login = User is logging in
+ *         passreset = Sends user a new password
  *    requestservers = User is requesting their list of servers
  * requestfreeserver = User wants their first server for free
  *        viewserver = User wants to see all information about a server
@@ -56,6 +57,7 @@ $actionRequirements = array(
   'login' => array( NO_LOGIN, 'login', array( 'username', 'password' ) ),
   'newuser1' => array( NO_LOGIN, 'login', array( 'username', 'password' ) ),
   'newuser2' => array( NO_LOGIN, 'login', array( 'email', 'cpassword' ) ),
+  'passreset' => array( NO_LOGIN, 'login', array( 'username', 'email' ) ),
   'requestservers' => array( 0, 'server' ),
   'requestfreeserver' => array( 0, 'server' ),
   'viewserver' => array( 0, 'server', array( 'SERVER_ID' ) ),

@@ -40,5 +40,6 @@ writeJS('main');
 //writeJS('ui');
 
 ?></head><body><script type='text/javascript'>$(document).ready(function(){
-    doLogin();
+    //doLogin();
+    indexSetup();
 });</script></body></html>

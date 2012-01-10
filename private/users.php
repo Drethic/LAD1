@@ -63,6 +63,63 @@ class Users extends MySQLObject
         $val = $this->get( array( 'LOWER(EMAIL)' => "LOWER($email)" ) );
         return count( $val );
     }
+    
+    function checkEmailMatches( $nick, $email )
+    {
+        $nick = $this->escapifyString( $nick );
+        $email = $this->escapifyString( $email );
+        $val = $this->get( array( 'LOWER(NICK)' => "LOWER($nick)", 'LOWER(EMAIL)' => "LOWER($email)" ) );
+        if( count( $val ) == 0 )
+        {
+            return false;
+        }
+        return $val[ 0 ];
+    }
+    
+    function ranPass( )
+    {
+    $chars = "abcdefghijkmnopqrstuvwxyz023456789";
+    srand((double)microtime()*1000000);
+    $i = 0;
+    $pass = '' ;
+
+	while ($i <= 7)
+        {
+        $num = rand() % 33;
+        $tmp = substr($chars, $num, 1);
+        $pass = $pass . $tmp;
+        $i++;
+        }
+    return $pass;
+    }
+
+    function changePass( $id, $nick, $email )
+    {
+        $id = $this->escapifyString( $id );
+        $enick = $this->escapifyString($nick);
+        $eemail = $this->escapifyString( $email );
+        $ranpass = $this->ranPass();
+        $pass = $this->escapifyString( $ranpass );
+        
+        $recip = $email;
+		
+	$headers = 'MIME-Version: 1.0' . "\n";
+	$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\n";
+	$headers .= 'Message-ID: <". time() .rand(1,1000). ">' . "\n";
+	$headers .= 'From: Support <evemut@dhandwb.com>' . "\n";
+	$subject = 'Password Reset ';
+	
+        $message = 'Dear ' . $nick . "<br /><br />";
+	$message .= 'Thank you for resetting your password.' . "<br /><br />";
+	$message .= 'Your new password is: ' . $ranpass . '<br /><br />';
+	
+		// Sends email
+	mail( $recip, $subject, $message, $headers );
+        
+        echo "emailRight(" . $enick . ")";
+        return $this->update(array('PASSWORD' => "PASSWORD($pass)"), 
+                array('ID' => $id, 'EMAIL' => $eemail, 'NICK' => $enick));
+    }
 
     function lookupUserDetails( $id )
     {

@@ -6,8 +6,8 @@ session_start();
 srand();
 date_default_timezone_set('America/Los_Angeles');
 
-define('JQUERY_VERSION', '1.6.1');
-define('JQUERY_UI_VERSION', '1.8.13');
+define('JQUERY_VERSION', '1.7.1');
+define('JQUERY_UI_VERSION', '1.8.16');
 define('JQUERY_LAYOUT_VERSION', '1.3.0');
 define('JTASKBAR_VERSION', '0.2');
 
