@@ -43,7 +43,7 @@ html, body {
 }
 
 div#logofull {
-    background: url(images/logofull1.gif);
+    background: url(images/logofull.gif);
     width: 668px;
     height: 76px;
     float: left;
@@ -51,7 +51,7 @@ div#logofull {
     position: relative;
 }
 div#logo {
-    background: url(images/logo1.gif);
+    background: url(images/logo.gif);
     width: 76px;
     height: 76px;
     float: right;
