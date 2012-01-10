@@ -5,6 +5,46 @@
  * @todo Sort start menu buttons as added
  */
 
+function indexSetup()
+{
+    // Setup the basic layout
+    $("body").empty()
+      .css( "padding", "0px" )
+      .append(
+          $("<div id='layout-container'>")
+            .append("<div id='news' class='ui-layout-east'></div>")
+            .append("<div id='header' class='ui-layout-north'></div>")
+            .append("<div id='main' class='ui-layout-center'></div>")
+      );
+    
+    // Make the layout into a useable one
+    $("#layout-container").layout({
+        north: {
+           closable: false
+        ,  resizable: false
+        ,  spacing_open: 0
+        }
+        ,   east: {
+            closable: false
+        ,   resizable: false
+        ,   spacing_open: 0
+        }
+        }).sizePane("north", 79);
+
+    $("#main")
+    .append("<div id='main-center'>Welcome to Macro Web Security.</div>");
+    doLogin();
+    
+    $("#header")
+    .append("<div id='logofull'></div><div id='logo'></div>");
+    
+    $("<div>")
+      .append("<br>News RSS<br><br>The News will go here and we can do some" +
+      "swoopy stuff to it once we start updating the site to normal users.  " +
+      "To include a full blown function just to pull it from the DB.")
+      .appendTo("#loginform");
+}
+
 /**
  * Called upon successful login.  Sets up everything about the GUI and prepares
  * the client for user input.  Creates the layout, adds the taskbar to the
