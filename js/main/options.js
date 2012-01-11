@@ -6,7 +6,7 @@ function initOptions()
 {
     // Create the options window/menu button
     createWindow( "Options" );
-    addMenuButton( "Options", "ui-icon-gear", requestOptions );
+    addMenuButton( "Options", "ui-icon-wrench", requestOptions );
 }
 
 /**

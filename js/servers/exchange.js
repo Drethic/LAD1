@@ -6,6 +6,7 @@ function startExchangeProgram( id )
     var currram = toNumber( getTempCache( "serverram" ) );
     var currhdd = toNumber( getTempCache( "serverhdd" ) );
     var currbw = toNumber( getTempCache( "serverbw" ) );
+    var currgpoints = toNumber( getTempCache( "user-gatheringpoints" ) );
     var cpustep = toNumber( getDefault( "STEP_CPU" ) );
     var ramstep = toNumber( getDefault( "STEP_RAM" ) );
     var hddstep = toNumber( getDefault( "STEP_HDD" ) );
@@ -25,6 +26,7 @@ function startExchangeProgram( id )
             .append( createRow( "RAM", currram, ramstep, points ) )
             .append( createRow( "HDD", currhdd, hddstep, points ) )
             .append( createRow( "BW", currbw, bwstep, points ) )
+            .append( createRow( "GPoints", currgpoints, 1, points ) )
     ).append(
         $("<div></div>").append(
             $("<div style='float:right' id='commitexchange'>" +
@@ -34,7 +36,8 @@ function startExchangeProgram( id )
                     CPU_UP: calculateRegionPointsUsed( "CPU" ),
                     RAM_UP: calculateRegionPointsUsed( "RAM" ),
                     HDD_UP: calculateRegionPointsUsed( "HDD" ),
-                    BW_UP: calculateRegionPointsUsed( "BW" )
+                    BW_UP: calculateRegionPointsUsed( "BW" ),
+                    GPOINTS_UP: calculateRegionPointsUsed( "GPoints" )
                 });
             }).button({disabled: true})
         ).append(
@@ -60,7 +63,8 @@ function calculateRemainingPoints()
            calculateRegionPointsUsed( "CPU" ) -
            calculateRegionPointsUsed( "RAM" ) -
            calculateRegionPointsUsed( "HDD" ) -
-           calculateRegionPointsUsed( "BW" );
+           calculateRegionPointsUsed( "BW" ) -
+           calculateRegionPointsUsed( "GPoints" );
 }
 
 function refreshExchangeSliders()
@@ -68,7 +72,8 @@ function refreshExchangeSliders()
     var pointsremaining = calculateRemainingPoints();
     $("#exchangeremain").html( pointsremaining );
     
-    $("#CPUSlider, #RAMSlider, #HDDSlider, #BWSlider").each(function(index, domEl){
+    $("#CPUSlider, #RAMSlider, #HDDSlider, #BWSlider," +
+      "#GPointsSlider").each(function(index, domEl){
         var obj = $(domEl);
         var min = toNumber( obj.slider( "option", "min" ) );
         var value = toNumber( obj.slider( "value" ) );
@@ -145,6 +150,7 @@ function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
         {
             var progid = programlist[ i ];
             programarray.push( new Array( progid, id,
+                          getTempCache( "program-" + progid + "-customname" ),
                           getTempCache( "program-" + progid + "-type" ),
                           getTempCache( "program-" + progid + "-size" ),
                           getTempCache( "program-" + progid + "-version" )));

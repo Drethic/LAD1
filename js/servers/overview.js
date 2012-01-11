@@ -1,7 +1,5 @@
-createWindow( "Explorer" );
 createWindow( "Servers" );
-addMenuButton( "Servers", "ui-icon-image", requestServers);
-addMenuButton( "Explorer", "ui-icon-locked", function(){} );
+addMenuButton( "Servers", "ui-icon-folder-open", requestServers);
 
 function disableModuleSERVERS()
 {
@@ -37,21 +35,6 @@ function ownedServers( list )
         var id = obj[ 0 ];
         var row = $("<tr></tr>");
         var customname = verifyServerName( id, obj[ 3 ] );
-        /*
-        var tempOut = "<tr>";
-        tempOut += "<td><button href='#server-" + id + "' " +
-                   "title='View Server' id='server-" + id + "-link'>" +
-                   intToIP( obj[ 2 ] ) + "</button></td>";
-        tempOut += "<td><input type='text' id='server-" + id + "-customname' " +
-                   "class='semihidden' title='Click to Edit' />" +
-                   "</td>";
-        for( var j = 4; j < 8; j++ )
-        {
-            tempOut += "<td>" + obj[ j ] + "</td>";
-        }
-        tempOut += "<td>" + obj[ 9 ] + "</td>";
-        tempOut += "</tr>";
-        */
         row.append( "<td><button href='#server-" + id + "' " +
                     "title='View Server' id='server-" + id + "-link'>" +
                     intToIP( obj[ 2 ] ) + "</button></td>" );
@@ -67,27 +50,6 @@ function ownedServers( list )
 
         serverids[ i ] = id;
         $('#servertable').append( row );
-        /*
-        $('#server-' + id + '-customname').val( obj[ 3 ] )
-            .hover(function(){
-                $(this).addClass("semihiddenhover");
-            }, function(){
-                $(this).removeClass("semihiddenhover");
-            }).focus(function(){
-                $(this).addClass("semihiddenactive");
-            }).blur(function(){
-                $(this).removeClass("semihiddenactive");
-                var oldVal = getTempCache( $(this).attr( "id" ) );
-                var newVal = $(this).val();
-                if( oldVal != newVal )
-                {
-                    doAjax( "changeservername", {
-                        SERVER_ID: id,
-                        NAME: newVal
-                    });
-                }
-            });
-        */
         tempCache( "server-" + id + "-ip", obj[ 2 ], cache );
         tempCache( "server-" + id + "-customname", obj[ 3 ], cache );
         tempCache( "server-" + id + "-cpu", obj[ 4 ], cache );
@@ -177,6 +139,10 @@ function animateServerStatModification( obj, objname, newvalue, cb )
 /**
  * Verifies that the server name is valid.  The name is not allowed to be blank
  * so replace it with a valid string if it is.
+ * 
+ * @param id ID of the server
+ * @param name Custom name of the server
+ * @return Custom name if it is not blank, Server #ID if it is
  */
 function verifyServerName( id, name )
 {

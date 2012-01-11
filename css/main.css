@@ -296,3 +296,29 @@ th {
     cursor: pointer;
     font-size: 10px;
 }
+
+.clear {
+    clear: both;
+}
+
+/* Tower Defense */
+#tdHdrTbl {
+    width: 100%;
+    border: none;
+}
+
+#tdHdrTbl td {
+    text-align: center;
+}
+
+div#TowerTabs div button {
+    float:right;
+}
+
+#center div#Tower_D {
+    width: 550px;
+}
+
+#center div#Tower_Dpu {
+    width: 548px;
+}

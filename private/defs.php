@@ -55,6 +55,10 @@ define('PROCESS_OP_DELETE', 5);
 define('PROCESS_OP_COPY', 6);
 define('PROCESS_OP_INSTALL', 7);
 define('PROCESS_OP_UNINSTALL', 8);
+define('PROCESS_OP_FIREWALL', 9);
+define('PROCESS_OP_FIREWALLBREAKER', 9);
+define('PROCESS_OP_PASSWORD', 9);
+define('PROCESS_OP_PASSWORDBREAKER', 9);
 
 // Basic program types
 define('PROGRAM_TYPE_FIREWALL', 1);
@@ -80,6 +84,9 @@ define('MATH_DIFF_SUB', 2);
 define('MATH_DIFF_MULT', 3);
 define('MATH_DIFF_DIV', 4);
 define('MATH_DIFF_ROOT', 5);
+
+// Minimum crafting find chance
+define('MINIMUM_CRAFT_FIND', 20);
 
 // Forces an array to be 2D
 function force2DArray( $val )
@@ -117,6 +124,10 @@ function getClientSideDefines()
         'OP_COPY' => PROCESS_OP_COPY,
         'OP_INSTALL' => PROCESS_OP_INSTALL,
         'OP_UNINSTALL' => PROCESS_OP_UNINSTALL,
+        'OP_FIREWALL' => PROCESS_OP_FIREWALL,
+        'OP_FIREWALLBREAKER' => PROCESS_OP_FIREWALLBREAKER,
+        'OP_PASSWORD' => PROCESS_OP_PASSWORD,
+        'OP_PASSWORDBREAKER' => PROCESS_OP_PASSWORDBREAKER,
         'STEP_CPU' => STEP_CPU,
         'STEP_RAM' => STEP_RAM,
         'STEP_HDD' => STEP_HDD,
@@ -153,11 +164,11 @@ function getProgramSize( $type )
 
 /**
  * Returns an array with all of the current valid modules.
- * @return array Array of [SERVERS,MATH]
+ * @return array Array of [SERVERS,MATH,CRAFTING,TOWERD]
  */
 function opt_getValidModules()
 {
-    return array( 'SERVERS', 'MATH' );
+    return array( 'SERVERS', 'MATH', 'CRAFTING', 'TOWERD' );
 }
 
 /**
@@ -458,8 +469,49 @@ function clientfile_cache( $type, $base )
     $modifiedTime = filemtime( $actualFileName );
     $modifiedTiem = date( DateTime::RFC2822, $modifiedTime );
     
-    $timeString = "/* File Last Modified: $modifiedTime */\n";
-    file_put_contents( $cacheFileName, $timeString . $outBuffer );
+    file_put_contents( $cacheFileName, $outBuffer );
+}
+
+function getHighestBit( $number, $bit )
+{
+    if( $bit > 4 || $bit < 1 )
+    {
+        $bit = 1;
+    }
+    $number = $number >> ( ( 4 - $bit ) * 2 );
+    if( $number & 0x1 )
+    {
+        return 1;
+    }
+    if( $number & 0x2 )
+    {
+        return 2;
+    }
+    if( $number & 0x4 )
+    {
+        return 3;
+    }
+    if( $number & 0x8 )
+    {
+        return 4;
+    }
+    if( $number & 0x10 )
+    {
+        return 5;
+    }
+    if( $number & 0x20 )
+    {
+        return 6;
+    }
+    if( $number & 0x40 )
+    {
+        return 7;
+    }
+    if( $number & 0x80 )
+    {
+        return 8;
+    }
+    return 0;
 }
 
 /*************** END OF FUNCTIONS - BEGIN INIT ********************************/

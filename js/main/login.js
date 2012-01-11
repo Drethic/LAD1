@@ -10,7 +10,7 @@ function createLoginInput( label, type, name, maxlen, optional )
                "</span><br>" );
 }
 
-function doLogin()
+function doLogin( userid, gpoints )
 {
     //$("body").html("");
     $("#news").empty().append(
@@ -144,6 +144,9 @@ function doLogin()
     }).keyup();
     
     $("#username").focus();
+    
+    // Set gathering points
+    tempCache( "user-gatheringpoints", gpoints );
 }
 
 function loginError( field, reason )

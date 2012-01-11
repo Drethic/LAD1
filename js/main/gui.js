@@ -145,8 +145,9 @@ function validLogin( id )
 
 function addMenuButton( name, icon, fn )
 {
+    var id = name.replace( /\s/, '_' );
     var buttonlist = $("#menu button");
-    var button = $( "<button id='" + name + "'>" + name + "</button>" );
+    var button = $( "<button id='" + id + "'>" + name + "</button>" );
     if( buttonlist.length == 0 || name == "Logout" )
     {
         $("#menu").append( button );
@@ -165,7 +166,7 @@ function addMenuButton( name, icon, fn )
         });
     }
 
-    var menuobj = $("button#" + name);
+    var menuobj = $("button#" + id);
     if( icon != undefined )
     {
         menuobj.button({icons: {primary: icon}});
@@ -216,13 +217,32 @@ function addMenuButton( name, icon, fn )
     }
     menuobj.click(function(){
         $('#start').click();
-        enclosedfn( name );
+        enclosedfn( id );
     });
 }
 
-function createWindow( name )
+function createWindow( name, resizeProps )
 {
-    $($("<div class='popup' id='" + name + "'></div>"))
+    var id = name.replace( /\s/, '_' );
+    // Setup resize options
+    if( resizeProps == undefined )
+    {
+        resizeProps = {};
+    }
+    if( !resizeProps.containment )
+    {
+        resizeProps.containment = '#center';
+    }
+    if( !resizeProps.alsoResize )
+    {
+        resizeProps.alsoResize = "#" + id + "pu";
+    }
+    if( !resizeProps.handles )
+    {
+        resizeProps.handles = "n, e, s, w, ne, nw, se, sw";
+    }
+    
+    $($("<div class='popup' id='" + id + "'></div>"))
         .append($("<div class='popup_header' title='" + name + "'>")
             .append("<div class='popup_title'>" +
                     "<span class='ui-icon ui-icon-image popup_image' " +
@@ -288,7 +308,7 @@ function createWindow( name )
                             'containment': '#center'
                         });
                         div.resizable({
-                            'alsoResize': "#" + name + "pu",
+                            'alsoResize': "#" + id + "pu",
                             'containment': '#center'
                         });
                         div.find('.popup_header').css( "cursor", "move" );
@@ -341,7 +361,7 @@ function createWindow( name )
             .css( "cursor", "move" )
         )
         .append(
-            $("<div id='" + name + "pu' class='popup_body'></div>")
+            $("<div id='" + id + "pu' class='popup_body'></div>")
                 .css( {
                     "max-height": $("#center").height() - 20,
                     "max-width": $("#center").width()
@@ -356,11 +376,7 @@ function createWindow( name )
             'max-height': $("#center").height(),
             'max-width': $("#center").width()
         })
-        .resizable({
-            'containment': '#center',
-            'alsoResize': "#" + name + "pu",
-            'handles': "n, e, s, w, ne, nw, se, sw"
-        })
+        .resizable( resizeProps )
         .draggable({
             'opacity': '0.7',
             'cancel': '.popup_body',
@@ -369,12 +385,12 @@ function createWindow( name )
             'stack': '.popup',
             start: function(event,ui){
                 $('#jTaskBar').find('.jTask').removeClass('jTask-current');
-                $('#jTaskBar').find('.jTask#' + name).addClass('jTask-current');
+                $('#jTaskBar').find('.jTask#' + id).addClass('jTask-current');
             }
         })
         .mousedown(function(){
             $('#jTaskBar').find('.jTask').removeClass('jTask-current');
-            $('#jTaskBar').find('.jTask#' + name).addClass('jTask-current');
+            $('#jTaskBar').find('.jTask#' + id).addClass('jTask-current');
             $('.popup').css( 'z-index', 1000 );
             $(this).css( 'z-index', 1001 );
             $(this).trigger( 'dragstart' ).trigger( 'drag' ).trigger( 'dragstop' );
@@ -446,6 +462,7 @@ function resizeWidth( element )
 
 function getPopupContext( name )
 {
+    name = name.toString().replace( " ", "_" );
     return $('#' + name + 'pu');
 }
 

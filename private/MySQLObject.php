@@ -126,7 +126,9 @@ abstract class MySQLObject
      * if the insert fails. An optional parameter exists that allows for a
      * 'ON DUPLICATE KEY UPDATE' clause to be appended to the INSERT clause.
      * If the parameter is set then the UPDATE clause is populated by the
-     * key/value pairs from the parameter.
+     * key/value pairs from the parameter.  If the first parameter has arrays
+     * as children then each of the arrays will be concatenated together
+     * properly.
      * 
      * @param array $values The values to insert
      * @param array $duplicatepairs If set, will fill ON DUPLICATE KEY UPDATE
@@ -134,9 +136,24 @@ abstract class MySQLObject
      */
     public function insert( $values, $duplicatepairs = NULL )
     {
+        // Make sure that values is an array that has arrays as children
+        if( !is_array( $values[ 0 ] ) )
+        {
+            $values = array( $values );
+        }
+        // Now convert each of the array children to a string
+        foreach( $values as &$child )
+        {
+            if( is_array( $child ) )
+            {
+                $child = '(' . implode( ',', $child ) . ')';
+            }
+        }
+        
+        
         // Build the statement
-        $sql = 'INSERT INTO ' . $this->getTableName() . ' VALUES(' .
-                implode( ', ', $values ) . ')';
+        $sql = 'INSERT INTO ' . $this->getTableName() . ' VALUES' .
+                implode( ',', $values );
         
         // Check if UPDATE clause requested
         if( is_array( $duplicatepairs ) && count( $duplicatepairs ) )

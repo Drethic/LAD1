@@ -20,7 +20,8 @@ class Users extends MySQLObject
 
     function getColumns( )
     {
-        return array( 'ID', 'NICK', 'PASSWORD', 'EMAIL', 'FLAGS' );
+        return array( 'ID', 'NICK', 'PASSWORD', 'EMAIL', 'GATHERING_POINTS',
+                      'FLAGS' );
     }
 
     function getTableName( )
@@ -139,6 +140,13 @@ class Users extends MySQLObject
         }
 
         return $array[ 'FLAGS' ] & self::ADMIN_FLAG;
+    }
+    
+    function adjustGatheringPoints( $id, $amount )
+    {
+        return $this->update( array( 'GATHERING_POINTS' =>
+                                     'GATHERING_POINTS+' . $amount ),
+                              array( 'ID' => $id ) );
     }
 }
 
