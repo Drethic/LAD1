@@ -333,8 +333,6 @@ function clientfile_getApplicationType( $type )
 
 function clientfile_buildRequest( $type, $base )
 {
-    $folder = clientfile_getFolder( $type );
-    $extension = clientfile_getExtension( $type );
     $cacheName = clientfile_getCacheName( $type, $base );
     $actualFile = clientfile_getName( $type, $base );
     if( $type == 'C' || $type == 'J' )
@@ -466,8 +464,6 @@ function clientfile_cache( $type, $base )
         $outBuffer = JSMin::minify( $outBuffer );
         $outBuffer = str_replace( "\n", '', $outBuffer );
     }
-    $modifiedTime = filemtime( $actualFileName );
-    $modifiedTiem = date( DateTime::RFC2822, $modifiedTime );
     
     file_put_contents( $cacheFileName, $outBuffer );
 }
