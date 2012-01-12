@@ -512,7 +512,7 @@ function getHighestBit( $number, $bit )
 
 /*************** END OF FUNCTIONS - BEGIN INIT ********************************/
 // Connect to MySQL
-$sqlConnection = mysql_pconnect( 'localhost', DB_NAME, DB_PASS );
+$sqlConnection = mysql_pconnect( 'localhost', DB_USERNAME, DB_PASS );
 
 if( !$sqlConnection )
 {
@@ -520,7 +520,7 @@ if( !$sqlConnection )
 }
 
 // Select Database
-$dbSelection = mysql_select_db( DB_USERNAME );
+$dbSelection = mysql_select_db( DB_NAME );
 
 if( !$dbSelection )
 {

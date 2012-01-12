@@ -3,17 +3,13 @@
 /**
  * Basic concept: Check all MySQL databases
  *
- * 1. Establish connection
- * 2. Rebuild system table if needed
- * 3. Upgrade tables based on what level the system version is
- * 4. Update the system table
+ * 1. Rebuild system table if needed
+ * 2. Upgrade tables based on what level the system version is
+ * 3. Update the system table
  */
 
-// Initialize some variables
-$dbName = 'admin_lad';
-$dbUsername = 'admin_lad';
-
 /*********************************** STEP 1 ***********************************/
+require_once 'defs.php';
 require_once 'users.php';
 
 $version = array();
@@ -122,24 +118,8 @@ $version[ 29 ] = "CREATE TABLE `ITEM_TYPES` (\n" .
                  "PRIMARY KEY(`ID`)\n" .
                  ") ENGINE = MyISAM DEFAULT CHARSET=latin1";
 
-// Connect to MySQL
-$sqlConnection = mysql_pconnect('localhost', 'admin_lad', 'password' );
-
-if( !$sqlConnection )
-{
-    die( 'Failed to connect to MySQL.' . mysql_error() );
-}
-
-// Select Database
-$dbSelection = mysql_select_db( 'admin_lad' );
-
-if( !$dbSelection )
-{
-    die( 'Failed to select DB in MySQL.' . mysql_error() );
-}
-
 // Perform actual query to find out what tables MySQL has
-$allTablesResult = mysql_query( "SHOW TABLES FROM $dbName" );
+$allTablesResult = mysql_query( 'SHOW TABLES FROM ' . DB_NAME );
 
 if( !$allTablesResult )
 {
