@@ -212,7 +212,6 @@ abstract class MySQLObject
     {
         $sql = 'UPDATE ' . $this->getTableName() . ' SET ';
         $valueKeys = array_keys( $values );
-        $conditionKeys = array_keys( $conditions );
 
         // Build the update sequence
         for( $i = 0; $i < count( $values ); $i++ )
@@ -401,7 +400,6 @@ abstract class MySQLObject
                 {
                     if( $parseIn )
                     {
-                        $imploded = implode( ',', $pair );
                         $sql .= "$pairKey IN (" . join( ',', $pair ) . ') ';
                     }
                 }

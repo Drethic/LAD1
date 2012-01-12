@@ -61,7 +61,7 @@ class Processes extends MySQLObject
                                $targetCPU, $ownerRAM, $targetRAM, $bw,
                                $operation, $remainingCycles )
     {
-        $this->mergeModifiedServer( $owningServer );
+        $this->mergeModifiedServer( $ownerServer );
         $this->mergeModifiedServer( $targetServer );
         $id1 = $this->insert( array( 'NULL', $target, $ownerServer, $ownerCPU,
                                     $ownerRAM, $bw, $operation, 0, 0,
@@ -142,7 +142,6 @@ class Processes extends MySQLObject
     function redistributeCPU( $serverInfo )
     {
         $serverid = $serverInfo[ 'ID' ];
-        $servercpu = $serverInfo[ 'CPU' ];
         $serverratio = $serverInfo[ 'OPERATING_RATIO' ];
         $serverupdate = $serverInfo[ 'LAST_UPDATE_TIME' ];
         $procs = $this->getProcessesByServer( $serverid );

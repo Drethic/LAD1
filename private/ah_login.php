@@ -52,11 +52,12 @@ function loadApplicableModules( $user, $result )
 {
     require_once( 'userdisabledmodules.php' );
     // Set up session vars
-    $_SESSION[ 'ID' ] = $id = $result[ 'ID' ];
+    $_SESSION[ 'ID' ] = $result[ 'ID' ];
     $_SESSION[ 'username' ] = $result[ 'NICK' ];
-    $_SESSION[ 'GATHERING_POINTS' ] = $gpoints =
-        $result[ 'GATHERING_POINTS' ];
+    $_SESSION[ 'GATHERING_POINTS' ] = $result[ 'GATHERING_POINTS' ];
 
+    $id = $result[ 'ID' ];
+    $gpoints = $result[ 'GATHERING_POINTS' ];
     // Check admin
     $isAdmin = $_SESSION['isAdmin'] = $user->isUserDataAdmin( $result );
     echo "validLogin($id,$gpoints);";
