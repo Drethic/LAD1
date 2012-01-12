@@ -79,19 +79,19 @@ class Users extends MySQLObject
     
     function ranPass( )
     {
-    $chars = "abcdefghijkmnopqrstuvwxyz023456789";
-    srand((double)microtime()*1000000);
-    $i = 0;
-    $pass = '' ;
+        $chars = "abcdefghijkmnopqrstuvwxyz023456789";
+        srand((double)microtime()*1000000);
+        $i = 0;
+        $pass = '' ;
 
-	while ($i <= 7)
+        while ($i <= 7)
         {
-        $num = rand() % 33;
-        $tmp = substr($chars, $num, 1);
-        $pass = $pass . $tmp;
-        $i++;
+            $num = rand() % 33;
+            $tmp = substr($chars, $num, 1);
+            $pass = $pass . $tmp;
+            $i++;
         }
-    return $pass;
+        return $pass;
     }
 
     function changePass( $id, $nick, $email )
@@ -104,18 +104,18 @@ class Users extends MySQLObject
         
         $recip = $email;
 		
-	$headers = 'MIME-Version: 1.0' . "\n";
-	$headers .= 'Content-type: text/html; charset=iso-8859-1' . "\n";
-	$headers .= 'Message-ID: <". time() .rand(1,1000). ">' . "\n";
-	$headers .= 'From: Support <evemut@dhandwb.com>' . "\n";
-	$subject = 'Password Reset ';
-	
+        $headers = 'MIME-Version: 1.0' . "\n";
+        $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\n";
+        $headers .= 'Message-ID: <". time() .rand(1,1000). ">' . "\n";
+        $headers .= 'From: Support <evemut@dhandwb.com>' . "\n";
+        $subject = 'Password Reset ';
+
         $message = 'Dear ' . $nick . "<br /><br />";
-	$message .= 'Thank you for resetting your password.' . "<br /><br />";
-	$message .= 'Your new password is: ' . $ranpass . '<br /><br />';
+        $message .= 'Thank you for resetting your password.' . "<br /><br />";
+        $message .= 'Your new password is: ' . $ranpass . '<br /><br />';
 	
-		// Sends email
-	mail( $recip, $subject, $message, $headers );
+        // Sends email
+        mail( $recip, $subject, $message, $headers );
         
         echo "emailRight(" . $enick . ")";
         return $this->update(array('PASSWORD' => "PASSWORD($pass)"), 
