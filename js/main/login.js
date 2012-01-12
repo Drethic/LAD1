@@ -267,12 +267,6 @@ function emailTaken()
     $("#forgotpassbutton").button( "disable" );
 }
 
-function accountCreated( id )
-{
-    validLogin( id );
-    restoreLoginForm();
-}
-
 function invalidLoginCombo()
 {
     var str = "Invalid login information.";

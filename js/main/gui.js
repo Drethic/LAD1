@@ -96,7 +96,7 @@ function validLogin( id )
         if($(this).hasClass('active'))
         {
             $(this).removeClass('active');
-            $("#menu").slideToggle(function(){
+            $("#menu").slideToggle('slow',function(){
                 $("#layout-container").layout().resetOverflow('south');
             });
         }
@@ -104,7 +104,9 @@ function validLogin( id )
         {
             $(this).addClass('active');
             $("#layout-container").layout().allowOverflow('south');
-            $("#menu").slideToggle();
+            $("#menu").slideToggle('slow',function(){
+                $(this).css('height', $("#menu").height() + "px");
+            });
         }
     });
     
@@ -133,7 +135,7 @@ function validLogin( id )
         if( start.hasClass( 'active' ) )
         {
             start.removeClass('active');
-            $("#menu").slideToggle(function(){
+            $("#menu").slideToggle('slow',function(){
                 $("#layout-container").layout().resetOverflow('south');
             });
         }

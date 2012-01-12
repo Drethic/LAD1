@@ -48,6 +48,47 @@ function isValidEmail($email){
     return true;
 }
 
+function loadApplicableModules( $user, $result )
+{
+    require_once( 'userdisabledmodules.php' );
+    // Set up session vars
+    $_SESSION[ 'ID' ] = $id = $result[ 'ID' ];
+    $_SESSION[ 'username' ] = $result[ 'NICK' ];
+    $_SESSION[ 'GATHERING_POINTS' ] = $gpoints =
+        $result[ 'GATHERING_POINTS' ];
+
+    // Check admin
+    $isAdmin = $_SESSION['isAdmin'] = $user->isUserDataAdmin( $result );
+    echo "validLogin($id,$gpoints);";
+    // Add admin script/stylesheet if admin
+    if( $isAdmin )
+    {
+        echo 'addScriptElement("' .
+                clientfile_buildRequest( 'J', 'admin' ) . '");';
+        echo 'addStylesheet("' .
+                clientfile_buildRequest( 'C', 'admin' ) . '");';
+    }
+
+    // Walk over modules and add script elements for enabled ones
+    $validModules = opt_getValidModules();
+    $userdisabledmodules = new UserDisabledModules();
+    $disabledModules = $userdisabledmodules->getDisabledModules( $id );
+
+    function moduleWalker( $var, $key, $modules )
+    {
+        $varupper = strtoupper( $var );
+        foreach( $modules as $module )
+        {
+            if( $varupper == $module[ 'MODULE_NAME' ] )
+            {
+                return;
+            }
+        }
+        $request = clientfile_buildRequest( 'J', strtolower( $var ) );
+        echo "addScriptElement('$request');";
+    }
+    array_walk( $validModules, "moduleWalker", $disabledModules );
+}
 
 /*********************************** STEP 1 ***********************************/
 if( $action == 'login' )
@@ -73,44 +114,7 @@ if( $action == 'login' )
 /*********************************** STEP 1b **********************************/
     else
     {
-        require_once( 'userdisabledmodules.php' );
-        // Set up session vars
-        $_SESSION[ 'ID' ] = $id = $result[ 'ID' ];
-        $_SESSION[ 'username' ] = $result[ 'NICK' ];
-        $_SESSION[ 'GATHERING_POINTS' ] = $gpoints =
-          $result[ 'GATHERING_POINTS' ];
-        
-        // Check admin
-        $isAdmin = $_SESSION['isAdmin'] = $user->isUserDataAdmin( $result );
-        echo "validLogin($id,$gpoints);";
-        // Add admin script/stylesheet if admin
-        if( $isAdmin )
-        {
-            echo 'addScriptElement("' .
-                 clientfile_buildRequest( 'J', 'admin' ) . '");';
-            echo 'addStylesheet("' .
-                 clientfile_buildRequest( 'C', 'admin' ) . '");';
-        }
-        
-        // Walk over modules and add script elements for enabled ones
-        $validModules = opt_getValidModules();
-        $userdisabledmodules = new UserDisabledModules();
-        $disabledModules = $userdisabledmodules->getDisabledModules( $id );
-        
-        function moduleWalker( $var, $key, $modules )
-        {
-            $varupper = strtoupper( $var );
-            foreach( $modules as $module )
-            {
-                if( $varupper == $module[ 'MODULE_NAME' ] )
-                {
-                    return;
-                }
-            }
-            $request = clientfile_buildRequest( 'J', strtolower( $var ) );
-            echo "addScriptElement('$request');";
-        }
-        array_walk( $validModules, "moduleWalker", $disabledModules );
+        loadApplicableModules( $user, $result );
     }
 }
 /*********************************** STEP 2 ***********************************/
@@ -183,8 +187,8 @@ elseif( $action == 'newuser2' )
         else
         {
             $id = $user->addUser( $nick, $pass, $email );
-            $_SESSION['ID'] = $id;
-            echo "accountCreated($id)";
+            $result = $user->checkCombo( $nick, $pass );
+            loadApplicableModules( $user, $result );
         }
     }
 }
