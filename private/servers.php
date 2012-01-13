@@ -11,6 +11,29 @@ require_once( 'MySQLObject.php' );
 
 class Servers extends MySQLObject
 {
+    function generateAICustomName()
+    {
+        $min = 8;
+        $max = 12;
+        $len = rand( $min, $max );
+        for( $i = 0; $i < $len; $i++ )
+        {
+            $which = rand( 1, 3 );
+            if( $which == 1 )
+            {
+                $string .= chr( rand( 48, 57 ) );
+            }
+            elseif( $which == 2 )
+            {
+                $string .= chr( rand( 65, 90 ) );
+            }
+            else
+            {
+                $string .= chr( rand( 97, 122 ) );
+            }
+        }
+        return $string;
+    }
     function getColumns( )
     {
         return array( 'ID', 'OWNER_ID', 'IP', 'CUSTOM_NAME', 'CPU', 'RAM',
