@@ -18,9 +18,19 @@ var td = {
     expansionhp: 25,
     baddytypes: [
         {
-            hp: 75
+            hp: 75,
+            name: "Bunny",
+            speed: 0,
+            complexity: 1
+        },
+        {
+            hp: 100,
+            name: "Chihuahua",
+            speed: 0,
+            complexity: 2
         }
-    ]
+    ],
+    maxbaddycomplexity: 2
 };
 
 function disableModuleTOWERD()
@@ -55,6 +65,9 @@ function createAlterableButton( txt, spanid, buttonid )
 
 function runTowerD()
 {
+    // Quick var instantiation
+    var i;
+    
     // Cosmetics
     $("#center #Tower_D");
     
@@ -62,11 +75,11 @@ function runTowerD()
     var baddies, baddiesstr = getPermCache( "Baddies" );
     eval( "baddies=[" + baddiesstr + "]" );
     document.baddies = new Array();
-    for( var i = 0; i < baddies.length; i++ )
+    for( i = 0; i < baddies.length; i++ )
     {
         var currbaddy = baddies[ i ];
         var hp = currbaddy[ 0 ], multiplier = 0, speed = td.baddybasespeed,
-            distance = td.baddybasespawndistance;
+            distance = td.baddybasespawndistance, name = td.baddytypes[ 0 ].name;
         
         if( currbaddy.length >= 2 )
         {
@@ -80,7 +93,11 @@ function runTowerD()
         {
             distance = currbaddy[ 3 ];
         }
-        document.baddies.push( createBaddy( hp, multiplier, speed, distance ) );
+        if( currbaddy.length >= 5 )
+        {
+            name = currbaddy[ 4 ];
+        }
+        document.baddies.push( createBaddy( hp, multiplier, speed, distance, name ) );
     }
     
     // Unpack totals
@@ -101,6 +118,8 @@ function runTowerD()
     document.baddyhpup = getTowerInitial( "BaddyHPUp" );
     document.baddyspeedup = getTowerInitial( "BaddySpeedUp" );
     
+    // Unpack Baddy Level
+    document.baddycomplexity = getTowerInitial( "BaddyComplexity", 1 );
     
     // Setup window
     var w = getPopupContext( "Tower D" );
@@ -113,11 +132,15 @@ function runTowerD()
                  "<li><a href='#TabBaddies'>Mobs</a></li>" +
                  "<li><a href='#TabExpansions'>Expansions</a></li>" +
                  "<li><a href='#TabTStats'>Stats</a></li>" +
+                 "<li><a href='#TabBeastiary'>Beastiary</a></li>" +
+                 "<li><a href='#TabTowerView'>View Tower</a></li>" +
                "</ul>" +
                "<div id='TabTower'></div>" +
                "<div id='TabBaddies'></div>" +
                "<div id='TabExpansions'></div>" +
                "<div id='TabTStats'></div>" +
+               "<div id='TabBeastiary'></div>" +
+               "<div id='TabTowerView'></div>" +
              "</div>" );
          
     $("#TowerTabs li a").css( "padding", "0.2em" );
@@ -132,6 +155,7 @@ function runTowerD()
     $("#TabBaddies")
       .append( createAlterableButton( "Initial HP", "InitialBaddyHP", "tdIncreaseBaddyHP" ) )
       .append( createAlterableButton( "Initial Speed", "InitialBaddySpeed", "tdIncreaseBaddySpeed" ) )
+      .append( createAlterableButton( "Complexity", "BaddyComplexity", "tdIncreaseBaddyComplexity" ) )
       .append( "Initial Spawn Distance: " + td.baddybasespawndistance );
     $("#TabExpansions")
       .append( createAlterableButton( "Expansions", "ExpansionCount", "tdIncreaseExpansion" ) )
@@ -139,6 +163,9 @@ function runTowerD()
     $("#TabTStats")
       .append( "Total Kills: <span id='TotalBaddyKills'>" + document.totalbaddykills + "</span><div class='clear'></div>")
       .append( "Total Gold: <span id='TotalGold'>" + document.totalgold + "</span><div class='clear'></div>" );
+    $("#TabBeastiary")
+      .append( "<div id='BeastiaryAccordion'></div>" );
+
     $("#tdIncreaseBaseAtk").button().click(function(){
         var cost = getIncreaseBaseAtkCost();
         if( document.gold < cost )
@@ -194,17 +221,30 @@ function runTowerD()
     $("#tdIncreaseExpansion").button().click(function(){
         increaseExpansion();
     });
+    $("#tdIncreaseBaddyComplexity").button().click(function(){
+        increaseBaddyComplexity();
+    });
     
     updateIncreaseBaseAtkButton();
     updateIncreaseBaseRangeButton();
     updateIncreaseBaseHPButton();
     updateIncreaseBaddyHPButton();
     updateIncreaseBaddySpeedButton();
+    updateIncreaseBaddyComplexity();
     updateIncreaseExpansionButton();
     permCache( "Gold", document.gold, true );
     permCache( "BaddyCount", document.baddies.length, true );
     permCache( "TotalGold", document.totalgold, true );
     permCache( "TotalBaddyKills", document.totalbaddykills, true );
+
+    // Check the beastiary
+    for( i = 0; i < td.baddytypes.length; i++ )
+    {
+        if( td.baddytypes[ i ].complexity <= document.baddycomplexity )
+        {
+            addBeastiary( i );
+        }
+    }
     
     // Start game loop
     document.towerdinterval = setInterval( "towerDLoop();", 500 );
@@ -411,30 +451,89 @@ function increaseBaddySpeed()
     updateIncreaseBaddySpeedButton();
 }
 
-function getBaddySpeed()
+function getBaddySpeed( type )
 {
-    return td.baddybasespeed + ( td.baddyspeedstep * document.baddyspeedup );
+    return td.baddybasespeed + ( td.baddyspeedstep * document.baddyspeedup ) +
+           td.baddytypes[ type ].speed;
 }
 
 function updateIncreaseBaddySpeedButton()
 {
-    var initialspeed = getBaddySpeed();
+    var initialspeed = ( td.baddyspeedstep * document.baddyspeedup );
     var step = td.baddyspeedstep;
     $("#InitialBaddySpeed").html( initialspeed + ",+" + document.baddyspeedup * 2 + "% gold" );
     $("#tdIncreaseBaddySpeed").button( "option", "label", "Increase Baddy Speed(+" + step + " Speed,+2% gold)" );
 }
 
+// Baddy Complexity
+function increaseBaddyComplexity()
+{
+    document.baddycomplexity++;
+    permCache( "BaddyComplexity", document.baddycomplexity );
+    updateIncreaseBaddyComplexity();
+    // Check if we need to add a baddy to the beastiary
+    for( var i = 0; i < td.baddytypes.length; i++ )
+    {
+        if( td.baddytypes[ i ].complexity == document.baddycomplexity )
+        {
+            addBeastiary( i );
+        }
+    }
+}
+
+function getBaddyComplexity()
+{
+    return document.baddycomplexity;
+}
+
+function updateIncreaseBaddyComplexity()
+{
+    var complexity = getBaddyComplexity();
+    $("#BaddyComplexity").html( document.baddycomplexity );
+    if( td.maxbaddycomplexity == complexity )
+    {
+        $("#tdIncreaseBaddyComplexity").button( "option", "disabled", true );
+    }
+    else
+    {
+        $("#tdIncreaseBaddyComplexity").button( "option", "label", "Increase Baddy Complexity" );
+    }
+}
+
+function addBeastiary( level )
+{
+    var baddyinfo = td.baddytypes[ level ];
+    $("#BeastiaryAccordion")
+      .append( "<h3><a href='#'>" + baddyinfo.name + "</a></h3>" )
+      .append( $("<div></div>")
+         // TODO: Insert image here...bunnies!
+         .append( "<div style='width:128px;height:128px;display:inline;float:left;background-color:#00ffff'></div>" )
+         .append( "<table style='color:white'><tr><td>Name</td><td colspan=3 style='text-align:center'>" +
+                  baddyinfo.name + "</td></tr><tr><td>Health</td><td>" +
+                  baddyinfo.hp + "</td><td style='color:#FFFF00'>+" + getBaddyHPAddAll() + "</td><td>=" +
+                  getBaddyHP( level ) + "</td></tr><tr><td>Speed</td><td>" +
+                  ( td.baddybasespeed + baddyinfo.speed ) + "</td><td style='color:#FFFF00'>+" +
+                  ( td.baddyspeedstep * document.baddyspeedup ) + "</td><td>=" +
+                  getBaddySpeed( level ) + "</td></tr></table>" )
+      ).accordion( "destroy" ).accordion({
+        active: false,
+        collapsible: true,
+        clearStyle: true
+    });
+}
+
 // Baddy Spawning
-function createBaddy( i_hp, i_multiplier, i_speed, i_distance )
+function createBaddy( i_hp, i_multiplier, i_speed, i_distance, i_name )
 {
     return {
         hp: i_hp,
         multiplier: i_multiplier,
         speed: i_speed,
         distance: i_distance,
+        name: i_name,
         toString: function(){
             return "[" + this.hp + "," + this.multiplier + "," + this.speed +
-                   "," + this.distance + "]";
+                   "," + this.distance + ",\"" + this.name + "\"]";
         }
     };
 }
@@ -446,11 +545,25 @@ function getBaddySpawnCount()
 
 function spawnBaddyWave()
 {
-    for( var i = 0; i < getBaddySpawnCount(); i++ )
+    var count = getBaddySpawnCount();
+    var complexity = getBaddyComplexity();
+    for( var i = 0; i < count; i++ )
     {
+        var baddylevel = 0;
+        switch( complexity )
+        {
+            case 1:
+                break;
+            case 2:
+                if( i == count - 1 )
+                {
+                    baddylevel = 1;
+                }
+        }
         var multiplier = ( document.baddyhpup + document.baddyspeedup ) * 2;
-        document.baddies.push( createBaddy( getBaddyHP( 0 ), multiplier,
-                               getBaddySpeed(), td.baddybasespawndistance ) );
+        document.baddies.push( createBaddy( getBaddyHP( baddylevel ), multiplier,
+                               getBaddySpeed( baddylevel ), td.baddybasespawndistance,
+                               td.baddytypes[ baddylevel ].name ) );
     }
     permCache( "Baddies", document.baddies );
     permCache( "BaddyCount", document.baddies.length, true );
@@ -461,7 +574,7 @@ function damageBaddies( damage, indexes )
 {
     // Apply damage
     // Put all dead baddies into an array
-    var deadIndexes = [], i, index, j = 0;
+    var deadIndexes = [], i, index, j = 0, goldearned = 0;
     for( i in indexes )
     {
         index = indexes[ i ];
@@ -485,12 +598,13 @@ function damageBaddies( damage, indexes )
     while( deadIndexes.length > 0 )
     {
         document.totalbaddykills++;
-        permCache( "TotalBaddyKills", document.totalbaddykills, true );
         index = deadIndexes.shift() - j;
-        adjustGold( 1 + ( 0.01 * document.baddies[ index ].multiplier ) );
+        goldearned += 1 + ( 0.01 * document.baddies[ index ].multiplier );
         document.baddies.splice( index, 1 );
         j++;
     }
+    adjustGold( goldearned );
+    permCache( "TotalBaddyKills", document.totalbaddykills, true );
     permCache( "BaddyCount", document.baddies.length, true );
 }
 
@@ -550,6 +664,17 @@ function towerDLoop()
     {
         spawnBaddyWave();
     }
+
+    // Add graphical view stuff here
+    // Use #TabTowerView as your container, though you'll probably want a sub
+    // container so it doesn't mess up the layout
+    // document.baddies:
+    //   Array of all the baddies
+    //     Includes: hp, name, multiplier, speed and distance
+    //     Useful for you would be distance mostly, maybe the others
+    //     Use document.baddies.length to find out how many
+    //     From there use it like document.baddies[ 0 ].distance, etc.
+    //     GL
     
     permCache( "Baddies", document.baddies );
 }
