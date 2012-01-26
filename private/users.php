@@ -12,7 +12,7 @@
  *    lookupUserDetails: Looks up a single user, return false/array of user
  */
 
-require_once( 'MySqlObject.php' );
+require_once( 'MySQLObject.php' );
 
 class Users extends MySQLObject
 {

@@ -356,6 +356,7 @@ function clientfile_buildRequest( $type, $base )
                     $maxTime = $subTime;
                 }
             }
+            chmod( $actualFile, 0777 );
             touch( $actualFile, $maxTime );
             $mtime = $maxTime;
         }
