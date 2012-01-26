@@ -1,9 +1,22 @@
 createWindow( "Tower D", {minWidth: 550} );
 addMenuButton( "Tower D", "ui-icon-image", function(){runTowerD();} );
 
+Array.prototype.toString = function()
+{
+    var ret = "[";
+    for( var i = 0; i < this.length; i++ )
+    {
+        ret += this[ i ];
+        if( i != this.length - 1 )
+        {
+            ret += ",";
+        }
+    }
+    return ret + "]";
+};
+
 var td = {
     baddyhpstep: 5,
-    baddybasespawncount: 5,
     baddybasespawndistance: 300,
     baddybasespeed: 5,
     baddyspeedstep: 1,
@@ -14,23 +27,46 @@ var td = {
     towerbasemaxhp: 100,
     towerhpstep: 10,
     towerhpstepcost: 50,
-    expansioncost: 100,
-    expansionhp: 25,
+    archerbaserange: 150,
+    archerrangestep: 5,
+    archerbasedamage: 1,
+    archerdamagestep: 1,
     baddytypes: [
         {
             hp: 75,
             name: "Bunny",
             speed: 0,
-            complexity: 1
+            multiplier: 0
         },
         {
             hp: 100,
             name: "Chihuahua",
             speed: 0,
-            complexity: 2
+            multiplier: 0.04
+        },
+        {
+            hp: 80,
+            name: "Rat",
+            speed: 3,
+            multiplier: 0.1
+        },
+        {
+            hp: 100,
+            name: "Flying Pig",
+            speed: 0,
+            multiplier: 0.1
+        },
+        {
+            hp: 200,
+            name: "Snake",
+            speed: 1,
+            multiplier: 0.15
         }
     ],
-    maxbaddycomplexity: 2
+    complexities: [
+        [ 0, 0, 0, 0, 0 ],
+        [ 1, 0, 0, 0, 0 ]
+    ]
 };
 
 function disableModuleTOWERD()
@@ -72,8 +108,11 @@ function runTowerD()
     $("#center #Tower_D");
     
     // Unpack baddies
-    var baddies, baddiesstr = getPermCache( "Baddies" );
-    eval( "baddies=[" + baddiesstr + "]" );
+    var baddies = [], baddiesstr = getPermCache( "Baddies" );
+    if( baddiesstr != "" )
+    {
+        eval( "baddies=" + baddiesstr );
+    }
     document.baddies = new Array();
     for( i = 0; i < baddies.length; i++ )
     {
@@ -99,6 +138,14 @@ function runTowerD()
         }
         document.baddies.push( createBaddy( hp, multiplier, speed, distance, name ) );
     }
+
+    // Unpack expansions
+    var expansions = [], expansionstr = getPermCache( "Expansions" );
+    if( expansionstr != "" )
+    {
+        eval( "expansions=" + expansionstr );
+    }
+    document.expansions = new Array();
     
     // Unpack totals
     document.gold = getTowerInitial( "Gold" );
@@ -111,15 +158,13 @@ function runTowerD()
     document.basemaxhpupgrades = getTowerInitial( "BaseHPUpgrades" );
     document.basehp = getTowerInitial( "BaseHP", td.towerbasemaxhp );
     
-    // Unpack Expansions
-    document.expansioncount = getTowerInitial( "ExpansionCount" );
-    
     // Unpack Baddy Upgrades
     document.baddyhpup = getTowerInitial( "BaddyHPUp" );
     document.baddyspeedup = getTowerInitial( "BaddySpeedUp" );
     
     // Unpack Baddy Level
     document.baddycomplexity = getTowerInitial( "BaddyComplexity", 1 );
+    document.seenbaddies = [];
     
     // Setup window
     var w = getPopupContext( "Tower D" );
@@ -158,8 +203,8 @@ function runTowerD()
       .append( createAlterableButton( "Complexity", "BaddyComplexity", "tdIncreaseBaddyComplexity" ) )
       .append( "Initial Spawn Distance: " + td.baddybasespawndistance );
     $("#TabExpansions")
-      .append( createAlterableButton( "Expansions", "ExpansionCount", "tdIncreaseExpansion" ) )
-      .append( "<div id='ExpansionTabs'></div>" );
+      .append( "<button id='tdIncreaseExpansion'></button><div class='clear'></div>" )
+      .append( "<div id='ExpansionTabs'>No expansions purchased.</div>" );
     $("#TabTStats")
       .append( "Total Kills: <span id='TotalBaddyKills'>" + document.totalbaddykills + "</span><div class='clear'></div>")
       .append( "Total Gold: <span id='TotalGold'>" + document.totalgold + "</span><div class='clear'></div>" );
@@ -219,6 +264,12 @@ function runTowerD()
         increaseBaddySpeed();
     });
     $("#tdIncreaseExpansion").button().click(function(){
+        var cost = getIncreaseExpansionCost();
+        if( document.gold < cost )
+        {
+            return;
+        }
+        adjustGold( -cost );
         increaseExpansion();
     });
     $("#tdIncreaseBaddyComplexity").button().click(function(){
@@ -238,13 +289,43 @@ function runTowerD()
     permCache( "TotalBaddyKills", document.totalbaddykills, true );
 
     // Check the beastiary
-    for( i = 0; i < td.baddytypes.length; i++ )
+    for( i = 0; i < document.baddycomplexity; i++ )
     {
-        if( td.baddytypes[ i ].complexity <= document.baddycomplexity )
+        var wave = td.complexities[ i ];
+        for( var j = 0; j < wave.length; j++ )
         {
-            addBeastiary( i );
+            var baddy = wave[ j ];
+            if( document.seenbaddies.indexOf( baddy ) == -1 )
+            {
+                addBeastiary( baddy );
+                document.seenbaddies.push( baddy );
+            }
         }
     }
+    
+    // Setup expansions
+    for( i = 0; i < expansions.length; i++ )
+    {
+        increaseExpansion();
+        var currdata = expansions[ i ];
+        var type = currdata.shift();
+        switch( type )
+        {
+            case 1:
+                buildArcheryRange( currdata );
+                break;
+            case 2:
+                buildBarracks( currdata );
+                break;
+            case 3:
+                buildBlacksmith( currdata );
+                break;
+        }
+    }
+    updateIncreaseExpansionButton();
+    
+    // Expansions force focus back to them, sooo...reset focus back to first
+    $("#TowerTabs").tabs( "select", 0 );
     
     // Start game loop
     document.towerdinterval = setInterval( "towerDLoop();", 500 );
@@ -282,40 +363,247 @@ function adjustGold( amt )
 // Expansions
 function increaseExpansion()
 {
-    //wait
+    document.expansions.push( [0] );
+    permCache( "Expansions", document.expansions );
+    var exp = document.expansions.length;
+    if( $("#ExpansionTabs").children( "ul" ).size() == 0 )
+    {
+        $("#ExpansionTabs").html( "" ).append("<ul></ul>");
+    }
+    $("#ExpansionTabs ul").append( "<li><a href='#TabExpansion" + exp + "'>Expansion " + exp + "</a></li>" );
+    $("#ExpansionTabs").append( "<div id='TabExpansion" + exp + "'></div>" );
+    var tab = $("#TabExpansion" + exp );
+    tab.append( "<div style='display:none' class='id'>" + exp + "</div>" );
+
+    // Create/add buttons to build the expansions
+    var archeryRange = $("<button>Build Archery Range</button>")
+      .appendTo( tab ).button().click(function(){
+          buildArcheryRange();
+      });
+    tab.append( "<div class='clear'></div>" );
+    var barracks = $("<button>Build Barracks</button>")
+      .appendTo( tab ).button().click(function(){
+          buildBarracks();
+      });
+    tab.append( "<div class='clear'></div>" );
+    var blacksmith = $("<button>Build Blacksmith</button>")
+      .appendTo( tab ).button().click(function(){
+          buildBlacksmith();
+      });
+    tab.append( "<div class='clear'></div>" );
+
+    // Only allow one of each the unique buildings
+    for( var i = 0; i < document.expansions.length; i++ )
+    {
+        switch( document.expansions[ i ][ 0 ] )
+        {
+            case 1:
+                disableExpansionButton( archeryRange, "archery range" );
+                break;
+            case 2:
+                disableExpansionButton( barracks, "barracks" );
+                break;
+            case 3:
+                disableExpansionButton( blacksmith, "blacksmith" );
+                break;
+        }
+    }
+    
+    // Refresh the tabs
+    $("#ExpansionTabs").tabs( "destroy" ).tabs({idPrefix: 'Tab'});
+    $("#TowerTabs").tabs( "destroy" ).tabs({idPrefix: 'Tab'}).tabs( "select", 2 );
+    updateIncreaseExpansionButton();
+}
+
+function disableExpansionButton( button, type )
+{
+    button.button( "disable" ).button( "option", "label", "Only one " + type + " is allowed." );
+}
+
+// Archery range param details:
+// Count, Range, Damage, Type
+function buildArcheryRange( params )
+{
+    var data = getExpansionData( [ 1, 0, 0, 0 ], params, 1 );
+    data.o.append( "<h2>Archery Range</h2>" )
+      .append( "Number:<span id='tdExpArcherCount'>1</span>" )
+      .append( $("<button class='tdExpArcherCount'></button>").button().click(function(){
+          var tab = $(this).siblings(".id").text();
+          var currCount = document.expansions[ tab - 1 ][ 1 ];
+          var cost = getExpArcherIncreaseCost( currCount );
+          if( document.gold < cost )
+          {
+              return;
+          }
+          currCount++;
+          document.expansions[ tab - 1 ][ 1 ] = currCount;
+          permCache( "Expansions", document.expansions );
+          updateExpArcherCount( tab, currCount );
+      })).append( "<div class='clear'></div>" )
+      .append( "Range:<span id='tdExpArcherRange'>" + td.archerbaserange + "</span>" )
+      .append( $("<button class='tdExpArcherRange'></button>").button().click(function(){
+          var tab = $(this).siblings(".id").text();
+          var currRangeUpgrade = document.expansions[ tab - 1 ][ 2 ];
+          var cost = getExpArcherRangeIncreaseCost( currRangeUpgrade );
+          if( document.gold < cost )
+          {
+              return;
+          }
+          currRangeUpgrade++;
+          document.expansions[ tab - 1 ][ 2 ] = currRangeUpgrade;
+          permCache( "Expansions", document.expansions );
+          updateExpArcherRange( tab, currRangeUpgrade );
+      })).append( "<div class='clear'></div>" )
+      .append( "Damage:<span id='tdExpArcherDamage'>" + td.archerbasedamage + "</span>" )
+      .append( $("<button class='tdExpArcherDamage'></button").button().click(function(){
+          var tab = $(this).siblings(".id").text();
+          var currDamageUpgrade = document.expansions[ tab - 1 ][ 3 ];
+          var cost = getExpArcherDamageIncreaseCost( currRangeUpgrade );
+          if( document.gold < cost )
+          {
+              return;
+          }
+          currDamageUpgrade++;
+          document.expansions[ tab - 1 ][ 3 ] = currDamageUpgrade;
+          permCache( "Expansions", document.expansions );
+          updateExpArcherDamage( tab, currDamageUpgrade );
+      })).append( "<div class='clear'></div>" );
+      updateExpArcherCount( data.t, data.p[ 1 ] );
+      updateExpArcherRange( data.t, data.p[ 2 ] );
+      updateExpArcherDamage( data.t, data.p[ 3 ] );
+}
+
+function getExpArcherIncreaseCost( currCount )
+{
+    return 1000 + ( ( currCount - 1 ) * 250 );
+}
+
+function updateExpArcherCount( tab, currCount )
+{
+    var cost = getExpArcherIncreaseCost( currCount );
+    $("#tdExpArcherCount").html( currCount );
+    $(".tdExpArcherCount").button( "option", "label", "+1 Archer, " + cost + " gold" );
+}
+
+function getExpArcherTab( )
+{
+    for( var i = 0; i < document.expansions.length; i++ )
+    {
+        if( document.expansions[ i ][ 0 ] == 1 )
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function getExpArcherRangeIncreaseCost( currRange )
+{
+    return 500 + ( ( currRange - 1 ) * 500 );
+}
+
+function getExpArcherActualRange( )
+{
+    var tab = getExpArcherTab();
+    return td.archerbaserange + ( td.archerrangestep * document.expansions[ tab - 1 ][ 2 ] );
+}
+
+function updateExpArcherRange( tab, currRange )
+{
+    var cost = getExpArcherRangeIncreaseCost( currRange );
+    var actualRange = getExpArcherActualRange();
+    $("#tdExpArcherRange").html( actualRange );
+    $(".tdExpArcherRange").button( "option", "label", "+" + td.archerrangestep + 
+                                   " range, " + cost + " gold" );
+}
+
+function getExpArcherDamageIncreaseCost( currDamage )
+{
+    return 2000 + ( ( currDamage - 1 ) * 1000 );
+}
+
+function getExpArcherActualDamage( )
+{
+    var tab = getExpArcherTab();
+    return td.archerbasedamage + ( td.archerdamagestep * document.expansions[ tab - 1 ][ 3 ] );
+}
+
+function updateExpArcherDamage( tab, currDamage )
+{
+    var cost = getExpArcherDamageIncreaseCost( currDamage );
+    var actualDamage = getExpArcherActualDamage();
+    $("#tdExpArcherDamage").html( actualDamage );
+    $(".tdExpArcherDamage").button( "option", "label", "+" + td.archerdamagestep +
+                                    " damage, " + cost + " gold" );
+}
+
+// Barracks param details:
+// Count, Health, Damage, Type
+function buildBarracks( params )
+{
+    var data = getExpansionData( [ 1, 0, 0, 0 ], params, 2 );
+    data.o.append( "<h2>Barracks</h2>" );
+}
+
+// Blacksmith param details:
+// Armor, Ranged Weapons, Melee Weapons
+function buildBlacksmith( params )
+{
+    var data = getExpansionData( [ 0, 0, 0 ], params, 3 );
+    data.o.append( "<h2>Blacksmith</h2>" );
+}
+
+// Returns object with:
+// p: parameter data
+// t: tab number
+// o: Object for putting data in
+function getExpansionData( def, input, type )
+{
+    var params, tab;
+    if( input == undefined )
+    {
+        params = def;
+        tab = $(this).siblings(".id").text();
+    }
+    else
+    {
+        while( input.length < def.length )
+        {
+            input.push( 0 );
+        }
+        tab = document.expansions.length;
+        params = input;
+    }
+    var object = $("#ExpansionTabs div#TabExpansion" + tab);
+    object.children().not("[class='id']").remove();
+    var paramscopy = params;
+    paramscopy.unshift( type );
+    document.expansions[ tab - 1 ] = paramscopy;
+    permCache( "Expansions", document.expansions );
+    return {
+        p: params,
+        t: tab,
+        o: object
+    };
 }
 
 function getIncreaseExpansionCost()
 {
     var expansions = getExpansion();
-    var ignore = ( expansions + 1 ) * ( expansions + 1 );
-    var future = ( expansions + 3 ) * ( expansions + 3 );
-    var diff = future - ignore;
-    return diff * td.expansioncost;
+    var power = 1 + ( 0.05 * expansions );
+    return Math.round( Math.pow( 1000, power ) );
 }
 
 function updateIncreaseExpansionButton()
 {
     var cost = getIncreaseExpansionCost();
     var expansion = getExpansion();
-    $("#ExpansionCount").html( expansion );
     $("#tdIncreaseExpansion").button( "option", "label", "Add Expansion(+1 layer, " + cost + " gold)" );
 }
 
 function getExpansion()
 {
-    return document.expansioncount;
-}
-
-function getExpansionIndexMin( layer )
-{
-    return ( ( layer * 2 ) - 1 ) * ( ( layer * 2 ) - 1 );
-}
-
-function getExpansionIndexMax( layer )
-{
-    var cols = ( layer * 2 ) + 1;
-    return ( cols * cols ) - 1;
+    return document.expansions.length;
 }
 
 // Base Attack
@@ -471,12 +759,24 @@ function increaseBaddyComplexity()
     document.baddycomplexity++;
     permCache( "BaddyComplexity", document.baddycomplexity );
     updateIncreaseBaddyComplexity();
+    // Quick list
+    var currlist = getComplexityWave();
     // Check if we need to add a baddy to the beastiary
-    for( var i = 0; i < td.baddytypes.length; i++ )
+    for( var i = 0; i < currlist.length; i++ )
     {
-        if( td.baddytypes[ i ].complexity == document.baddycomplexity )
+        var currlevel = currlist[ i ];
+        var found = false;
+        for( var j = 0; j < document.seenbaddies.length; j++ )
         {
-            addBeastiary( i );
+            if( currlevel == document.seenbaddies[ j ] )
+            {
+                found = true;
+                break;
+            }
+        }
+        if( !found )
+        {
+            addBeastiary( currlevel );
         }
     }
 }
@@ -486,11 +786,16 @@ function getBaddyComplexity()
     return document.baddycomplexity;
 }
 
+function getComplexityWave()
+{
+    return td.complexities[ getBaddyComplexity() ];
+}
+
 function updateIncreaseBaddyComplexity()
 {
     var complexity = getBaddyComplexity();
-    $("#BaddyComplexity").html( document.baddycomplexity );
-    if( td.maxbaddycomplexity == complexity )
+    $("#BaddyComplexity").html( complexity );
+    if( td.complexities.length == complexity )
     {
         $("#tdIncreaseBaddyComplexity").button( "option", "disabled", true );
     }
@@ -502,6 +807,7 @@ function updateIncreaseBaddyComplexity()
 
 function addBeastiary( level )
 {
+    document.seenbaddies.push( level );
     var baddyinfo = td.baddytypes[ level ];
     $("#BeastiaryAccordion")
       .append( "<h3><a href='#'>" + baddyinfo.name + "</a></h3>" )
@@ -540,27 +846,20 @@ function createBaddy( i_hp, i_multiplier, i_speed, i_distance, i_name )
 
 function getBaddySpawnCount()
 {
-    return td.baddybasespawncount;
+    var wave = getComplexityWave();
+    return wave.length;
 }
 
 function spawnBaddyWave()
 {
     var count = getBaddySpawnCount();
     var complexity = getBaddyComplexity();
+    var wave = getComplexityWave();
     for( var i = 0; i < count; i++ )
     {
-        var baddylevel = 0;
-        switch( complexity )
-        {
-            case 1:
-                break;
-            case 2:
-                if( i == count - 1 )
-                {
-                    baddylevel = 1;
-                }
-        }
+        var baddylevel = wave[ i ];
         var multiplier = ( document.baddyhpup + document.baddyspeedup ) * 2;
+        multiplier += td.baddytypes[ baddylevel ].multiplier;
         document.baddies.push( createBaddy( getBaddyHP( baddylevel ), multiplier,
                                getBaddySpeed( baddylevel ), td.baddybasespawndistance,
                                td.baddytypes[ baddylevel ].name ) );
@@ -575,7 +874,7 @@ function damageBaddies( damage, indexes )
     // Apply damage
     // Put all dead baddies into an array
     var deadIndexes = [], i, index, j = 0, goldearned = 0;
-    for( i in indexes )
+    for( i = 0; i < indexes.length; i++ )
     {
         index = indexes[ i ];
         document.baddies[ index ].hp -= damage;
