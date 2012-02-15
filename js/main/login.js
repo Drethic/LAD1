@@ -74,7 +74,6 @@ function doLogin( userid, gpoints )
             // store the username if we should
             if( $( "#remusername" ).attr( 'checked' ) == "checked" )
             {
-                alert( $("#username").val() );
                 permCache( "StoredUsername", $("#username").val() );
             }
         }
