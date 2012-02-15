@@ -24,6 +24,9 @@ function doLogin( userid, gpoints )
       .append( createLoginInput( "E-mail", "text", "email", 40 ) )
       .appendTo("body").filterKeys()//;
       );
+    
+    $("#loginform").append( "<input type='checkbox' id='remusername'>Remember Username" +
+                            "</input>" );
 
     $("<div>")
       .append("<button id='loginbutton'>Login</button>")
@@ -68,6 +71,12 @@ function doLogin( userid, gpoints )
                 username: $("#username").val(),
                 password: $("#password").val()
             });
+            // store the username if we should
+            if( $( "#remusername" ).attr( 'checked' ) == "checked" )
+            {
+                alert( $("#username").val() );
+                permCache( "StoredUsername", $("#username").val() );
+            }
         }
         evt.preventDefault();
     });
@@ -143,7 +152,18 @@ function doLogin( userid, gpoints )
         }
     }).keyup();
     
-    $("#username").focus();
+    var pastUsername = getPermCache( "StoredUsername" );
+    if( pastUsername.length > 0 )
+    {
+        $("#username").val( pastUsername );
+        $("#username").trigger( 'keyup' );
+        $("#remusername").attr( "checked", "checked" );
+        $("#password").focus();
+    }
+    else
+    {
+        $("#username").focus();
+    }
     
     // Set gathering points
     tempCache( "user-gatheringpoints", gpoints );
