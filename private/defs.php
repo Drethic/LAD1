@@ -168,7 +168,12 @@ function getProgramSize( $type )
  */
 function opt_getValidModules()
 {
-    return array( 'SERVERS', 'MATH', 'CRAFTING', 'TOWERD' );
+    return array(
+        'SERVERS' => array(),
+        'MATH' => array(),
+        'CRAFTING' => array(),
+        'TOWERD' => array('towerd')
+    );
 }
 
 /**

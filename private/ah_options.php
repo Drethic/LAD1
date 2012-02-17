@@ -78,11 +78,23 @@ elseif( $action == 'opt_enablemodules' )
     $userDisabledModules = new UserDisabledModules();
     $enabled = $userDisabledModules->enableModules( $userid, $moduleArray );
     
+    // Get the list of valid modules
+    $validModules = opt_getValidModules();
+    
     // Inform the user how many modules were enabled
     echo( "enabledModules($enabled);" );
     foreach( $moduleArray as $module )
     {
         $base = strtolower( $module );
+        $cssarray = $validModules[ $module ];
+        if( !empty( $cssarray ) )
+        {
+            foreach( $cssarray as $csssheet )
+            {
+                echo( "addStylesheet('" .
+                      clientfile_buildRequest( 'C', $csssheet ) . "');" );
+            }
+        }
         echo( "addScriptElement('" . clientfile_buildRequest( 'J', $base) .
               "');" );
     }

@@ -75,9 +75,9 @@ function loadApplicableModules( $user, $result )
     $userdisabledmodules = new UserDisabledModules();
     $disabledModules = $userdisabledmodules->getDisabledModules( $id );
 
-    function moduleWalker( $var, $key, $modules )
+    function moduleWalker( $value, $key, $modules )
     {
-        $varupper = strtoupper( $var );
+        $varupper = strtoupper( $key );
         foreach( $modules as $module )
         {
             if( $varupper == $module[ 'MODULE_NAME' ] )
@@ -85,8 +85,16 @@ function loadApplicableModules( $user, $result )
                 return;
             }
         }
-        $request = clientfile_buildRequest( 'J', strtolower( $var ) );
+        $request = clientfile_buildRequest( 'J', strtolower( $key ) );
         echo "addScriptElement('$request');";
+        if( !empty( $value ) )
+        {
+            foreach( $value as $csssheet )
+            {
+                $cssrequest = clientfile_buildRequest( 'C', $csssheet );
+                echo "addStylesheet('$cssrequest');";
+            }
+        }
     }
     array_walk( $validModules, "moduleWalker", $disabledModules );
 }

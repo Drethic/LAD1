@@ -36,13 +36,15 @@ var td = {
             hp: 75,
             name: "Bunny",
             speed: 0,
-            multiplier: 0
+            multiplier: 0,
+            image: "icon-bunny"
         },
         {
             hp: 100,
             name: "Chihuahua",
             speed: 0,
-            multiplier: 0.04
+            multiplier: 0.04,
+            image: "icon-chihuahua"
         },
         {
             hp: 80,
@@ -813,7 +815,7 @@ function addBeastiary( level )
       .append( "<h3><a href='#'>" + baddyinfo.name + "</a></h3>" )
       .append( $("<div></div>")
          // TODO: Insert image here...bunnies!
-         .append( "<div style='width:128px;height:128px;display:inline;float:left;background-color:#00ffff'></div>" )
+         .append( "<div id='" + baddyinfo.image + "' style='width:128px;height:128px;display:inline;float:left;'></div>" )
          .append( "<table style='color:white'><tr><td>Name</td><td colspan=3 style='text-align:center'>" +
                   baddyinfo.name + "</td></tr><tr><td>Health</td><td>" +
                   baddyinfo.hp + "</td><td style='color:#FFFF00'>+" + getBaddyHPAddAll() + "</td><td>=" +
