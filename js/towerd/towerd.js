@@ -790,7 +790,7 @@ function getBaddyComplexity()
 
 function getComplexityWave()
 {
-    return td.complexities[ getBaddyComplexity() ];
+    return td.complexities[ getBaddyComplexity() - 1 ];
 }
 
 function updateIncreaseBaddyComplexity()
@@ -799,7 +799,8 @@ function updateIncreaseBaddyComplexity()
     $("#BaddyComplexity").html( complexity );
     if( td.complexities.length == complexity )
     {
-        $("#tdIncreaseBaddyComplexity").button( "option", "disabled", true );
+        $("#tdIncreaseBaddyComplexity").button( "option", "disabled", true )
+          .button( "option", "label", "Max Complexity" );
     }
     else
     {
