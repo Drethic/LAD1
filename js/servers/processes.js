@@ -21,7 +21,7 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     if( processtable.length == 0 )
     {
         $('#processdiv').html( "<table id='processtable' style='width:100%'>" +
-                               "<thead><th>Target ID" +
+                               "<thead><th>Target" +
                                "</th><th>CPU</th><th>RAM</th><th>BW</th>" +
                                "<th>Operation</th><th title='Estimated Time " +
                                "of Completion'>ETC</th></thead></table>" );
@@ -39,7 +39,14 @@ function addServerProcess( id, targetprog, owningserver, cpu, ram, bw,
     tempOut += "</tr>";
     processtable.append( tempOut );
 
-    tempCache( "process-" + id + "-target", targetprog, cache, true );
+    tempCache( "process-" + id + "-target", targetprog, cache,
+      function(elem, val){
+        var target = "program-" + val + "-customname";
+        $(elem).html( getTempCache( target ) ).bind( "mouseenter mouseleave",
+          function(){
+            $("#program-" + val + "-row").toggleClass( "highlight" );
+        });    
+    });
     tempCache( "process-" + id + "-server", owningserver, cache );
     tempCache( "process-" + id + "-cpu", cpu, cache, true );
     tempCache( "process-" + id + "-ram", ram, cache, true );

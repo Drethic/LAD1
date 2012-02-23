@@ -288,6 +288,10 @@ input.semihiddenactive, input.semihiddenhover {
     background-color: #654;
 }
 
+.highlight {
+    background-color: #2AB;
+}
+
 th {
     font-size: 14px;
 }
