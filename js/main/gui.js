@@ -198,6 +198,22 @@ function addMenuButton( name, icon, fn )
             // Show the window
             if( obj.css('display') == 'none' )
             {
+                // Load offsets
+                var x = getPermCache( "win-" + id + "-x" );
+                var y = getPermCache( "win-" + id + "-y" );
+                var w = getPermCache( "win-" + id + "-width" );
+                var h = getPermCache( "win-" + id + "-height" );
+                obj.css({
+                    'left': x,
+                    'top': y,
+                    'width': w,
+                    'height': h
+                });
+                var pu = getPopupContext( id );
+                pu.css({
+                    'width': w,
+                    'height': (toNumber( h.replace( /[p-x]/g, '') ) ) - 22
+                });
                 obj.fadeIn().queue(function(){
                     $(this).updatejTaskBar();
                     obj.trigger( 'mousedown' );
@@ -317,14 +333,6 @@ function createWindow( name, resizeProps )
                         div.removeClass('popup_max')
                             .removeAttr('style')
                             .css("z-index", "10009")
-                            .css( "height", getTempCache( "puheight" +
-                            div.attr("id")) )
-                            .css( "width", getTempCache( "puwidth" +
-                            div.attr("id")) )
-                            .css( "top", getTempCache ( "putop" +
-                            div.attr("id")) - 1 )
-                            .css( "left", getTempCache ( "puleft" +
-                            div.attr("id")) - 1 )
                             .css( "max-height", $("#center").height() )
                             .css( "max-width", $("#center").width() );
                         div.find('.popup_body')
@@ -346,6 +354,12 @@ function createWindow( name, resizeProps )
             .append($("<div class='close_popup' title='Close'>" +
                       "<span class='ui-icon ui-icon-close'></span></div></div>")
                 .click( function() {
+                    var div = $(this).parents('.popup');
+                    if( div.length != 0 && div.css( 'width' ) != "" )
+                    {
+                        permCache( "win-" + id + "-width", div.css( 'width' ) );
+                        permCache( "win-" + id + "-height", div.css( 'height' ) );
+                    }
                     $(this).parents('.popup').fadeOut('fast').queue(function(){
                         $(this).removeClass('popup');
                         $(this).updatejTaskBar();
@@ -388,6 +402,11 @@ function createWindow( name, resizeProps )
             start: function(event,ui){
                 $('#jTaskBar').find('.jTask').removeClass('jTask-current');
                 $('#jTaskBar').find('.jTask#' + id).addClass('jTask-current');
+            },
+            stop: function(event,ui){
+                var div = $(this);
+                permCache( "win-" + id + "-x", div.css( 'left' ) );
+                permCache( "win-" + id + "-y", div.css( 'top' ) );
             }
         })
         .mousedown(function(){

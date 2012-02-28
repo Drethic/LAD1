@@ -367,14 +367,15 @@ function tempCache( ind, val, clearRegions, updateScreen )
  * 
  * @param ind Index to retrieve from the perm cache.  If there is no entry
  *            then an empty string is returned.
+ * @param def Default value if index isn't found
  * @return Value in the perm cache for the given index
  */
-function getPermCache( ind )
+function getPermCache( ind, def )
 {
     var ret = localStorage.getItem( ind );
     if( ret == undefined )
     {
-        return "";
+        return def == undefined ? "" : def;
     }
     return ret;
 }
@@ -872,3 +873,13 @@ function deleteAllElementsById( name )
     }
     $("script[href~='" + ID.toLowerCase() + "']").remove();
 }
+
+/**
+ * Performs cleanup whenever the user leaves the website
+ */
+function leavingWebsite()
+{
+    $(".close_popup").trigger( 'click' );
+}
+
+window.onunload = leavingWebsite;
