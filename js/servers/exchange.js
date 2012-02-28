@@ -129,6 +129,7 @@ function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
     var owner = toNumber( getTempCache( "serverowner" ) );
     var ip = toNumber( getTempCache( "serverip" ) );
     var cpu = toNumber( getTempCache( "servercpu" ) );
+    var customname = getTempCache( "server-" + id + "-customname" );
     var ram = toNumber( getTempCache( "serverram" ) );
     var hdd = toNumber( getTempCache( "serverhdd" ) );
     var bw = toNumber( getTempCache( "serverbw" ) );
@@ -175,7 +176,7 @@ function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
                       getTempCache( "process-" + procid + "-completetime" )));
         }
     }
-    beginServerView( id, owner, ip, cpu, ram, hdd, bw );
+    beginServerView( id, owner, ip, customname, cpu, ram, hdd, bw );
     if( programsvalid )
     {
         serverPrograms( programarray );
