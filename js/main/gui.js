@@ -43,6 +43,16 @@ function indexSetup()
       "swoopy stuff to it once we start updating the site to normal users.  " +
       "To include a full blown function just to pull it from the DB.")
       .appendTo("#loginform");
+      
+    resetqtip();
+}
+
+/**
+ * Call to reset all qtip's using default settings
+ */
+function resetqtip()
+{
+    $("[title]").qtip();
 }
 
 /**

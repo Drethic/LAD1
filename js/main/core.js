@@ -218,6 +218,9 @@ function updateCache( win, cache )
     {
         tempCache( arr[ i ] );
     }
+    
+    // This is the only place that we are guaranteed to be called
+    resetqtip();
 }
 
 /**

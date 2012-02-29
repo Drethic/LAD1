@@ -46,6 +46,8 @@ function startExchangeProgram( id )
             }).button()
         )
     );
+        
+    resetqtip();
 }
 
 function calculateRegionPointsUsed( region )
@@ -200,6 +202,8 @@ function exchangedProgram( programid, cpuUp, ramUp, hddUp, bwUp )
     applyExchangeAnimation( "ram", ram, ramUp * getDefault( "STEP_RAM" ) );
     applyExchangeAnimation( "hdd", hdd, hddUp * getDefault( "STEP_HDD" ) );
     applyExchangeAnimation( "bw", bw, bwUp * getDefault( "STEP_BW" ) );
+    
+    resetqtip();
 }
 
 function applyExchangeAnimation( type, orig, up )

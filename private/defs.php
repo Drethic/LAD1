@@ -18,9 +18,10 @@ define('JQUERY_UI_JS', 'jquery-ui-' . JQUERY_UI_VERSION . '.custom.min');
 define('JQUERY_LAYOUT_JS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION . '.min');
 define('JQUERY_LAYOUT_CSS', 'jquery-layout-' . JQUERY_LAYOUT_VERSION);
 define('JQUERY_JTASKBAR', 'jquery-jtaskbar-' . JTASKBAR_VERSION);
+define('JQUERY_QTIP', 'jquery.qtip.min');
 
 $GLOBALS['JQUERY_FILES'] = array( JQUERY_JS, JQUERY_UI_JS, JQUERY_LAYOUT_JS,
-                                  JQUERY_JTASKBAR );
+                                  JQUERY_JTASKBAR, JQUERY_QTIP );
 
 define('DB_NAME', 'admin_lad');
 define('DB_USERNAME', 'admin_lad');

@@ -29,6 +29,7 @@ function writeJS( $filebase )
 
 writeCSS( JQUERY_UI_CSS );
 writeCSS( JQUERY_LAYOUT_CSS );
+writeCSS( JQUERY_QTIP );
 writeCSS( 'main' );
 
 foreach( $GLOBALS['JQUERY_FILES'] as $jqueryjs )
