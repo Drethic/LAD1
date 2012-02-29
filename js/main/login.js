@@ -12,18 +12,16 @@ function createLoginInput( label, type, name, maxlen, optional )
 
 function doLogin( userid, gpoints )
 {
-    //$("body").html("");
     $("#news").empty().append(
-
-    $("<form id='loginform'>For new or returning users:<br></form>")
-      .append( createLoginInput( "Username", "text", "username", 20,
-               "class='filterkeys' data-filterkeys='[a-zA-Z0-9]'") )
-      .append( createLoginInput( "Password", "password", "password", 40 ) )
-      .append( createLoginInput( "Retype Password", "password", "cpassword",
-                                 40 ) )
-      .append( createLoginInput( "E-mail", "text", "email", 40 ) )
-      .appendTo("body").filterKeys()//;
-      );
+      $("<form id='loginform'>For new or returning users:<br></form>")
+        .append( createLoginInput( "Username", "text", "username", 20,
+                 "class='filterkeys' data-filterkeys='[a-zA-Z0-9]'") )
+        .append( createLoginInput( "Password", "password", "password", 40 ) )
+        .append( createLoginInput( "Retype Password", "password", "cpassword",
+                                   40 ) )
+        .append( createLoginInput( "E-mail", "text", "email", 40 ) )
+        .appendTo("body").filterKeys()
+    );
     
     $("#loginform").append( "<input type='checkbox' id='remusername'>Remember Username" +
                             "</input>" );

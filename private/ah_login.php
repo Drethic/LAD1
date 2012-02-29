@@ -77,6 +77,7 @@ function loadApplicableModules( $user, $result )
 
     function moduleWalker( $value, $key, $modules )
     {
+        // Check if the user has disabled this specific module
         $varupper = strtoupper( $key );
         foreach( $modules as $module )
         {
@@ -84,6 +85,11 @@ function loadApplicableModules( $user, $result )
             {
                 return;
             }
+        }
+        // Check if this module has been disabled by the system
+        if( strpos( ADMIN_DISABLED_MODULES, $varupper ) !== false )
+        {
+            return;
         }
         $request = clientfile_buildRequest( 'J', strtolower( $key ) );
         echo "addScriptElement('$request');";

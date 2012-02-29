@@ -37,7 +37,6 @@ foreach( $GLOBALS['JQUERY_FILES'] as $jqueryjs )
 }
 writeJS('plugins');
 writeJS('main');
-//writeJS('ui');
 
 ?></head><body><script type='text/javascript'>$(document).ready(function(){
     //doLogin();

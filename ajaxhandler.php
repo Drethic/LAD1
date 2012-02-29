@@ -75,6 +75,7 @@ $actionRequirements = array(
   'a_runsqlselect' => array( ADMIN_ONLY, 'admin', array( 'SQL' ) ),
   'a_runsqlother' => array( ADMIN_ONLY, 'admin', array( 'SQL' ) ),
   'a_runcssjsclear' => array( ADMIN_ONLY, 'admin' ),
+  'a_disablemodules' => array( ADMIN_ONLY, 'admin', array( 'MODULES' ) ),
   'nextmathquestion' => array( 0, 'math', array( 'DIFFICULTY', 'MODIFIERS')),
   'opt_request' => array( 0, 'options' ),
   'opt_disablemodules' => array( 0, 'options', array( 'MODULES' ) ),

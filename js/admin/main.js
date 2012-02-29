@@ -106,6 +106,16 @@ addMenuButton( "Admin", "ui-icon-star", function(){
           });
         }).button()
     );
+    mxtab.append( "<br />Comma delimited list of modules to disable:" );
+    mxtab.append( "<input type='text' id='a_disablemodules' size='20'>" );
+    $("<button></button>").button({
+        label: "Disable Modules"
+    }).appendTo( mxtab ).click(function(){
+        doAjax( "a_disablemodules", {
+            MODULES: $("#a_disablemodules").val()
+        });
+    });
+    mxtab.append( "<br />Possible values: " + getDefault( "ALL_MODULES" ) );
 
     resizePopup( "Admin" );  
 });

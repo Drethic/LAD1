@@ -1,6 +1,7 @@
 <?php
 
 require_once( 'jsmin.php' );
+require_once( 'inc.php' );
 
 session_start();
 srand();
@@ -136,7 +137,8 @@ function getClientSideDefines()
         'MATH_DIFF_SUB' => MATH_DIFF_SUB,
         'MATH_DIFF_MULT' => MATH_DIFF_MULT,
         'MATH_DIFF_DIV' => MATH_DIFF_DIV,
-        'MATH_DIFF_ROOT' => MATH_DIFF_ROOT
+        'MATH_DIFF_ROOT' => MATH_DIFF_ROOT,
+        'ALL_MODULES' => implode(',', array_keys( opt_getValidModules() ) )
     );
 }
 
@@ -531,6 +533,17 @@ $dbSelection = mysql_select_db( DB_NAME );
 if( !$dbSelection )
 {
    die( 'Failed to select DB in MySQL.' . mysql_error() );
+}
+
+// Validate admin variables
+if( !@constant( 'ADMIN_DISABLED_MODULES' ) )
+{
+    $text = <<<EOT
+<?
+    define('ADMIN_DISABLED_MODULES','');
+?>
+EOT;
+    file_put_contents( $_SERVER['DOCUMENT_ROOT'] . '/LAD/private/inc.php', $text );
 }
 
 ?>
