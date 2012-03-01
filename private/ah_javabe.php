@@ -17,23 +17,23 @@ if( $action == 'java_run' )
     unset( $req[ '_'] );
     foreach( $req as $key => $value )
     {
-        $text = "$key,$value";
+        $text = "$key,$value\n";
         fwrite( $sock, $text );
     }
-    fwrite( $sock, "end,transmission" );
+    fwrite( $sock, "end,transmission\n" );
     
     $done = false;
     $output = '';
     while( !$done )
     {
-        $line = stream_get_line( $sock, 1024 );
-        if( $line == 'DONE' )
+        $line = stream_get_line( $sock, 1024, "\n" );
+        if( $line == 'DONE' || feof( $sock ) )
         {
             $done = true;
         }
         else
         {
-            $output .= $line . '\n';
+            $output .= "$line\n";
         }
     }
     echo $output;
