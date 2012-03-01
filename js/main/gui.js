@@ -620,3 +620,31 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc,
     
     return table;
 }
+
+/**
+ * Shows a generic error message with an okay dialog
+ * @param title The title
+ * @param msg The message to show
+ * @param cb The function to call after okay is pressed
+ */
+function genericErrorDialog( title, msg, cb )
+{
+    $("body").append( '<div id="dialog-confirm" ' + 'title="' + title +
+                      '"><p>' + msg + '</p></div>');
+
+    $( "#dialog-confirm" ).dialog({
+        resizable: false,
+        height:165,
+        width:360,
+        modal: true,
+        buttons: {
+          "Okay": function() {
+              if( cb )
+              {
+                  cb();
+              }
+              $(this).dialog( "close" ).remove();
+          }
+        }
+    });
+}

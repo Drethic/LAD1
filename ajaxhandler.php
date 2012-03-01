@@ -79,7 +79,8 @@ $actionRequirements = array(
   'nextmathquestion' => array( 0, 'math', array( 'DIFFICULTY', 'MODIFIERS')),
   'opt_request' => array( 0, 'options' ),
   'opt_disablemodules' => array( 0, 'options', array( 'MODULES' ) ),
-  'opt_enablemodules' => array( 0, 'options', array( 'MODULES' ) )
+  'opt_enablemodules' => array( 0, 'options', array( 'MODULES' ) ),
+  'java_run' => array( 0, 'javabe' )
 );
 
 // First of all make sure the action is set

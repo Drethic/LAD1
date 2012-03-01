@@ -175,7 +175,8 @@ function opt_getValidModules()
         'SERVERS' => array(),
         'MATH' => array(),
         'CRAFTING' => array(),
-        'TOWERD' => array('towerd')
+        'TOWERD' => array('towerd'),
+        'JAVABE' => array()
     );
 }
 
