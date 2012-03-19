@@ -4,6 +4,6 @@ createWindow( "LAD" );
 // Setup button
 addMenuButton( "LAD", "ui-icon-home", function(){
     doAjax( "java_run", {
-        cmd: "start"
+        login: ""
     });
 });

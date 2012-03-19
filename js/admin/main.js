@@ -106,6 +106,7 @@ addMenuButton( "Admin", "ui-icon-star", function(){
           });
         }).button()
     );
+    // Disabled modules
     mxtab.append( "<br />Comma delimited list of modules to disable:" );
     mxtab.append( "<input type='text' id='a_disablemodules' size='20'>" );
     $("<button></button>").button({
@@ -117,6 +118,11 @@ addMenuButton( "Admin", "ui-icon-star", function(){
     });
     mxtab.append( "<br />Possible values: " + getDefault( "ALL_MODULES" ) );
 
+    // Shutdown java server button
+    mxtab.append( "<br />" );
+    $("<div>Shutdown Java Server</div>").click(function(){
+        doAjax( "java_shutdown" );
+    }).button().appendTo( mxtab );
     resizePopup( "Admin" );  
 });
 
