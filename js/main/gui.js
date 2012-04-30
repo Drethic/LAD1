@@ -629,22 +629,38 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc,
  */
 function genericErrorDialog( title, msg, cb )
 {
-    $("body").append( '<div id="dialog-confirm" ' + 'title="' + title +
+    genericDialog( title, msg, {
+        "Okay": function(){
+            if( cb )
+            {
+                cb();
+            }
+            $(this).dialog( "close" ).remove();
+        }
+    });
+}
+
+/**
+ * Shows a generic message with customizable buttons.
+ *
+ * The array of buttons should be a key/index array where the keys are the
+ * text to show and the values are the corresponding functions to run when
+ * the button has been clicked.
+ *
+ *  @param title Title of the dialog
+ *  @param msg Message to show the user
+ *  @param buttons Array of buttons to show
+ */
+ function genericDialog( title, msg, buttons )
+ {
+    $("body").append( '<div id="dialog-generic" ' + 'title="' + title +
                       '"><p>' + msg + '</p></div>');
 
-    $( "#dialog-confirm" ).dialog({
+    $( "#dialog-generic" ).dialog({
         resizable: false,
         height:165,
         width:360,
         modal: true,
-        buttons: {
-          "Okay": function() {
-              if( cb )
-              {
-                  cb();
-              }
-              $(this).dialog( "close" ).remove();
-          }
-        }
+        "buttons": buttons
     });
-}
+ }
