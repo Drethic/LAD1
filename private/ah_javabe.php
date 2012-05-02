@@ -8,7 +8,7 @@ function preconnect_java( )
     {
         $title = 'Server Error';
         $msg = 'An internal server is down.  Please try again later.';
-        $func = '$("#LAD.popup .close_popup").trigger(\'click\');';
+        $func = '$("div#LAD").dialog("close");';
         echo "genericErrorDialog(\"$title\",\"$msg\",function(){ $func });";
         exit( 0 );
     }
