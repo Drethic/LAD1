@@ -133,7 +133,8 @@ elseif( $action == 'a_disablemodules' )
     $modules = preg_replace( '/[^a-zA-Z0-9\,]/', '', $_REQUEST[ 'MODULES' ] );
     $modules = strtoupper( $modules );
     $t = "<?\ndefine('ADMIN_DISABLED_MODULES','$modules');\n?>";
-    file_put_contents( $_SERVER['DOCUMENT_ROOT'] . '/LAD/private/inc.php', $t );
+    file_put_contents( $_SERVER['DOCUMENT_ROOT'] . '/private/inc.php', $t );
+    echo( 'admin_setMaintenanceStatus("Disabled modules updated.");' );
 }
 
 function deleteAll( $directory, $empty = false )

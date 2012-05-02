@@ -123,7 +123,6 @@ addMenuButton( "Admin", "ui-icon-star", function(){
     $("<div>Shutdown Java Server</div>").click(function(){
         doAjax( "java_shutdown" );
     }).button().appendTo( mxtab );
-    resizePopup( "Admin" );  
 });
 
 /**
@@ -281,7 +280,6 @@ function admin_viewTempCache( force )
     obj.children().remove();
     obj.append( makeSortableTable( ["Name", "Value", "Region"],
         cacheValues, "admin-tempcache" ));
-    resizePopup( "Admin" );
 }
 
 function admin_setMaintenanceStatus( txt )

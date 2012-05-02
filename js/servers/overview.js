@@ -16,7 +16,6 @@ function noOwnedServers()
         doAjax( "requestfreeserver" );
     });
 
-    resizePopup( "Servers" );
     updateCache( "Servers", "Server-Overview" );
 }
 
@@ -67,7 +66,6 @@ function ownedServers( list )
 
     tempCache( "servers", serverids.join(","), cache );
 
-    resizePopup( "Servers" );
     updateCache( "Servers", "Server-Overview" );
 }
 

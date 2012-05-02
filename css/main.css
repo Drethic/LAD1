@@ -122,91 +122,6 @@ div#logo {
     overflow: auto;
 }
 
-/*jTask window items*/
-
-div.popup {
-    background-color:#456;
-    width:415px;
-    height: 200px;
-    min-height:200px;
-    min-width: 415px;
-    position:absolute;
-}
-div.popup_body {
-    border:solid 1px;
-    position:absolute;
-    top: 20px;
-    left:0;
-    height: 180px;
-    width: 413px;
-    min-height:180px;
-    min-width: 413px;
-    background-color:#FFF;
-    overflow:auto;
-    line-height: normal;
-}
-div.popup_max {
-    top: 0px !important;
-    left: 0px !important;
-}
-div.popup_body_max {
-    position: relative;
-}
-div.popup_header {
-    position:absolute;
-    top:1px;
-    width:100%;
-    min-width: 384px;
-    height:20px;
-}
-div.popup_title {
-    position:absolute;
-    top:1px;
-    left:0;
-    color: white;
-}
-div.close_popup, div.min_popup, div.refresh_popup, div.max_popup,
-div.restore_popup {
-    position:absolute;
-    top:1px;
-    width:16px;
-    height:16px;
-    border:solid 1px;
-    background-color:#999;
-    text-align:center;
-    color: white;
-}
-div.close_popup span, div.min_popup span, div.refresh_popup span,
-div.restore_popup span{
-    position:relative;
-}
-div.max_popup span {
-    position: relative;
-    bottom: 4px;
-}
-div.close_popup:hover, div.min_popup:hover, div.refresh_popup:hover,
-div.max_popup:hover, div.restore_popup:hover {
-    cursor:hand;
-    cursor:pointer;
-    background-color:#666;
-    color:#EFF;
-}
-div.close_popup {
-    right:1px;
-}
-div.max_popup {
-    right:20px;
-}
-div.restore_popup {
-    right:20px;
-}
-div.min_popup {
-    right:39px;
-}
-div.refresh_popup {
-    right:58px;
-}
-
 /*jTask Taskbar items*/
 .jTask { /*This is the style for the different 'Tasks' that appear in the taskbar.*/
     cursor:hand;
@@ -315,26 +230,4 @@ th {
     font-size: 40px;
     font-family: monospace;
     display: inline;
-}
-
-/* Tower Defense */
-#tdHdrTbl {
-    width: 100%;
-    border: none;
-}
-
-#tdHdrTbl td {
-    text-align: center;
-}
-
-div#TowerTabs div button {
-    float:right;
-}
-
-#center div#Tower_D {
-    width: 550px;
-}
-
-#center div#Tower_Dpu {
-    width: 548px;
 }

@@ -330,7 +330,6 @@ function beginServerView( id, owner, ip, customname, cpu, ram, hdd, bw,
  */
 function endServerView()
 {
-    resizePopup( "Servers" );
     updateProgramOperations();
     updateServerDetail( "ram", getTempCache( "serverram" ) );
     updateServerDetail( "hdd", getTempCache( "serverhdd" ) );
@@ -365,7 +364,6 @@ function serverPrograms( list )
         addServerProgram( pro[ 0 ], pro[ 1 ], pro[ 2 ], pro[ 3 ], pro[ 4 ],
                           pro[ 5 ] );
     }
-    resizePopup( "Servers" );
 }
 
 /**

@@ -882,7 +882,7 @@ function deleteAllElementsById( name )
  */
 function leavingWebsite()
 {
-    $(".close_popup").trigger( 'click' );
+    $(".popup").dialog( "close" );
 }
 
 window.onunload = leavingWebsite;

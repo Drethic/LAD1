@@ -545,7 +545,7 @@ if( !@constant( 'ADMIN_DISABLED_MODULES' ) )
     define('ADMIN_DISABLED_MODULES','');
 ?>
 EOT;
-    file_put_contents( $_SERVER['DOCUMENT_ROOT'] . '/LAD/private/inc.php', $text );
+    file_put_contents( $_SERVER['DOCUMENT_ROOT'] . '/private/inc.php', $text );
 }
 
 ?>

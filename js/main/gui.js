@@ -53,7 +53,8 @@ function indexSetup()
  */
 function resetqtip()
 {
-    $("[title]").qtip();
+    var titles = $( "[title]" );
+    titles.qtip();
 }
 
 /**
@@ -184,75 +185,67 @@ function addMenuButton( name, icon, fn )
     {
         menuobj.button({icons: {primary: icon}});
     }
-    var enclosedfn;
-    if( fn == undefined )
-    {
-        enclosedfn = function(){
-            alert( name + " INW" );
-        };
-    }
-    else
-    {
-        enclosedfn = function( id ){
-            var obj = $('div#' + id);
-            // Call function if there is no window
-            if( obj.length == 0 )
-            {
-                fn();
-                return;
-            }
-            // Make sure it's a popup
-            if( !obj.hasClass( "popup" ) )
-            {
-                obj.addClass('popup');
-            }
-            // Show the window
-            if( obj.css('display') == 'none' )
-            {
-                // Load offsets
-                var x = getPermCache( "win-" + id + "-x" );
-                var y = getPermCache( "win-" + id + "-y" );
-                var w = getPermCache( "win-" + id + "-width" );
-                var h = getPermCache( "win-" + id + "-height" );
-                obj.css({
-                    'left': x,
-                    'top': y,
-                    'width': w,
-                    'height': h
-                });
-                var pu = getPopupContext( id );
-                pu.css({
-                    'width': w,
-                    'height': (toNumber( h.replace( /[p-x]/g, '') ) ) - 22
-                });
-                obj.fadeIn().queue(function(){
-                    $(this).updatejTaskBar();
-                    obj.trigger( 'mousedown' );
-                    $(this).dequeue();
-                });
-                getPopupContext( id ).empty();
-                fn();
-            }
-            // Fade in the taskbar entry
-            if( $('#jTaskBar').find('div#'+id).hasClass('jTask-hidden') )
-            {
-                $('#jTaskBar').find('div#'+id).removeClass('jTask-hidden');
-                obj.fadeIn().queue(function(){
-                    $(this).updatejTaskBar();
-                    $(this).dequeue();
-                });
-            }
+    var enclosedfn = fn === undefined ? function(){
+        alert( name + " INW" );
+    } : function( id ){
+        var obj = $('div#' + id);
+        // Call function if there is no window
+        if( obj.length == 0 )
+        {
+            fn();
+            return;
         }
-    }
+        // Show the window
+        // Load offsets
+        var x = getPermCache( "win-" + id + "-x" );
+        var y = getPermCache( "win-" + id + "-y" );
+        var w = getPermCache( "win-" + id + "-width" );
+        var h = getPermCache( "win-" + id + "-height" );
+        obj.dialog( "widget" ).css({
+            'left': x,
+            'top': y,
+            'width': w,
+            'height': h
+        });
+        obj.dialog( "open" ).empty();
+        fn();
+        // Fade in the taskbar entry
+        if( $('#jTaskBar').find('div#'+id).hasClass('jTask-hidden') )
+        {
+            $('#jTaskBar').find('div#'+id).removeClass('jTask-hidden');
+            obj.fadeIn().queue(function(){
+                $(this).updatejTaskBar();
+                $(this).dequeue();
+            });
+        }
+    };
     menuobj.click(function(){
         $('#start').click();
         enclosedfn( id );
     });
 }
 
-function createWindow( name, resizeProps )
+function createWindow( name )
 {
-    var id = name.replace( /\s/, '_' );
+    var id = name.replace( /\s/, '_' ),
+        widthstr = "win-" + id + "-width",
+        heightstr = "win-" + id + "-height";
+    return $("<div id='" + id + "'></div>" ).dialog({
+        title: name,
+        autoOpen: false,
+        beforeClose: function(event, ui){
+            var div = $(this);
+            if( div.dialog( "isOpen" ) != "" )
+            {
+                permCache( widthstr, div.dialog( "option", "width" ) );
+                permCache( heightstr, div.dialog( "option", "height" ) );
+            }
+            window.location.hash = '';
+        },
+        width: getPermCache( widthstr, 100 ),
+        height: getPermCache( heightstr, 100 )
+    }).addClass( 'popup' );
+    /*
     // Setup resize options
     if( resizeProps == undefined )
     {
@@ -428,8 +421,10 @@ function createWindow( name, resizeProps )
             $(this).trigger( 'dragstart' ).trigger( 'drag' ).trigger( 'dragstop' );
         })
         .appendTo($('#center'));
+    */
 }
 
+/*
 function resizePopup( name )
 {
     var elem = getPopupContext( name );
@@ -491,11 +486,12 @@ function resizeWidth( element )
         element.parent().css('left', centerw + centerleft - newWidth);
     }
 }
+*/
 
 function getPopupContext( name )
 {
     name = name.toString().replace( " ", "_" );
-    return $('#' + name + 'pu');
+    return $('div#' + name);
 }
 
 function refreshCurrent( name )
@@ -664,4 +660,4 @@ function genericErrorDialog( title, msg, cb )
         modal: true,
         "buttons": buttons
     });
- }
+}

@@ -7,3 +7,16 @@
     background: url(images/td-chihuahuaicon.jpg) no-repeat;
     background-size: 100% 100%;
 }
+
+#tdHdrTbl {
+    width: 100%;
+    border: none;
+}
+
+#tdHdrTbl td {
+    text-align: center;
+}
+
+div#TowerTabs div button {
+    float:right;
+}
