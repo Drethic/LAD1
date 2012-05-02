@@ -185,11 +185,15 @@ function loginError( field, reason )
         /*warnObject.html( "<span class='ui-icon ui-icon-alert' " +
                          "style='float:left'></span>" + reason );*/
         warnObject.html( "<span class='ui-icon ui-icon-alert' " +
-                         "style='float:left' title='" + reason +
-                         "'></span>" );
+                         "style='float:left'></span>" );
         warnObject.css( {"display" : "inline-block"} );
-        warnObject.qtip();
-        warnObject.qtip( "option", "position.container", $('#news') );
+        warnObject.qtip({
+            position:{
+                my: "top right",
+                at: "bottom left"
+            },
+            content: reason
+        });
     }
 }
 

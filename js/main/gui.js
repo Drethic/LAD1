@@ -53,8 +53,7 @@ function indexSetup()
  */
 function resetqtip()
 {
-    var titles = $( "[title]" );
-    titles.qtip();
+    $( "[title]" ).qtip();
 }
 
 /**
