@@ -7,7 +7,8 @@ function createLoginInput( label, type, name, maxlen, optional )
                "autocomplete='off'>")
       .append( "<span id='" + name + "error' class='ui-state-error " +
                "ui-corner-all' style='padding: 0.2em;font-size:smaller'>" +
-               "</span><br>" );
+               "</span>" )
+      .append( "<br>" );
 }
 
 function doLogin( userid, gpoints )
@@ -187,6 +188,8 @@ function loginError( field, reason )
                          "style='float:left' title='" + reason +
                          "'></span>" );
         warnObject.css( {"display" : "inline-block"} );
+        warnObject.qtip();
+        warnObject.qtip( "option", "position.container", $('#news') );
     }
 }
 
