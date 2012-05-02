@@ -223,11 +223,13 @@ th {
 .bigLogoLetter {
     color: red;
     font-size: 80px;
+    font-weight: 700;
     display: inline;
 }
 
 .logoLetter {
     font-size: 40px;
     font-family: monospace;
+    font-weight: 600;
     display: inline;
 }
