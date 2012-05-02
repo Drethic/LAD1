@@ -32,11 +32,12 @@ function indexSetup()
         }).sizePane("north", 79);
 
     $("#main")
-    .append("<div id='main-center'>Welcome to Macro Web Security.</div>");
+    .append("<div id='main-center'>Welcome to LAD.</div>");
     doLogin();
     
     $("#header")
-    .append("<div id='logofull'></div><div id='logo'></div>");
+    .append( "<div class='logoLetter'><div class='bigLogoLetter'>L</div>" +
+             "ife and <div class='bigLogoLetter'>D</div>eath</div>" );
     
     $("<div>")
       .append("<br>News RSS<br><br>The News will go here and we can do some" +
