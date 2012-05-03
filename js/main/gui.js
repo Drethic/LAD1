@@ -135,8 +135,6 @@ function validLogin( id )
         $('div.popup_body')
             .css( "max-height", $("#center").height() - 22 )
             .css( "max-width", $("#center").width() );
-        resizeHeight($('div.popup_body'));
-        resizeWidth($('div.popup_body'));
     });
     
     // Setup the start menu to hide if something other than it is clicked and
@@ -265,6 +263,9 @@ function restoreForm(frm)
 }
 
 /**
+ * The keys of the headers are what are output, if the value === "true" then
+ * it is able to be sorted on.
+ *
  * @param headers 1-D array of headers
  * @param values 2-D array of values
  * @param cacheprefix Prefix for cache entries, must be unique
@@ -274,49 +275,79 @@ function restoreForm(frm)
 function makeSortableTable( headers, values, cacheprefix, postsortfunc,
                             clearRegion )
 {
-    var table = $("<table id='" + cacheprefix + "tbl'></table>");
-    var headerrow = $("<tr class='primaryRow'></tr>");
-    var i, j;
-    
-    var printCells = function(values, table){
-        table.find( "tr:gt(0)" ).remove();
-        for( var i = 0; i < values.length; i++ )
-        {
-            var row = $("<tr></tr>");
-            if( ( i - 1 ) % 2 == 0 )
+    // Variables
+    var table = $("<table id='" + cacheprefix + "tbl'></table>"),
+        headerrow = $("<tr class='primaryRow'></tr>"),
+        i, j, header, thead = $("<thead></thead>"),
+        printCells = function(newValues, table){
+            table.children( "tbody" ).find( "tr" ).remove();
+            for( i = 0; i < newValues.length; i++ )
             {
-                row.addClass( "alternateRow" );
+                var row = $("<tr></tr>"), cell, j = 0;
+                if( ( i - 1 ) % 2 === 0 )
+                {
+                    row.addClass( "alternateRow" );
+                }
+                else
+                {
+                    row.addClass( "primaryRow" );
+                }
+                for( j = 0; j < newValues[ 0 ].length; j++ )
+                {
+                    cell = newValues[ i ][ j ];
+                    row.append( cell );
+                }
+                table.append( row );
             }
-            else
+
+            if( postsortfunc !== undefined )
             {
-                row.addClass( "primaryRow" );
+                postsortfunc( table );
             }
-            for( j = 0; j < headers.length; j++ )
+        },customsort = function(a,b){
+            var ca = Number(a.html()), cb = Number(b.html());
+            if( !isNaN( ca ) )
             {
-                row.append( "<td>" + values[ i ][ j ] + "</td>" );
+                if( !isNaN( cb ) )
+                {
+                    return ca - cb;
+                }
+                return -1;
             }
-            table.append( row );
-        }
-        
-        tempCache( cacheprefix + "-values", stringify( values ), clearRegion );
-        if( postsortfunc != undefined )
-        {
-            postsortfunc( table );
-        }
+            else if( !isNaN( cb ) || a === undefined )
+            {
+                return 1;
+            }
+            return a.html().localeCompare( b.html() );
     };
 
-    for( i = 0; i < headers.length; i++ )
+    for( header in headers )
     {
-        var cell = $( "<th class='sorttblhead'>" + headers[ i ] + "</th>" );
-        if( values.length > 1 )
+        var cell = $( "<th class='sorttblhead'>" + header + "</th>" );
+        if( headers[ header ] === "true" )
         {
             cell.prepend($('<span></span>').addClass('ui-icon').
                 addClass('ui-icon-arrowthick-2-n-s').
                 css( 'float', 'left' ));
             cell.click(function(){
-                var sibth = $(this).siblings("th");
-                var sibicons = sibth.children(".ui-icon");
-                var thisicon = $(this).children(".ui-icon");
+                // Setup variables
+                var sibth = $(this).siblings("th"),
+                    sibicons = sibth.children(".ui-icon"),
+                    thisicon = $(this).children(".ui-icon"),
+                    index = $(this).prevAll("th").length,
+                    values = [],
+                    lastSort = getTempCache( cacheprefix + "-lastsort" ),
+                    lastSortDir = getTempCache( cacheprefix + "-lastsortdir" ),
+                    newSortDir, jTable = $("#" + cacheprefix + "tbl");
+                // Populate values array
+                jTable.children( "tbody" ).children( "tr" )
+                  .each(function(index,dom){
+                    values[ index ] = [];
+                    $(dom).children( "td" ).each(function(index2,dom2){
+                        values[ index ][ index2 ] = $(dom2);
+                    });
+                });
+                // Remove icons to clean up
                 sibth.removeClass( "ui-state-hover" );
                 $(this).addClass( "ui-state-hover" );
                 sibicons.removeClass( 'ui-icon-arrowthick-1-s').
@@ -325,74 +356,57 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc,
                 thisicon.
                       removeClass( 'ui-icon-arrowthick-2-n-s').
                       removeClass( 'ui-icon-arrowthick-1-s').
-                      removeClass( 'ui-icon-arrowthick-1-n');
-                var index = $(this).prevAll("th").length;
-                var valuestring = getTempCache( cacheprefix + "-values" );
-                eval( "values = " + valuestring );
-                var lastSort = getTempCache( cacheprefix + "-lastsort" );
-                var newSort = index;
-                var customsort = function(a,b){
-                    var ca = Number(a);
-                    var cb = Number(b);
-                    if( !isNaN( ca ) )
-                    {
-                        if( !isNaN( cb ) )
-                        {
-                            return ca - cb;
-                        }
-                        return -1;
-                    }
-                    else if( !isNaN( cb ) || a == undefined )
-                    {
-                        return 1;
-                    }
-                    return a.localeCompare(b);
-                };
-                if( lastSort != index )
+                      removeClass( 'ui-icon-arrowthick-1-n' );
+                if( lastSort !== String(index) ||
+                    lastSortDir === "2" )
                 {
+                    // User clicked a different column
+                    // Or clicked same column second time
                     values.sort(function(a,b){
                         return customsort(a[index],b[index]);
                     });
                     thisicon.addClass( 'ui-icon-arrowthick-1-s');
+                    newSortDir = 1;
                 }
                 else
                 {
+                    // User clicked same column, update
                     values.sort(function(a,b){
                         return customsort(b[index],a[index]);
                     });
                     thisicon.addClass( 'ui-icon-arrowthick-1-n');
-                    newSort = -1;
+                    newSortDir = 2;
                 }
-                tempCache( cacheprefix + "-lastsort", newSort, clearRegion );
-                printCells( values, $("#" + cacheprefix + "tbl") );
+                tempCache( cacheprefix + "-lastsort", index, clearRegion );
+                tempCache( cacheprefix + "-lastsortdir", newSortDir, clearRegion );
+                printCells( values, jTable );
             });
+            
         }
         headerrow.append( cell );
     }
-    
-    table.append( headerrow );
-    printCells( values, table );
+
+    if( values.length > 0 )
+    {
+        var valuesCopy = [];
+        for( i = 0; i < values.length; i++ )
+        {
+            valuesCopy[ i ] = [];
+            for( j = 0; j < values[ 0 ].length; j++ )
+            {
+                valuesCopy[ i ][ j ] =
+                    $("<td></td>").append( values[ i ][ j ] );
+            }
+        }
+        tempCache( cacheprefix + "-lastsort", -1, clearRegion );
+        tempCache( cacheprefix + "-lastsortdir", -1, clearRegion );
+        printCells( valuesCopy, table );
+
+    }
+    thead.append( headerrow );
+    table.prepend( thead );
     
     return table;
-}
-
-/**
- * Shows a generic error message with an okay dialog
- * @param title The title
- * @param msg The message to show
- * @param cb The function to call after okay is pressed
- */
-function genericErrorDialog( title, msg, cb )
-{
-    genericDialog( title, msg, {
-        "Okay": function(){
-            if( cb )
-            {
-                cb();
-            }
-            $(this).dialog( "close" ).remove();
-        }
-    });
 }
 
 /**
@@ -417,5 +431,24 @@ function genericErrorDialog( title, msg, cb )
         width:360,
         modal: true,
         "buttons": buttons
+    });
+}
+
+/**
+ * Shows a generic error message with an okay dialog
+ * @param title The title
+ * @param msg The message to show
+ * @param cb The function to call after okay is pressed
+ */
+function genericErrorDialog( title, msg, cb )
+{
+    genericDialog( title, msg, {
+        "Okay": function(){
+            if( cb )
+            {
+                cb();
+            }
+            $(this).dialog( "close" ).remove();
+        }
     });
 }

@@ -135,7 +135,8 @@ addMenuButton( "Admin", "ui-icon-star", function(){
  */
 function admin_selectSQLResult( headers, table, error )
 {
-    var result = $("#admin_sqlresult");
+    var translatedHeaders= admin_arrayToKeysWithTrue( headers ),
+        result = $("#admin_sqlresult");
     if( error != undefined )
     {
         result.html( error );
@@ -143,7 +144,8 @@ function admin_selectSQLResult( headers, table, error )
     else
     {
         result.html( "" );
-        result.append( makeSortableTable( headers, table, "admin-sql" ) );
+        result.append( makeSortableTable( translatedHeaders, table,
+                                          "admin-sql" ) );
     }
 }
 
@@ -174,37 +176,44 @@ function admin_otherSQLResult( modified, error )
 function admin_addTables( tablenames )
 {
     // Set up the container div
-    var txt = "<div id='admintableaccordion'>";
+    var accordion = $("<div id='admintableaccordion'></div>");
+
+    // Add each table
     for( var i = 0; i < tablenames.length; i++ )
     {
         // Each table has to be inside a h5 element
         var tablename = tablenames[ i ].toLowerCase();
-        txt += "<h5><a href='#'>" + tablename.toCamelCase() +
-               "</a></h5><div id='admin_tbl" + tablename + "'></div>";
+        accordion.append( "<h5><a href='#'>" + tablename.toCamelCase() +
+                          "</a></h5><div id='admin_tbl" + tablename +
+                          "' class='admin_tableview'></div>" );
     }
-    txt += "</div>";
     
-    // Add the container div to the view
-    $("#admintab-Tables").append( txt );
-    
-    // Prepare it as an accordion, update whenever a view is selected,
-    // start off initially closed
-    $("#admintableaccordion").accordion({
+    // Setup as an accordion
+    accordion.accordion({
         active: false,
         change: function(event,ui){
-            var text = ui.newHeader.text().toLowerCase();
+            var text = ui.newHeader.text().toLowerCase(), i,
+                obj = $("#admintableaccordion");
             if( text == "" )
             {
                 return;
             }
+            accordion.find( ".admin_tableview" ).each(function(index,dom){
+                $(dom).empty();
+            });
+            tempCache( "currentAccordionView", text, "Admin-Tables" );
             doAjax( "a_gettable", {
                 TABLE: text
             });
-            tempCache( "currentAccordionView", text, "Admin-Tables" );
         },
         collapsible: true,
-        clearStyle: true
+        clearStyle: true,
+        autoHeight: false
     });
+    
+    // Add the container div to the view
+    $("#admintab-Tables").append( accordion );
+    
 }
 
 /**
@@ -216,8 +225,8 @@ function admin_addTables( tablenames )
  */
 function admin_tableView( values )
 {
-    // The headers are the first row, shift them off
-    var headers = values.shift();
+    // The headers are the first row, shift them off and translate
+    var headers = admin_arrayToKeysWithTrue( values.shift() );
     
     // Get the view and reset it
     var view = $("#admin_tbl" + getTempCache( "currentAccordionView" ) );
@@ -252,11 +261,15 @@ function admin_viewTempCache( force )
 {
     // Check if the tab is even visible, if it isn't and force is not set then
     // abort
-    var obj = $("#admintab-Temp_Cache");
+    var obj = $("#admintab-Temp_Cache"), headers = ["Name", "Value", "Region"],
+        translatedHeaders;
     if( obj.length != 1 || obj.css( 'display' ) == 'none' && !force )
     {
         return;
     }
+
+    //Calculate translated headers
+    translatedHeaders = admin_arrayToKeysWithTrue( headers );
     
     // Clear the previous values and sort for the table
     tempCache( "admin-tempcache-values", "", "Admin-TempCache" );
@@ -278,12 +291,34 @@ function admin_viewTempCache( force )
     // Reset the view to a sortable table with the array that was just
     // generated.  Ensure the popup is visible appropriately.
     obj.children().remove();
-    obj.append( makeSortableTable( ["Name", "Value", "Region"],
-        cacheValues, "admin-tempcache" ));
+    obj.append( makeSortableTable( translatedHeaders, cacheValues,
+                                   "admin-tempcache" ));
 }
 
 function admin_setMaintenanceStatus( txt )
 {
     $('#adminmx-status').html( txt ).addClass( "ui-state-highlight" )
       .addClass( "ui-corner-all" );
+}
+
+/**
+ * Converts an array of values to an array with the keys being the forementioned
+ * values and the values of each of the keys being "true".
+ *
+ * @param arr Array to translate
+ * @return Translated array
+ */
+function admin_arrayToKeysWithTrue( arr )
+{
+    // Variables
+    var headerArray = [], header;
+
+    // Populate the array with all of the values set to true
+    for( header in arr )
+    {
+        headerArray[ arr[ header ] ] = "true";
+    }
+
+    // Return resulting array
+    return headerArray;
 }
