@@ -62,7 +62,14 @@ function doAjax( actionPara, outData, popup )
         data: outData,
         success: function( response ){
             // Create the script element
-            eval( response );
+            try
+            {
+                eval( response );
+            }
+            catch( e )
+            {
+                throw new SyntaxError( response );
+            }
        }
     });
 }
