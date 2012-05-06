@@ -176,7 +176,7 @@ function opt_getValidModules()
         'MATH' => array(),
         'CRAFTING' => array(),
         'TOWERD' => array('towerd'),
-        'JAVABE' => array()
+        'JAVA' => array()
     );
 }
 
@@ -378,23 +378,30 @@ function clientfile_buildRequest( $type, $base )
 {
     $cacheName = clientfile_getCacheName( $type, $base );
     $actualFile = clientfile_getName( $type, $base );
-    if( $base == 'lad' )
+    if( $base == 'java' )
     {
         $file = $type === 'J' ? 'getJS' : 'getCSS';
         $sock = preconnect_java();
-        $userid = $_SESSION[ 'ID' ];
-        fwrite( $sock, "$file,\n" +
-                       "userid,$userid\n" +
-                       "end,transmission\n" );
-        fflush( $sock );
+        if( $sock )
+        {
+            $userid = $_SESSION[ 'ID' ];
+            fwrite( $sock, "$file,\n" );
+            fwrite( $sock, "userid,$userid\n" );
+            fwrite( $sock, "end,transmission\n" );
+            fflush( $sock );
 
-        $serverContents = postwrite_java( $sock );
+            $serverContents = postwrite_java( $sock );
+        }
+        else
+        {
+            $serverContents = '';
+        }
 
-        $currentContents = file_get_contents( $actualFile );
+        $currentContents = @file_get_contents( $actualFile );
         if( $currentContents === false || strcasecmp( $serverContents,
                                                       $currentContents ) !== 0 )
         {
-            file_put_contents( $actualFile, $serverContents );
+            @file_put_contents( $actualFile, $serverContents );
         }
     }
     if( $type == 'C' || $type == 'J' )

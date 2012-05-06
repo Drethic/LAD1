@@ -80,8 +80,8 @@ $actionRequirements = array(
   'opt_request' => array( 0, 'options' ),
   'opt_disablemodules' => array( 0, 'options', array( 'MODULES' ) ),
   'opt_enablemodules' => array( 0, 'options', array( 'MODULES' ) ),
-  'java_run' => array( 0, 'javabe' ),
-  'java_shutdown' => array( ADMIN_ONLY, 'javabe' )
+  'java_run' => array( 0, 'java' ),
+  'java_shutdown' => array( ADMIN_ONLY, 'java' )
 );
 
 // First of all make sure the action is set
