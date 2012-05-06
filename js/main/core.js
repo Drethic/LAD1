@@ -66,9 +66,10 @@ function doAjax( actionPara, outData, popup )
             {
                 eval( response );
             }
-            catch( e )
+            catch( error )
             {
-                throw new SyntaxError( response );
+                error.name = null;
+                throw new SyntaxError( error + "\n" + response );
             }
        }
     });
