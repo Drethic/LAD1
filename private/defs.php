@@ -340,10 +340,63 @@ function clientfile_getApplicationType( $type )
     }
 }
 
+function preconnect_java( )
+{
+    $sock = @stream_socket_client( '127.0.0.1:19191', $errno, $errstr, 0.2,
+            STREAM_CLIENT_CONNECT | STREAM_CLIENT_PERSISTENT );
+    if( !$sock )
+    {
+        $title = 'Server Error';
+        $msg = 'An internal server is down.  Please try again later.';
+        $func = '$("div#LAD").dialog("close");';
+        echo "genericErrorDialog(\"$title\",\"$msg\",function(){ $func });";
+        exit( 0 );
+    }
+    return $sock;
+}
+
+function postwrite_java( $sock )
+{
+    $done = false;
+    $output = '';
+    while( !$done )
+    {
+        $line = stream_get_line( $sock, 1024, "\n" );
+        if( $line == 'DONE' || feof( $sock ) )
+        {
+            $done = true;
+        }
+        else
+        {
+            $output .= "$line\n";
+        }
+    }
+    return $output;
+}
+
 function clientfile_buildRequest( $type, $base )
 {
     $cacheName = clientfile_getCacheName( $type, $base );
     $actualFile = clientfile_getName( $type, $base );
+    if( $base == 'lad' )
+    {
+        $file = $type === 'J' ? 'getJS' : 'getCSS';
+        $sock = preconnect_java();
+        $userid = $_SESSION[ 'ID' ];
+        fwrite( $sock, "$file,\n" +
+                       "userid,$userid\n" +
+                       "end,transmission\n" );
+        fflush( $sock );
+
+        $serverContents = postwrite_java( $sock );
+
+        $currentContents = file_get_contents( $actualFile );
+        if( $currentContents === false || strcasecmp( $serverContents,
+                                                      $currentContents ) !== 0 )
+        {
+            file_put_contents( $actualFile, $serverContents );
+        }
+    }
     if( $type == 'C' || $type == 'J' )
     {
         if( !is_dir( $actualFile ) )
