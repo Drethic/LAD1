@@ -68,8 +68,7 @@ function doAjax( actionPara, outData, popup )
             }
             catch( error )
             {
-                error.name = undefined;
-                throw new SyntaxError( error + "\n" + response );
+                throw new SyntaxError( error.message + "\n" + response );
             }
        }
     });
