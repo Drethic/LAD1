@@ -5,15 +5,15 @@
  */
 function prepareThis()
 {
-    if( this.prototype == undefined )
+    if( this.prototype === undefined )
     {
         this.prototype = {
-            popupdata: new Array(),
+            popupdata: [],
             cacheValues: {},
             clearRegions: {},
-            windowClearRegions: new Array(),
-            cbs: new Array()
-        }
+            windowClearRegions: [],
+            cbs: []
+        };
     }
 }
 
@@ -30,11 +30,11 @@ function doAjax( actionPara, outData, popup )
     prepareThis();
     // If a popup is able to reperform this query then serialize it in a way
     // we will be able to understand later.
-    if( popup != undefined )
+    if( popup !== undefined )
     {
-        var request = "window-" + popup + "-request";
-        var paras = "window-" + popup + "parameters";
-        if( actionPara == undefined && outData == undefined )
+        var request = "window-" + popup + "-request",
+            paras = "window-" + popup + "parameters";
+        if( actionPara === undefined && outData === undefined )
         {
             // If both the parameters are undefined then the popup is refreshing
             // and we should set the parameters based on the stored values
@@ -48,7 +48,7 @@ function doAjax( actionPara, outData, popup )
         }
     }
     // Put all the data into one object
-    if( outData == undefined || outData == "" )
+    if( outData === undefined || outData === "" )
     {
         outData = {action: actionPara};
     }
@@ -58,9 +58,12 @@ function doAjax( actionPara, outData, popup )
     }
     // Perform the AJAX query
     $.ajax({
-       url: "ajaxhandler.php",
-       data: outData,
-       dataType: "script"
+        url: "ajaxhandler.php",
+        data: outData,
+        success: function( response ){
+            // Create the script element
+            eval( response );
+       }
     });
 }
 
