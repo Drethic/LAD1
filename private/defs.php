@@ -534,6 +534,10 @@ function clientfile_cache( $type, $base )
         $outBuffer = JSMin::minify( $outBuffer );
         $outBuffer = str_replace( "\n", '', $outBuffer );
     }
+    if( $type == 'C' )
+    {
+        $outBuffer = str_replace( "\n\n", "\n", $outBuffer );
+    }
     
     file_put_contents( $cacheFileName, $outBuffer );
 }
