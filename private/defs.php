@@ -176,7 +176,7 @@ function opt_getValidModules()
         'MATH' => array(),
         'CRAFTING' => array(),
         'TOWERD' => array('towerd'),
-        'JAVA' => array()
+        'JAVA' => array('java')
     );
 }
 
