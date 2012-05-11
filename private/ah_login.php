@@ -129,7 +129,21 @@ if( $action == 'login' )
 /*********************************** STEP 1b **********************************/
     else
     {
-        loadApplicableModules( $user, $result );
+        if( defined( 'ONLY_JAVA_LAD' ) )
+        {
+            $sock = preconnect_java();
+            $userid = $_SESSION[ 'ID' ];
+            fwrite( $sock, "login,\n" );
+            fwrite( $sock, "userid,$userid\n" );
+            fwrite( $sock, "end,transmission\n" );
+            fflush( $sock );
+
+            echo postwrite_java( $sock );
+        }
+        else
+        {
+            loadApplicableModules( $user, $result );
+        }
     }
 }
 /*********************************** STEP 2 ***********************************/

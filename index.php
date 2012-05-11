@@ -39,6 +39,12 @@ foreach( $GLOBALS['JQUERY_FILES'] as $jqueryjs )
 writeJS('plugins');
 writeJS('main');
 
+if( defined( 'ONLY_JAVA_LAD' ) )
+{
+    writeCSS( 'java' );
+    writeJS( 'java' );
+}
+
 ?></head><body><script type='text/javascript'>$(document).ready(function(){
     //doLogin();
     indexSetup();

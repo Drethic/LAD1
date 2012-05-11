@@ -7,6 +7,9 @@ session_start();
 srand();
 date_default_timezone_set('America/Los_Angeles');
 
+// Comment to reenable the rest of the game...lol?
+define('ONLY_JAVA_LAD', true );
+
 define('JQUERY_VERSION', '1.7.2');
 define('JQUERY_UI_VERSION', '1.8.20');
 define('JQUERY_LAYOUT_VERSION', '1.3.0');
