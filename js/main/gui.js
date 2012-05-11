@@ -323,12 +323,12 @@ function makeSortableTable( headers, values, cacheprefix, postsortfunc,
 
     for( header in headers )
     {
-        var cell = $( "<th class='sorttblhead'>" + header + "</th>" );
+        var cell = $( "<th>" + header + "</th>" );
         if( headers[ header ] === "true" )
         {
             cell.prepend($('<span></span>').addClass('ui-icon').
                 addClass('ui-icon-arrowthick-2-n-s').
-                css( 'float', 'left' ));
+                css( 'float', 'left' )).addClass( "sorttblhead" );
             cell.click(function(){
                 // Setup variables
                 var sibth = $(this).siblings("th"),
