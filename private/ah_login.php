@@ -51,6 +51,21 @@ function isValidEmail($email){
 function loadApplicableModules( $user, $result )
 {
     require_once( 'userdisabledmodules.php' );
+
+    // If we are only using Java, don't do anything else!
+    if( defined( 'ONLY_JAVA_LAD' ) )
+    {
+        $sock = preconnect_java();
+        $userid = $_SESSION[ 'ID' ];
+        fwrite( $sock, "login,\n" );
+        fwrite( $sock, "userid,$userid\n" );
+        fwrite( $sock, "end,transmission\n" );
+        fflush( $sock );
+
+        echo postwrite_java( $sock );
+        return;
+    }
+
     // Set up session vars
     $_SESSION[ 'ID' ] = $result[ 'ID' ];
     $_SESSION[ 'username' ] = $result[ 'NICK' ];
@@ -129,21 +144,7 @@ if( $action == 'login' )
 /*********************************** STEP 1b **********************************/
     else
     {
-        if( defined( 'ONLY_JAVA_LAD' ) )
-        {
-            $sock = preconnect_java();
-            $userid = $_SESSION[ 'ID' ];
-            fwrite( $sock, "login,\n" );
-            fwrite( $sock, "userid,$userid\n" );
-            fwrite( $sock, "end,transmission\n" );
-            fflush( $sock );
-
-            echo postwrite_java( $sock );
-        }
-        else
-        {
-            loadApplicableModules( $user, $result );
-        }
+        loadApplicableModules( $user, $result );
     }
 }
 /*********************************** STEP 2 ***********************************/
